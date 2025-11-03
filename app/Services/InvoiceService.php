@@ -41,10 +41,8 @@ class InvoiceService
     /**
      * Update invoice
      */
-    public function update(int $id, array $data): Invoice
+    public function update(Invoice $invoice, array $data): Invoice
     {
-        $invoice = $this->find($id);
-
         // Replace invoice items if provided
         if ($items = data_get($data, 'items')) {
             $invoice->invoiceItems()->delete();

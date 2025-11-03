@@ -55,7 +55,7 @@ class InvoiceController extends Controller
      */
     public function update(UpdateInvoiceRequest $request, Invoice $invoice, InvoiceService $invoiceService)
     {
-        $invoiceService->update($invoice->id, $request->validated());
+        $invoiceService->update($invoice, $request->validated());
 
         return redirect()
             ->back()

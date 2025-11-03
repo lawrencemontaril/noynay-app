@@ -3,7 +3,6 @@ import Button from '@/components/ui/button/Button.vue';
 import { Dialog, DialogFooter, DialogHeader, DialogScrollContent, DialogTitle } from '@/components/ui/dialog';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import Input from '@/components/ui/input/Input.vue';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useFormatters } from '@/composables/useFormatters';
 import { Appointment, Invoice, Patient } from '@/types';
 import { ALL_SERVICES } from '@/types/constants';
@@ -13,6 +12,7 @@ import { LoaderCircle, Plus } from 'lucide-vue-next';
 import { useFieldArray, useForm as useVeeForm } from 'vee-validate';
 import { watch } from 'vue';
 import * as z from 'zod';
+import DataCard from './DataCard.vue';
 import InputError from './InputError.vue';
 
 const props = defineProps<{
@@ -43,7 +43,6 @@ const itemSchema = z.object({
 const formSchema = toTypedSchema(
     z.object({
         appointment_id: z.number({ required_error: 'Appointment is required.' }),
-        status: z.enum(['unpaid', 'paid', 'cancelled']),
         items: z
             .array(itemSchema)
             .min(1, 'Add at least one item')
@@ -60,7 +59,6 @@ watch(
     () => {
         setValues({
             appointment_id: props.invoice?.appointment_id,
-            status: props.invoice?.status,
             items:
                 props.invoice?.invoice_items!.map((item) => ({
                     description: item.description,
@@ -99,7 +97,7 @@ const addItem = () => {
         :open="open"
         @update:open="closeDialog"
     >
-        <DialogScrollContent class="w-[768px]">
+        <DialogScrollContent>
             <DialogHeader>
                 <DialogTitle>Add item to invoice #{{ invoice?.id }}</DialogTitle>
             </DialogHeader>
@@ -110,51 +108,23 @@ const addItem = () => {
                     class="mb-4"
                 />
 
-                <div class="mb-4 grid grid-cols-2 gap-2">
-                    <div class="grid grid-cols-1 gap-2">
-                        <label class="border-b pb-1 text-xs font-semibold uppercase">Patient Name</label>
-                        <p class="text-sm">
+                <DataCard
+                    title="Patient Information"
+                    :columns="2"
+                >
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">Name</label>
+                        <p class="text-sm font-semibold">
                             {{ getFullName(patient.last_name, patient.first_name, patient.middle_name) }}
                         </p>
                     </div>
-
-                    <div class="grid grid-cols-1 gap-2">
-                        <label class="border-b pb-1 text-xs font-semibold uppercase">Service</label>
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">Service</label>
                         <p class="text-sm">
-                            {{ ALL_SERVICES.find((type) => type.value === appointment.type)?.label }}
+                            {{ ALL_SERVICES.find((service) => service.value === appointment?.type)?.label }}
                         </p>
                     </div>
-                </div>
-
-                <FormField
-                    v-slot="{ componentField }"
-                    name="status"
-                >
-                    <FormItem>
-                        <FormLabel required> Payment Status </FormLabel>
-
-                        <Select
-                            v-bind="componentField"
-                            disabled
-                        >
-                            <FormControl>
-                                <SelectTrigger class="w-full">
-                                    <SelectValue placeholder="Select status" />
-                                </SelectTrigger>
-                            </FormControl>
-
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem value="unpaid"> Unpaid </SelectItem>
-                                    <SelectItem value="paid"> Paid </SelectItem>
-                                    <SelectItem value="cancelled"> Cancelled </SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
+                </DataCard>
 
                 <FormField name="items">
                     <FormItem>

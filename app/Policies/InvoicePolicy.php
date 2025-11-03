@@ -37,7 +37,7 @@ class InvoicePolicy
      */
     public function update(User $user, Invoice $invoice): bool
     {
-        return $user->can('invoices:update');
+        return $user->can('invoices:update') || $user->can('invoice_items:create');
     }
 
     /**

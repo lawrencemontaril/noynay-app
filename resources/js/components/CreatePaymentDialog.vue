@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import Button from '@/components/ui/button/Button.vue';
-import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogScrollContent, DialogTitle } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogScrollContent,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import Input from '@/components/ui/input/Input.vue';
 import { useFormatters } from '@/composables/useFormatters';
@@ -11,6 +18,7 @@ import { LoaderCircle } from 'lucide-vue-next';
 import { useForm as useVeeForm } from 'vee-validate';
 import { watch } from 'vue';
 import * as z from 'zod';
+import DataCard from './DataCard.vue';
 import InputError from './InputError.vue';
 
 const props = defineProps<{
@@ -74,7 +82,7 @@ watch(
         :open="open"
         @update:open="closeDialog"
     >
-        <DialogScrollContent class="w-[768px]">
+        <DialogScrollContent>
             <DialogHeader>
                 <DialogTitle>Payment</DialogTitle>
                 <DialogDescription>Fill up patient payment details.</DialogDescription>
@@ -86,21 +94,23 @@ watch(
                     class="mb-4"
                 />
 
-                <div class="mb-4 grid grid-cols-2 gap-2">
-                    <div class="grid grid-cols-1 gap-2">
-                        <label class="border-b pb-1 text-xs font-semibold uppercase">Patient Name</label>
-                        <p class="text-sm">
+                <DataCard
+                    title="Patient Information"
+                    :columns="2"
+                >
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">Name</label>
+                        <p class="text-sm font-semibold">
                             {{ getFullName(patient.last_name, patient.first_name, patient.middle_name) }}
                         </p>
                     </div>
-
-                    <div class="grid grid-cols-1 gap-2">
-                        <label class="border-b pb-1 text-xs font-semibold uppercase">Amount Payable</label>
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">Amount Payable</label>
                         <p class="text-sm">
                             {{ formatCurrency(invoice?.balance ?? 0) }}
                         </p>
                     </div>
-                </div>
+                </DataCard>
 
                 <FormField
                     name="amount"

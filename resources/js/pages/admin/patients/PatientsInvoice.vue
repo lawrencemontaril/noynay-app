@@ -172,7 +172,9 @@ const downloadInvoice = async () => {
                     </Table>
 
                     <Button
-                        v-if="hasRole('cashier') && appointment.is_operatable"
+                        v-if="
+                            hasRole('cashier') && hasPermissionTo('invoice_items:create') && appointment.is_operatable
+                        "
                         @click="isCreateInvoiceItemDialogOpen = true"
                         class="mt-4 w-full"
                     >
@@ -180,12 +182,7 @@ const downloadInvoice = async () => {
                     </Button>
 
                     <Button
-                        v-if="
-                            invoice &&
-                            hasRole('doctor') &&
-                            hasPermissionTo('invoices:update') &&
-                            ['approved', 'completed'].includes(appointment.status)
-                        "
+                        v-if="hasRole('doctor') && hasPermissionTo('invoices:update') && appointment.is_operatable"
                         @click="isEditInvoiceDialogOpen = true"
                         class="mt-4 w-full"
                     >
@@ -225,11 +222,10 @@ const downloadInvoice = async () => {
 
                     <Button
                         v-if="
-                            invoice &&
-                            invoice?.balance > 0 &&
                             hasRole('cashier') &&
                             hasPermissionTo('payments:create') &&
-                            ['approved', 'completed'].includes(appointment.status)
+                            invoice?.balance > 0 &&
+                            appointment.is_operatable
                         "
                         @click="isCreatePaymentDialogOpen = true"
                         class="mt-4 w-full"
