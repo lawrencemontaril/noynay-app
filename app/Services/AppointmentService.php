@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use App\Models\LaboratoryResult;
 use App\Models\User;
 use App\Notifications\AppointmentApproved;
+use App\Notifications\AppointmentCompleted;
 use App\Notifications\AppointmentCreated;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
@@ -105,6 +106,7 @@ class AppointmentService
 
         $this->notifyCashiersOfAppointmentApprovals($appointment);
         $this->notifyPatientOfAppointmentCompletion($appointment);
+        $this->notifyPatientOfAppointmentApprovals($appointment);
 
         return $appointment;
     }
@@ -184,6 +186,16 @@ class AppointmentService
     protected function notifyPatientOfAppointmentCompletion(Appointment $appointment)
     {
         if ($appointment->wasChanged('status') && $appointment->status === 'completed') {
+            Notification::send($appointment->patient?->user, new AppointmentCompleted($appointment));
+        }
+    }
+
+    /**
+     * Notify patient of appointment approvals.
+     */
+    protected function notifyPatientOfAppointmentApprovals(Appointment $appointment)
+    {
+        if ($appointment->wasChanged('status') && $appointment->status === 'approved') {
             Notification::send($appointment->patient?->user, new AppointmentApproved($appointment));
         }
     }
