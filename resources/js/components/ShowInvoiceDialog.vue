@@ -12,6 +12,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { useFormatters } from '@/composables/useFormatters';
+import { usePermissions } from '@/composables/usePermissions';
 import { Invoice, Patient } from '@/types';
 import { INVOICE_STATUSES } from '@/types/constants';
 import { FileText, LoaderCircle } from 'lucide-vue-next';
@@ -26,6 +27,7 @@ const props = defineProps<{
 const emit = defineEmits(['update:open']);
 
 const { formatCurrency, getFullName } = useFormatters();
+const { hasAnyRole } = usePermissions();
 
 function closeDialog() {
     emit('update:open', false);
@@ -192,6 +194,7 @@ const downloadInvoice = async () => {
 
             <DialogFooter>
                 <Button
+                    v-if="hasAnyRole(['patient', 'cashier'])"
                     variant="destructive"
                     :disabled="isDownloading"
                     @click="downloadInvoice"

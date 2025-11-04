@@ -116,6 +116,7 @@ const downloadInvoice = async () => {
 
                     <div class="flex gap-2">
                         <Button
+                            v-if="hasRole('cashier')"
                             variant="destructive"
                             :disabled="isDownloading"
                             @click="downloadInvoice"
