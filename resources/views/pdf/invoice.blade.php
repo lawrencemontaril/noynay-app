@@ -124,6 +124,10 @@
             background-color: #f59e0b;
         }
 
+        .badge.partially_paid {
+            background-color: #f59e0b;
+        }
+
         .badge.approved {
             background-color: #3b82f6;
         }
@@ -163,10 +167,10 @@
         <p>
             <strong>Status:</strong>
             <span class="badge {{ $invoice->status }}">
-                {{ ucfirst($invoice->status) }}
+                {{ str_replace('_', ' ', ucfirst($invoice->status)) }}
             </span>
         </p>
-        <p><strong>Service:</strong> {{ str_replace('_', ' ', ucfirst($invoice->appointment->type)) }}</p>
+        <p><strong>Service:</strong> {{ App\Models\Appointment::TYPE_LABELS[$invoice->appointment->type] }}</p>
         <p><strong>Scheduled at:</strong> {{ $invoice->appointment->scheduled_at->format('F d, Y h:i A') }}</p>
     </div>
 
@@ -175,6 +179,7 @@
     <table class="table">
         <thead>
             <tr>
+                <th>#</th>
                 <th>Description</th>
                 <th class="right">Quantity</th>
                 <th class="right">Unit Price</th>
@@ -184,6 +189,7 @@
         <tbody>
             @foreach ($invoice->invoiceItems as $item)
                 <tr>
+                    <td>{{ $loop->iteration }}</td>
                     <td>{{ $item->description }}</td>
                     <td class="right">{{ $item->quantity }}</td>
                     <td class="right">{{ number_format($item->unit_price, 2) }}</td>
@@ -191,15 +197,15 @@
                 </tr>
             @endforeach
             <tr class="total-row">
-                <td colspan="3">Total</td>
+                <td class="right" colspan="4">Total</td>
                 <td class="right">{{ number_format($invoice->total, 2) }}</td>
             </tr>
             <tr>
-                <td colspan="3">Total Paid</td>
+                <td class="right" colspan="4">Total Paid</td>
                 <td class="right">{{ number_format($invoice->total_paid, 2) }}</td>
             </tr>
             <tr class="total-row">
-                <td colspan="3">Outstanding Balance</td>
+                <td class="right" colspan="4">Outstanding Balance</td>
                 <td class="right">{{ number_format($invoice->balance, 2) }}</td>
             </tr>
         </tbody>
