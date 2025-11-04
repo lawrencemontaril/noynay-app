@@ -2,7 +2,6 @@
 import {
     AlertDialog,
     AlertDialogContent,
-    AlertDialogDescription,
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
@@ -11,6 +10,7 @@ import Button from '@/components/ui/button/Button.vue';
 import { Patient } from '@/types';
 import { useForm as useInertiaForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+import DataCard from './DataCard.vue';
 
 interface Props {
     open: boolean;
@@ -26,8 +26,8 @@ const closeDialog = () => {
 
 const inertiaForm = useInertiaForm({});
 
-const deleteConsultation = () => {
-    inertiaForm.delete(route('admin.patients.destroy', props.patient?.id), {
+const restorePatient = () => {
+    inertiaForm.patch(route('admin.patients.restore', props.patient?.id), {
         onSuccess: () => {
             closeDialog();
         },
@@ -42,9 +42,12 @@ const deleteConsultation = () => {
     >
         <AlertDialogContent>
             <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure you want to archive this patient?</AlertDialogTitle>
-                <AlertDialogDescription>Archived records can be restored.</AlertDialogDescription>
+                <AlertDialogTitle>Are you sure you want to restore this patient?</AlertDialogTitle>
             </AlertDialogHeader>
+
+            <DataCard title="Archive date">
+                <p class="text-sm">{{ patient?.deleted_at?.formatted_date }}</p>
+            </DataCard>
 
             <AlertDialogFooter>
                 <Button
@@ -57,15 +60,14 @@ const deleteConsultation = () => {
 
                 <Button
                     type="submit"
-                    variant="secondary"
                     :disabled="inertiaForm.processing"
-                    @click="deleteConsultation"
+                    @click="restorePatient"
                 >
                     <LoaderCircle
                         v-if="inertiaForm.processing"
                         class="h-4 w-4 animate-spin"
                     />
-                    Archive patient
+                    Restore patient
                 </Button>
             </AlertDialogFooter>
         </AlertDialogContent>

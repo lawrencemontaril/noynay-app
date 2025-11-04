@@ -4,6 +4,7 @@ import CreatePatientDialog from '@/components/CreatePatientDialog.vue';
 import DeletePatientDialog from '@/components/DeletePatientDialog.vue';
 import EditPatientDialog from '@/components/EditPatientDialog.vue';
 import Pagination from '@/components/Pagination.vue';
+import RestorePatientDialog from '@/components/RestorePatientDialog.vue';
 import { Button } from '@/components/ui/button';
 import Input from '@/components/ui/input/Input.vue';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -13,7 +14,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, PaginatedData, Patient } from '@/types';
 import { Link, router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
-import { Eye, Pencil, Search, Trash, X } from 'lucide-vue-next';
+import { Archive, ArchiveRestore, Eye, Pencil, Search, X } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 
 const props = defineProps<{
@@ -21,6 +22,7 @@ const props = defineProps<{
     filters: {
         q: string;
         gender: string;
+        archived: number;
     };
 }>();
 
@@ -36,30 +38,35 @@ const selectedPatient = ref<Patient | null>(null);
 const isCreateDialogOpen = ref(false);
 const isEditDialogOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
+const isRestoreDialogOpen = ref(false);
 
 function openCreateDialog() {
     isCreateDialogOpen.value = true;
 }
 
 function openEditDialog(patient: Patient) {
-    if (!patient) return;
     selectedPatient.value = patient;
     isEditDialogOpen.value = true;
 }
 
 function openDeleteDialog(patient: Patient) {
-    if (!patient) return;
     selectedPatient.value = patient;
     isDeleteDialogOpen.value = true;
 }
 
+function openRestoreDialog(patient: Patient) {
+    selectedPatient.value = patient;
+    isRestoreDialogOpen.value = true;
+}
+
 const q = ref(props.filters.q ?? '');
 const gender = ref(props.filters.gender ?? 'all');
+const archived = ref(props.filters.archived ?? 0);
 
 const filterPatients = useDebounceFn(() => {
     router.get(
         route('admin.patients.index'),
-        { q: q.value, gender: gender.value },
+        { q: q.value, gender: gender.value, archived: archived.value },
         { preserveState: true, replace: true },
     );
 }, 400);
@@ -69,7 +76,7 @@ function clearSearch() {
     filterPatients();
 }
 
-watch([q, gender], () => filterPatients());
+watch([q, gender, archived], () => filterPatients());
 </script>
 
 <template>
@@ -129,9 +136,24 @@ watch([q, gender], () => filterPatients());
                                 </Select>
                             </TableHead>
                             <TableHead>Age</TableHead>
-                            <TableHead v-if="hasAnyPermissionTo(['patients:update', 'patients:delete'])"
-                                >Actions</TableHead
+                            <TableHead
+                                v-if="hasAnyPermissionTo(['patients:view', 'patients:update', 'patients:delete'])"
                             >
+                                <Select
+                                    v-model="archived"
+                                    :disabled="!hasPermissionTo('patients:delete')"
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Records" />
+                                    </SelectTrigger>
+                                    <SelectContent v-if="hasPermissionTo('patients:delete')">
+                                        <SelectGroup>
+                                            <SelectItem :value="0">Active records</SelectItem>
+                                            <SelectItem :value="1">Archived records</SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -160,7 +182,7 @@ watch([q, gender], () => filterPatients());
                             >
                                 <div class="flex items-center gap-2">
                                     <Button
-                                        v-if="hasPermissionTo('patients:view')"
+                                        v-if="hasPermissionTo('patients:view') && !patient.deleted_at"
                                         variant="info"
                                         size="icon"
                                         as-child
@@ -171,7 +193,7 @@ watch([q, gender], () => filterPatients());
                                     </Button>
 
                                     <Button
-                                        v-if="hasPermissionTo('patients:update')"
+                                        v-if="hasPermissionTo('patients:update') && !patient.deleted_at"
                                         @click="openEditDialog(patient)"
                                         variant="warning"
                                         size="icon"
@@ -180,12 +202,20 @@ watch([q, gender], () => filterPatients());
                                     </Button>
 
                                     <Button
-                                        v-if="hasPermissionTo('patients:delete')"
+                                        v-if="hasPermissionTo('patients:delete') && !patient.deleted_at"
                                         @click="openDeleteDialog(patient)"
-                                        variant="destructive"
+                                        variant="secondary"
                                         size="icon"
                                     >
-                                        <Trash />
+                                        <Archive />
+                                    </Button>
+
+                                    <Button
+                                        v-if="hasPermissionTo('patients:restore') && patient.deleted_at"
+                                        @click="openRestoreDialog(patient)"
+                                        size="icon"
+                                    >
+                                        <ArchiveRestore />
                                     </Button>
                                 </div>
                             </TableCell>
@@ -209,6 +239,11 @@ watch([q, gender], () => filterPatients());
 
                 <DeletePatientDialog
                     v-model:open="isDeleteDialogOpen"
+                    :patient="selectedPatient"
+                />
+
+                <RestorePatientDialog
+                    v-model:open="isRestoreDialogOpen"
                     :patient="selectedPatient"
                 />
 

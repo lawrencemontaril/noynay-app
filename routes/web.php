@@ -96,7 +96,9 @@ Route::prefix('admin')
                 Route::get('/patients/{patient}/appointments/{appointment}/laboratory_results', 'laboratoryResults')->name('patients.appointments.laboratory_results');
             });
             Route::post('patients', 'store')->name('patients.store');
+            Route::patch('patients/{patient}/restore', 'restore')->withTrashed()->name('patients.restore');
             Route::patch('patients/{patient}', 'update')->name('patients.update');
+            Route::delete('patients/{patient}/force', 'forceDestroy')->withTrashed()->name('patients.forceDestroy');
             Route::delete('patients/{patient}', 'destroy')->name('patients.destroy');
         });
 
@@ -106,10 +108,10 @@ Route::prefix('admin')
         Route::controller(AdminAppointmentController::class)->group(function () {
             Route::get('appointments', 'index')->name('appointments.index');
             Route::post('appointments', 'store')->name('appointments.store');
-            Route::patch('appointments/{appointment}/restore', 'restore')->withTrashed()->name('appointments.restore');
             Route::delete('appointments/{appointment}/force', 'forceDestroy')->withTrashed()->name('appointments.forceDestroy');
-            Route::patch('appointments/{appointment}', 'update')->name('appointments.update');
             Route::delete('appointments/{appointment}', 'destroy')->name('appointments.destroy');
+            Route::patch('appointments/{appointment}/restore', 'restore')->withTrashed()->name('appointments.restore');
+            Route::patch('appointments/{appointment}', 'update')->name('appointments.update');
         });
 
         /**

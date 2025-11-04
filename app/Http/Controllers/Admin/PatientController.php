@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Filters\PatientFilter;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
@@ -20,21 +21,15 @@ class PatientController extends Controller
     {
         Gate::authorize('viewAny', Patient::class);
 
-        $patients = Patient::with(['user'])
-            ->search(request('q'))
-            ->when(request()->filled('gender') && request('gender') !== 'all', fn ($q) =>
-                $q->where('gender', request('gender'))
-            )
-            ->when($request->filled('id') && $request->input('id') !== '', fn ($q) =>
-                $q->where('patients.id', $request->input('id'))
-            )
+        $patients = (new PatientFilter($request))
+            ->apply(Patient::with(['user']))
             ->orderBy('last_name')
             ->paginate(10)
             ->withQueryString();
 
         return Inertia::render('admin/patients/PatientsIndex', [
             'patients' => $patients->toResourceCollection(),
-            'filters' => $request->only(['q', 'gender', 'is_employed'])
+            'filters' => $request->only(['q', 'gender', 'is_employed', 'archived'])
         ]);
     }
 
@@ -165,7 +160,7 @@ class PatientController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Soft delete (archive) the specified resource from storage.
      */
     public function destroy(Patient $patient)
     {
@@ -173,7 +168,36 @@ class PatientController extends Controller
 
         $patient->delete();
 
-        return back()
-            ->with('success', 'Patient deleted successfully.');
+        return redirect()
+            ->back()
+            ->with('info', 'The patient has been archived.');
+    }
+
+    /**
+     * Restore the specified resource from storage.
+     */
+    public function restore(Patient $patient)
+    {
+        Gate::authorize('restore', $patient);
+
+        $patient->restore();
+
+        return redirect()
+            ->back()
+            ->with('success', 'Patient restored successfully.');
+    }
+
+    /**
+     * Restore the specified resource from storage.
+     */
+    public function forceDestroy(Patient $patient)
+    {
+        Gate::authorize('forceDelete', $patient);
+
+        $patient->forceDelete();
+
+        return redirect()
+            ->back()
+            ->with('success', 'Patient permanent deletion successful.');
     }
 }

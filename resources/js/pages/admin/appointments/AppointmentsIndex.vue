@@ -182,11 +182,14 @@ const statuses: {
                                     ])
                                 "
                             >
-                                <Select v-model="archived">
+                                <Select
+                                    v-model="archived"
+                                    :disabled="!hasPermissionTo('appointments:delete')"
+                                >
                                     <SelectTrigger>
-                                        Records: <SelectValue placeholder="Active records" />
+                                        <SelectValue placeholder="Records" />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent v-if="hasPermissionTo('appointments:delete')">
                                         <SelectGroup>
                                             <SelectItem :value="0">Active records</SelectItem>
                                             <SelectItem :value="1">Archived records</SelectItem>
@@ -241,7 +244,7 @@ const statuses: {
                             >
                                 <div class="flex items-center gap-2">
                                     <Button
-                                        v-if="hasPermissionTo('appointments:view')"
+                                        v-if="hasPermissionTo('appointments:view') && !appointment.deleted_at"
                                         variant="info"
                                         size="icon"
                                         as-child
@@ -260,7 +263,7 @@ const statuses: {
                                     </Button>
 
                                     <Button
-                                        v-if="hasPermissionTo('appointments:update')"
+                                        v-if="hasPermissionTo('appointments:update') && !appointment.deleted_at"
                                         @click="openEditDialog(appointment)"
                                         variant="warning"
                                         size="icon"

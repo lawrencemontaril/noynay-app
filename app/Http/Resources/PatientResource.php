@@ -26,6 +26,7 @@ class PatientResource extends PaginatedJsonResource
             'age' => AgeResource::make($this->birthdate),
             'contact_number' => $this->contact_number,
             'address' => $this->address,
+            'deleted_at' => DateTimeResource::make($this->deleted_at),
             'created_at' => DateTimeResource::make($this->created_at),
             'updated_at' => DateTimeResource::make($this->updated_at),
 

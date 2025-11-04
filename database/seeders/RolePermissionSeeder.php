@@ -14,9 +14,11 @@ class RolePermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        $permissions = [
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        $permissionsArray = [
             'users' => ['view_any', 'view', 'create', 'update', 'delete'],
-            'patients' => ['view_any', 'view', 'create', 'update', 'delete'],
+            'patients' => ['view_any', 'view', 'create', 'update', 'delete', 'restore', 'force_delete'],
             'appointments' => ['view_any', 'view', 'create', 'update', 'delete', 'restore', 'force_delete'],
             'consultations' => ['view_any', 'view', 'create', 'update', 'delete'],
             'laboratory_results' => ['view_any', 'view', 'create', 'update', 'delete'],
@@ -25,11 +27,16 @@ class RolePermissionSeeder extends Seeder
             'payments' => ['create', 'update', 'delete']
         ];
 
-        foreach ($permissions as $resource => $actions) {
-            foreach ($actions as $action) {
-                Permission::firstOrCreate(['name' => "$resource:$action"]);
-            }
-        }
+        $permissions = collect($permissionsArray)
+            ->map(fn ($actions, $resource) =>
+                [
+                    'name' => collect($actions)->map(fn ($action) => "$resource:$action"),
+                    'guard_name' => 'web'
+                ]
+            )
+            ->toArray();
+
+        Permission::insert($permissions);
 
         $rolePermissions = [
             'admin' => [
@@ -40,7 +47,7 @@ class RolePermissionSeeder extends Seeder
             ],
             'system_admin' => [
                 'users:view_any', 'users:view', 'users:create', 'users:update', 'users:delete',
-                'patients:view_any', 'patients:view', 'patients:create', 'patients:update', 'patients:delete',
+                'patients:view_any', 'patients:view', 'patients:create', 'patients:update', 'patients:delete', 'patients:restore',
             ],
             'cashier' => [
                 'patients:view_any', 'patients:view',

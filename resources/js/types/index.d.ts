@@ -115,6 +115,7 @@ export interface Patient {
     age: AgeResource;
     contact_number: string;
     address: string;
+    deleted_at: DateTimeResource | null;
     created_at: DateTimeResource;
     updated_at: DateTimeResource;
 

@@ -1,9 +1,10 @@
 <?php
 
 use App\Models\User;
+use function Pest\Laravel\{actingAs};
 
 test('login screen can be rendered', function () {
-    $response = $this->get('/login');
+    $response = $this->get(route('login'));
 
     $response->assertStatus(200);
 });
@@ -13,7 +14,7 @@ test('users can authenticate using the login screen', function () {
 
     $response = $this->post('/login', [
         'email' => $user->email,
-        'password' => '@Super123',
+        'password' => 'password',
     ]);
 
     $this->assertAuthenticated();

@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\ExcludeArchivedPatient;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use App\Observers\AppointmentObserver;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[ObservedBy(AppointmentObserver::class)]
+#[ScopedBy(ExcludeArchivedPatient::class)]
 class Appointment extends Model
 {
     use HasFactory, SoftDeletes;

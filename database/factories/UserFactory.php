@@ -13,11 +13,6 @@ use Illuminate\Support\Str;
 class UserFactory extends Factory
 {
     /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password = '@Super123';
-
-    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
@@ -33,10 +28,60 @@ class UserFactory extends Factory
             'last_name' => $last_name,
             'middle_name' => $middle_name,
             'email' => strtolower($first_name.'.'.$last_name).'@example.com',
-            'password' => Hash::make(static::$password ?? 'password'),
+            'password' => Hash::make('password'),
             'is_active' => true,
             'email_verified_at' => now(),
         ];
+    }
+
+    /**
+     * State for administrators (role: admin).
+     */
+    public function adminRole(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->syncRoles('admin');
+        });
+    }
+
+    /**
+     * State for system administrators (role: system_admin).
+     */
+    public function systemAdminRole(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->syncRoles('system_admin');
+        });
+    }
+
+    /**
+     * State for doctor staffs (role: doctor).
+     */
+    public function doctorRole(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->syncRoles('doctor');
+        });
+    }
+
+    /**
+     * State for laboratory staffs (role: laboratory_staff).
+     */
+    public function laboratoryStaffRole(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->syncRoles('laboratory_staff');
+        });
+    }
+
+    /**
+     * State for cashier staffs (role: cashier).
+     */
+    public function cashierRole(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->syncRoles('cashier');
+        });
     }
 
     /**
@@ -45,7 +90,7 @@ class UserFactory extends Factory
     public function patientRole(): static
     {
         return $this->afterCreating(function (User $user) {
-            $user->assignRole('patient');
+            $user->syncRoles('patient');
         });
     }
 

@@ -100,7 +100,7 @@ class PatientPolicy
      */
     public function restore(User $user, Patient $patient): bool
     {
-        return false;
+        return $user->can('patients:restore');
     }
 
     /**
@@ -108,6 +108,6 @@ class PatientPolicy
      */
     public function forceDelete(User $user, Patient $patient): bool
     {
-        return false;
+        return $user->can('patients:force_delete');
     }
 }
