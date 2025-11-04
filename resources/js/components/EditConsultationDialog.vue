@@ -44,7 +44,6 @@ const inertiaForm = useInertiaForm({
     respiratory_rate: 0,
     weight_kg: 0 as number | null | undefined,
     height_cm: 0 as number | null | undefined,
-    bmi: 0 as number | null | undefined,
     temperature_c: 0,
     oxygen_saturation: 0 as number | null | undefined,
     assessment: '' as string | null | undefined,

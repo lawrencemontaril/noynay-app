@@ -24,16 +24,16 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
-        $first = $this->faker->firstName();
-        $last = $this->faker->lastName();
-        $middle = $this->faker->optional()->firstName();
+        $first_name = $this->faker->firstName();
+        $last_name = $this->faker->lastName();
+        $middle_name = $this->faker->optional()->firstName();
 
         return [
-            'first_name' => $first,
-            'last_name' => $last,
-            'middle_name' => $middle,
-            'email' => strtolower($first.'.'.$last).'@example.com',
-            'password' => Hash::make('password'),
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'middle_name' => $middle_name,
+            'email' => strtolower($first_name.'.'.$last_name).'@example.com',
+            'password' => Hash::make(static::$password ?? 'password'),
             'is_active' => true,
             'email_verified_at' => now(),
         ];
