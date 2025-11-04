@@ -13,11 +13,12 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[ObservedBy(AppointmentObserver::class)]
 class Appointment extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /*
     |--------------------------------------------------------------------------
@@ -31,7 +32,7 @@ class Appointment extends Model
         'status',
         'scheduled_at',
     ];
-    
+
     protected function casts(): array
     {
         return [

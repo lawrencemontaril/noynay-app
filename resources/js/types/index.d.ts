@@ -163,6 +163,7 @@ export interface Appointment {
     is_cancellable: boolean;
     is_operatable: boolean;
     scheduled_at: DateTimeResource;
+    deleted_at: DateTimeResource | null;
     created_at: DateTimeResource;
     updated_at: DateTimeResource;
 

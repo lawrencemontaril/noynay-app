@@ -3,6 +3,7 @@ import Container from '@/components/Container.vue';
 import DeleteAppointmentDialog from '@/components/DeleteAppointmentDialog.vue';
 import EditAppointmentDialog from '@/components/EditAppointmentDialog.vue';
 import Pagination from '@/components/Pagination.vue';
+import RestoreAppointmentDialog from '@/components/RestoreAppointmentDialog.vue';
 import { Badge, type BadgeVariants } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Input from '@/components/ui/input/Input.vue';
@@ -15,12 +16,12 @@ import { Appointment, BreadcrumbItem, PaginatedData } from '@/types';
 import { ALL_SERVICES, LAB_TYPES } from '@/types/constants';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
-import { Eye, Pencil, Search, Trash, X } from 'lucide-vue-next';
+import { Archive, ArchiveRestore, Eye, Pencil, Search, X } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 
 const props = defineProps<{
     appointments: PaginatedData<Appointment>;
-    filters: { q: string; status: string; type: string };
+    filters: { q: string; status: string; type: string; archived: number };
 }>();
 
 const { hasPermissionTo, hasAnyPermissionTo } = usePermissions();
@@ -38,6 +39,7 @@ const user = computed(() => page.props.auth.user);
 const selectedAppointment = ref<Appointment | null>(null);
 const isEditDialogOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
+const isRestoreDialogOpen = ref(false);
 
 function openEditDialog(appointment: Appointment) {
     selectedAppointment.value = appointment;
@@ -47,6 +49,11 @@ function openEditDialog(appointment: Appointment) {
 function openDeleteDialog(appointment: Appointment) {
     selectedAppointment.value = appointment;
     isDeleteDialogOpen.value = true;
+}
+
+function openRestoreDialog(appointment: Appointment) {
+    selectedAppointment.value = appointment;
+    isRestoreDialogOpen.value = true;
 }
 
 const serviceOptions = computed(() => {
@@ -63,9 +70,14 @@ const serviceOptions = computed(() => {
 const q = ref(props.filters.q ?? '');
 const status = ref(props.filters.status ?? 'all');
 const type = ref(props.filters.type ?? 'all');
+const archived = ref(props.filters.archived ?? 0);
 
 const filterAppointments = useDebounceFn(() => {
-    router.get(route('admin.appointments.index'), { q: q.value, status: status.value, type: type.value }, { preserveState: true, replace: true });
+    router.get(
+        route('admin.appointments.index'),
+        { q: q.value, status: status.value, type: type.value, archived: archived.value },
+        { preserveState: true, replace: true },
+    );
 }, 400);
 
 function clearSearch() {
@@ -73,7 +85,7 @@ function clearSearch() {
     filterAppointments();
 }
 
-watch([q, status, type], () => filterAppointments());
+watch([q, status, type, archived], () => filterAppointments());
 
 const statuses: {
     label: string;
@@ -99,8 +111,8 @@ const statuses: {
                     <Search class="absolute left-2 size-4 shrink-0 stroke-secondary-foreground" />
 
                     <Input
+                        @keydown.enter.prevent
                         v-model="q"
-                        name="q"
                         class="pl-8"
                         placeholder="Search for patients"
                     />
@@ -161,8 +173,26 @@ const statuses: {
                                 </Select>
                             </TableHead>
 
-                            <TableHead v-if="hasAnyPermissionTo(['appointments:view', 'appointments:update', 'appointments:delete'])">
-                                Actions
+                            <TableHead
+                                v-if="
+                                    hasAnyPermissionTo([
+                                        'appointments:view',
+                                        'appointments:update',
+                                        'appointments:delete',
+                                    ])
+                                "
+                            >
+                                <Select v-model="archived">
+                                    <SelectTrigger>
+                                        Records: <SelectValue placeholder="Active records" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem :value="0">Active records</SelectItem>
+                                            <SelectItem :value="1">Archived records</SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
                             </TableHead>
                         </TableRow>
                     </TableHeader>
@@ -175,13 +205,23 @@ const statuses: {
                             <TableCell>{{ (appointments.meta.from_index ?? 0) + index }}</TableCell>
 
                             <TableCell>
-                                {{ getFullName(appointment.patient!.last_name, appointment.patient!.first_name, appointment.patient!.middle_name) }}
+                                {{
+                                    getFullName(
+                                        appointment.patient!.last_name,
+                                        appointment.patient!.first_name,
+                                        appointment.patient!.middle_name,
+                                    )
+                                }}
                             </TableCell>
 
                             <TableCell>{{ appointment.scheduled_at.formatted_date }}</TableCell>
 
                             <TableCell class="max-w-48 truncate">
-                                {{ serviceOptions.find((service) => service.value === appointment.type)?.label || appointment.type || 'N/A' }}
+                                {{
+                                    serviceOptions.find((service) => service.value === appointment.type)?.label ||
+                                    appointment.type ||
+                                    'N/A'
+                                }}
                             </TableCell>
 
                             <TableCell>
@@ -190,7 +230,15 @@ const statuses: {
                                 </Badge>
                             </TableCell>
 
-                            <TableCell v-if="hasAnyPermissionTo(['appointments:view', 'appointments:update', 'appointments:delete'])">
+                            <TableCell
+                                v-if="
+                                    hasAnyPermissionTo([
+                                        'appointments:view',
+                                        'appointments:update',
+                                        'appointments:delete',
+                                    ])
+                                "
+                            >
                                 <div class="flex items-center gap-2">
                                     <Button
                                         v-if="hasPermissionTo('appointments:view')"
@@ -221,12 +269,20 @@ const statuses: {
                                     </Button>
 
                                     <Button
-                                        v-if="hasPermissionTo('appointments:delete')"
+                                        v-if="hasPermissionTo('appointments:delete') && !appointment.deleted_at"
                                         @click="openDeleteDialog(appointment)"
-                                        variant="destructive"
+                                        variant="secondary"
                                         size="icon"
                                     >
-                                        <Trash />
+                                        <Archive />
+                                    </Button>
+
+                                    <Button
+                                        v-if="hasPermissionTo('appointments:restore') && appointment.deleted_at"
+                                        @click="openRestoreDialog(appointment)"
+                                        size="icon"
+                                    >
+                                        <ArchiveRestore />
                                     </Button>
                                 </div>
                             </TableCell>
@@ -249,6 +305,11 @@ const statuses: {
 
                 <DeleteAppointmentDialog
                     v-model:open="isDeleteDialogOpen"
+                    :appointment="selectedAppointment"
+                />
+
+                <RestoreAppointmentDialog
+                    v-model:open="isRestoreDialogOpen"
                     :appointment="selectedAppointment"
                 />
 

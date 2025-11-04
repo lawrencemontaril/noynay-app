@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use App\Observers\LaboratoryResultObserver;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use App\Models\Scopes\ExcludeArchivedAppointment;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 #[ObservedBy(LaboratoryResultObserver::class)]
+#[ScopedBy([ExcludeArchivedAppointment::class])]
 class LaboratoryResult extends Model
 {
     /*

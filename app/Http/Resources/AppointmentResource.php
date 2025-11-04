@@ -21,6 +21,7 @@ class AppointmentResource extends PaginatedJsonResource
             'is_cancellable' => $this->is_cancellable,
             'is_operatable' => $this->is_operatable,
             'scheduled_at' => DateTimeResource::make($this->scheduled_at),
+            'deleted_at' => DateTimeResource::make($this->deleted_at),
             'created_at' => DateTimeResource::make($this->created_at),
             'updated_at' => DateTimeResource::make($this->updated_at),
 

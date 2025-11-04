@@ -59,7 +59,7 @@ class AppointmentPolicy
      */
     public function restore(User $user, Appointment $appointment): bool
     {
-        return false;
+        return $user->can('appointments:restore');
     }
 
     /**
@@ -67,6 +67,6 @@ class AppointmentPolicy
      */
     public function forceDelete(User $user, Appointment $appointment): bool
     {
-        return false;
+        return $user->can('appointments:force_delete');
     }
 }

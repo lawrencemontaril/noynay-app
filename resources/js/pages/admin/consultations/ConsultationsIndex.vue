@@ -69,8 +69,8 @@ watch([q], () => filterConsultations());
                     <Search class="absolute left-2 size-4 shrink-0 stroke-secondary-foreground" />
 
                     <Input
+                        @keydown.enter.prevent
                         v-model="q"
-                        name="q"
                         class="pl-8"
                         placeholder="Search for patients"
                     />
@@ -96,7 +96,15 @@ watch([q], () => filterConsultations());
                             <TableHead>Age</TableHead>
                             <TableHead>Blood Pressure</TableHead>
                             <TableHead>Heart Rate</TableHead>
-                            <TableHead v-if="hasAnyPermissionTo(['consultations:view', 'consultations:update', 'consultations:delete'])">
+                            <TableHead
+                                v-if="
+                                    hasAnyPermissionTo([
+                                        'consultations:view',
+                                        'consultations:update',
+                                        'consultations:delete',
+                                    ])
+                                "
+                            >
                                 Actions
                             </TableHead>
                         </TableRow>
@@ -122,12 +130,26 @@ watch([q], () => filterConsultations());
                             <TableCell>{{ consultation.appointment?.patient?.age.formatted_long }}</TableCell>
 
                             <TableCell>
-                                {{ consultation.systolic && consultation.diastolic ? `${consultation?.systolic}/${consultation?.diastolic}` : 'N/A' }}
+                                {{
+                                    consultation.systolic && consultation.diastolic
+                                        ? `${consultation?.systolic}/${consultation?.diastolic}`
+                                        : 'N/A'
+                                }}
                             </TableCell>
 
-                            <TableCell>{{ consultation?.heart_rate ? `${consultation?.heart_rate}bpm` : 'N/A' }}</TableCell>
+                            <TableCell>{{
+                                consultation?.heart_rate ? `${consultation?.heart_rate}bpm` : 'N/A'
+                            }}</TableCell>
 
-                            <TableCell v-if="hasAnyPermissionTo(['consultations:view', 'consultations:update', 'consultations:delete'])">
+                            <TableCell
+                                v-if="
+                                    hasAnyPermissionTo([
+                                        'consultations:view',
+                                        'consultations:update',
+                                        'consultations:delete',
+                                    ])
+                                "
+                            >
                                 <div class="flex items-center gap-2">
                                     <Button
                                         v-if="hasPermissionTo('consultations:view')"

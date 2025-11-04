@@ -51,7 +51,11 @@ const q = ref(props.filters.q ?? '');
 const status = ref(props.filters.status ?? 'all');
 
 const filterInvoices = useDebounceFn(() => {
-    router.get(route('admin.invoices.index'), { q: q.value, status: status.value }, { preserveState: true, replace: true });
+    router.get(
+        route('admin.invoices.index'),
+        { q: q.value, status: status.value },
+        { preserveState: true, replace: true },
+    );
 }, 400);
 
 function clearSearch() {
@@ -84,6 +88,7 @@ const statuses: {
                     <Search class="absolute left-2 size-4 shrink-0 stroke-secondary-foreground" />
 
                     <Input
+                        @keydown.enter.prevent
                         v-model="q"
                         class="pl-8"
                         placeholder="Search for patients"
@@ -132,7 +137,11 @@ const statuses: {
 
                             <TableHead>Total</TableHead>
 
-                            <TableHead v-if="hasAnyPermissionTo(['invoices:view', 'invoices:update', 'invoices:delete'])"> Actions </TableHead>
+                            <TableHead
+                                v-if="hasAnyPermissionTo(['invoices:view', 'invoices:update', 'invoices:delete'])"
+                            >
+                                Actions
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -163,7 +172,9 @@ const statuses: {
                                 {{ formatCurrency(invoice.total) }}
                             </TableCell>
 
-                            <TableCell v-if="hasAnyPermissionTo(['invoices:view', 'invoices:update', 'invoices:delete'])">
+                            <TableCell
+                                v-if="hasAnyPermissionTo(['invoices:view', 'invoices:update', 'invoices:delete'])"
+                            >
                                 <div class="flex items-center gap-2">
                                     <Button
                                         v-if="hasPermissionTo('invoices:view')"

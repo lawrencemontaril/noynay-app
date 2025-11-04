@@ -17,7 +17,7 @@ class RolePermissionSeeder extends Seeder
         $permissions = [
             'users' => ['view_any', 'view', 'create', 'update', 'delete'],
             'patients' => ['view_any', 'view', 'create', 'update', 'delete'],
-            'appointments' => ['view_any', 'view', 'create', 'update', 'delete'],
+            'appointments' => ['view_any', 'view', 'create', 'update', 'delete', 'restore', 'force_delete'],
             'consultations' => ['view_any', 'view', 'create', 'update', 'delete'],
             'laboratory_results' => ['view_any', 'view', 'create', 'update', 'delete'],
             'invoices' => ['view_any', 'view', 'create', 'update', 'delete'],
@@ -35,7 +35,7 @@ class RolePermissionSeeder extends Seeder
             'admin' => [
                 'users:view_any', 'users:view',
                 'patients:view_any', 'patients:view',
-                'appointments:view_any', 'appointments:view', 'appointments:update', 'appointments:delete',
+                'appointments:view_any', 'appointments:view', 'appointments:update', 'appointments:delete', 'appointments:restore',
                 'invoices:view_any', 'invoices:view',
             ],
             'system_admin' => [

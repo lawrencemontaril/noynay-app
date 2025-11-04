@@ -89,8 +89,8 @@ const laboratoryResultStatusBadgeMap: Record<LaboratoryResult['status'], BadgeVa
                     <Search class="absolute left-2 size-4 shrink-0 stroke-secondary-foreground" />
 
                     <Input
+                        @keydown.enter.prevent
                         v-model="q"
-                        name="q"
                         class="pl-8"
                         placeholder="Search for patients"
                     />
@@ -152,7 +152,13 @@ const laboratoryResultStatusBadgeMap: Record<LaboratoryResult['status'], BadgeVa
                             </TableHead>
 
                             <TableHead
-                                v-if="hasAnyPermissionTo(['laboratory_results:view', 'laboratory_results:update', 'laboratory_results:delete'])"
+                                v-if="
+                                    hasAnyPermissionTo([
+                                        'laboratory_results:view',
+                                        'laboratory_results:update',
+                                        'laboratory_results:delete',
+                                    ])
+                                "
                             >
                                 Actions
                             </TableHead>
@@ -177,7 +183,11 @@ const laboratoryResultStatusBadgeMap: Record<LaboratoryResult['status'], BadgeVa
                             </TableCell>
 
                             <TableCell class="max-w-48 truncate capitalize">
-                                {{ LAB_TYPES.find((type) => type.value === laboratory_result.type)?.label || laboratory_result.type || 'N/A' }}
+                                {{
+                                    LAB_TYPES.find((type) => type.value === laboratory_result.type)?.label ||
+                                    laboratory_result.type ||
+                                    'N/A'
+                                }}
                             </TableCell>
 
                             <TableCell class="capitalize">
@@ -187,7 +197,13 @@ const laboratoryResultStatusBadgeMap: Record<LaboratoryResult['status'], BadgeVa
                             </TableCell>
 
                             <TableCell
-                                v-if="hasAnyPermissionTo(['laboratory_results:view', 'laboratory_results:update', 'laboratory_results:delete'])"
+                                v-if="
+                                    hasAnyPermissionTo([
+                                        'laboratory_results:view',
+                                        'laboratory_results:update',
+                                        'laboratory_results:delete',
+                                    ])
+                                "
                             >
                                 <div class="flex items-center gap-2">
                                     <Button

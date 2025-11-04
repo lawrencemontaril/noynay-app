@@ -48,6 +48,11 @@ class AppointmentFilter
                 if ($this->request->filled('type') && $this->request->input('type') !== 'all') {
                     $q->where('type', $this->request->input('type'));
                 }
+            })
+            ->when($this->user->can('appointments:delete'), function ($q): void {
+                if ($this->request->boolean('archived')) {
+                    $q->onlyTrashed();
+                }
             });
     }
 }

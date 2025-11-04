@@ -28,7 +28,7 @@ class AppointmentController extends Controller
 
         return Inertia::render('admin/appointments/AppointmentsIndex', [
             'appointments' => $appointments->toResourceCollection(),
-            'filters' => $request->only(['q', 'status', 'type'])
+            'filters' => $request->only(['q', 'status', 'type', 'archived'])
         ]);
     }
 
@@ -71,7 +71,7 @@ class AppointmentController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Soft delete (archive) the specified resource from storage.
      */
     public function destroy(Appointment $appointment)
     {
@@ -81,6 +81,34 @@ class AppointmentController extends Controller
 
         return redirect()
             ->back()
-            ->with('success', 'Appointment deleted successfully');
+            ->with('info', 'The appointment has been archived.');
+    }
+
+    /**
+     * Restore the specified resource from storage.
+     */
+    public function restore(Appointment $appointment)
+    {
+        Gate::authorize('restore', $appointment);
+
+        $appointment->restore();
+
+        return redirect()
+            ->back()
+            ->with('success', 'Appointment restored successfully.');
+    }
+
+    /**
+     * Permanently delete the specified resource from storage.
+     */
+    public function forceDestroy(Appointment $appointment)
+    {
+        Gate::authorize('forceDelete', $appointment);
+
+        $appointment->forceDelete();
+
+        return redirect()
+            ->back()
+            ->with('success', 'Appointment permanent deletion successful.');
     }
 }

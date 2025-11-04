@@ -57,7 +57,11 @@ const q = ref(props.filters.q ?? '');
 const gender = ref(props.filters.gender ?? 'all');
 
 const filterPatients = useDebounceFn(() => {
-    router.get(route('admin.patients.index'), { q: q.value, gender: gender.value }, { preserveState: true, replace: true });
+    router.get(
+        route('admin.patients.index'),
+        { q: q.value, gender: gender.value },
+        { preserveState: true, replace: true },
+    );
 }, 400);
 
 function clearSearch() {
@@ -87,8 +91,8 @@ watch([q, gender], () => filterPatients());
                     <Search class="absolute left-2 size-4 shrink-0 stroke-secondary-foreground" />
 
                     <Input
+                        @keydown.enter.prevent
                         v-model="q"
-                        name="q"
                         class="pl-8"
                         placeholder="Search for patients"
                     />
@@ -125,7 +129,9 @@ watch([q, gender], () => filterPatients());
                                 </Select>
                             </TableHead>
                             <TableHead>Age</TableHead>
-                            <TableHead v-if="hasAnyPermissionTo(['patients:update', 'patients:delete'])">Actions</TableHead>
+                            <TableHead v-if="hasAnyPermissionTo(['patients:update', 'patients:delete'])"
+                                >Actions</TableHead
+                            >
                         </TableRow>
                     </TableHeader>
 
@@ -137,7 +143,8 @@ watch([q, gender], () => filterPatients());
                             <TableCell>{{ (patients.meta.from_index ?? 0) + index }}</TableCell>
 
                             <TableCell>
-                                {{ patient.last_name }}, {{ patient.first_name }} {{ patient.middle_name ? `${patient.middle_name[0]}.` : '' }}
+                                {{ patient.last_name }}, {{ patient.first_name }}
+                                {{ patient.middle_name ? `${patient.middle_name[0]}.` : '' }}
                             </TableCell>
 
                             <TableCell class="capitalize">
@@ -148,7 +155,9 @@ watch([q, gender], () => filterPatients());
                                 {{ patient.age.formatted_short }}
                             </TableCell>
 
-                            <TableCell v-if="hasAnyPermissionTo(['patients:view', 'patients:update', 'patients:delete'])">
+                            <TableCell
+                                v-if="hasAnyPermissionTo(['patients:view', 'patients:update', 'patients:delete'])"
+                            >
                                 <div class="flex items-center gap-2">
                                     <Button
                                         v-if="hasPermissionTo('patients:view')"

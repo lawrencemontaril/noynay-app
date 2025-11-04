@@ -2,7 +2,6 @@
 import {
     AlertDialog,
     AlertDialogContent,
-    AlertDialogDescription,
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
@@ -11,6 +10,7 @@ import Button from '@/components/ui/button/Button.vue';
 import { Appointment } from '@/types';
 import { useForm as useInertiaForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+import DataCard from './DataCard.vue';
 
 interface Props {
     open: boolean;
@@ -26,8 +26,8 @@ const closeDialog = () => {
 
 const inertiaForm = useInertiaForm({});
 
-const deleteAppointment = () => {
-    inertiaForm.delete(route('admin.appointments.destroy', props.appointment?.id), {
+const restoreAppointment = () => {
+    inertiaForm.patch(route('admin.appointments.restore', props.appointment?.id), {
         onSuccess: () => {
             closeDialog();
         },
@@ -42,9 +42,12 @@ const deleteAppointment = () => {
     >
         <AlertDialogContent>
             <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure you want to archive this appointment?</AlertDialogTitle>
-                <AlertDialogDescription>Archived records can be restored.</AlertDialogDescription>
+                <AlertDialogTitle>Are you sure you want to restore this appointment?</AlertDialogTitle>
             </AlertDialogHeader>
+
+            <DataCard title="Archive date">
+                <p class="text-sm">{{ appointment?.deleted_at?.formatted_date }}</p>
+            </DataCard>
 
             <AlertDialogFooter>
                 <Button
@@ -57,15 +60,14 @@ const deleteAppointment = () => {
 
                 <Button
                     type="submit"
-                    variant="secondary"
                     :disabled="inertiaForm.processing"
-                    @click="deleteAppointment"
+                    @click="restoreAppointment"
                 >
                     <LoaderCircle
                         v-if="inertiaForm.processing"
                         class="h-4 w-4 animate-spin"
                     />
-                    Archive appointment
+                    Restore appointment
                 </Button>
             </AlertDialogFooter>
         </AlertDialogContent>

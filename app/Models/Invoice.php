@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use App\Observers\InvoiceObserver;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use App\Models\Scopes\ExcludeArchivedAppointment;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 #[ObservedBy(InvoiceObserver::class)]
+#[ScopedBy([ExcludeArchivedAppointment::class])]
 class Invoice extends Model
 {
     use HasFactory;
