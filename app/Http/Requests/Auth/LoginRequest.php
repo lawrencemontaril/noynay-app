@@ -51,7 +51,7 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        if (! $user->is_active) {
+        if (! $user->is_active || $user->patient?->trashed()) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

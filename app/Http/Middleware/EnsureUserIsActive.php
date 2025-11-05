@@ -16,12 +16,13 @@ class EnsureUserIsActive
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && ! Auth::user()->is_active) {
+        $user = Auth::user();
+
+        if ($user && (! $user->is_active || $user->patient?->trashed())) {
             Auth::guard('web')->logout();
 
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-            $request->session()->forget('url.intended');
 
             return redirect()
                 ->route('login')

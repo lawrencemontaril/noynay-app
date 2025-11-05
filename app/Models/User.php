@@ -52,7 +52,7 @@ class User extends Authenticatable
     */
     public function patient(): HasOne
     {
-        return $this->hasOne(Patient::class)->withDefault();
+        return $this->hasOne(Patient::class)->withTrashed();
     }
 
     public function appointments(): HasMany
