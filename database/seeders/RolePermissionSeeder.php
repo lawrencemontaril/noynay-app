@@ -17,7 +17,7 @@ class RolePermissionSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         $permissionsArray = [
-            'users' => ['view_any', 'view', 'create', 'update', 'delete'],
+            'users' => ['view_any', 'view', 'create', 'update'],
             'patients' => ['view_any', 'view', 'create', 'update', 'delete', 'restore', 'force_delete'],
             'appointments' => ['view_any', 'view', 'create', 'update', 'delete', 'restore', 'force_delete'],
             'consultations' => ['view_any', 'view', 'create', 'update', 'delete'],
@@ -36,7 +36,11 @@ class RolePermissionSeeder extends Seeder
             )
             ->toArray();
 
-        Permission::insert($permissions);
+        // Delete permissions removed from the array
+        Permission::whereNotIn('name', collect($permissions)->pluck('name'))->delete();
+
+        // And insert new ones...
+        Permission::upsert($permissions, ['name'], ['guard_name']);
 
         $rolePermissions = [
             'admin' => [
@@ -46,7 +50,7 @@ class RolePermissionSeeder extends Seeder
                 'invoices:view_any', 'invoices:view',
             ],
             'system_admin' => [
-                'users:view_any', 'users:view', 'users:create', 'users:update', 'users:delete',
+                'users:view_any', 'users:view', 'users:create', 'users:update',
                 'patients:view_any', 'patients:view', 'patients:create', 'patients:update', 'patients:delete', 'patients:restore',
             ],
             'cashier' => [

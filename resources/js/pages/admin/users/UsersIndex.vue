@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Container from '@/components/Container.vue';
 import CreateUserDialog from '@/components/CreateUserDialog.vue';
-import DeleteUserDialog from '@/components/DeleteUserDialog.vue';
+// import DeleteUserDialog from '@/components/DeleteUserDialog.vue';
 import EditUserDialog from '@/components/EditUserDialog.vue';
 import Pagination from '@/components/Pagination.vue';
 import Badge from '@/components/ui/badge/Badge.vue';
@@ -189,7 +189,7 @@ watch([q, role, is_active], () => filterUsers());
                                 </Button>
 
                                 <Button
-                                    v-if="hasPermissionTo('users:update')"
+                                    v-if="hasPermissionTo('users:delete')"
                                     @click="openDeleteDialog(user)"
                                     variant="destructive"
                                     size="icon"
@@ -215,10 +215,10 @@ watch([q, role, is_active], () => filterUsers());
                     :user="selectedUser"
                 />
 
-                <DeleteUserDialog
+                <!-- <DeleteUserDialog
                     v-model:open="isDeleteDialogOpen"
                     :user="selectedUser"
-                />
+                /> -->
 
                 <Pagination :meta="users.meta" />
             </div>
