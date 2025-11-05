@@ -81,9 +81,6 @@ const submit = handleSubmit((validatedValues) => {
                         <FormControl>
                             <Input
                                 v-bind="componentField"
-                                v-model="values.email"
-                                id="email"
-                                type="email"
                                 autofocus
                                 autocomplete="email"
                                 :tabindex="1"
@@ -115,8 +112,6 @@ const submit = handleSubmit((validatedValues) => {
                         <FormControl>
                             <Input
                                 v-bind="componentField"
-                                v-model="values.password"
-                                id="password"
                                 type="password"
                                 autocomplete="current-password"
                                 :tabindex="2"

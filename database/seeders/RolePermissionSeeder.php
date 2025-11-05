@@ -28,11 +28,11 @@ class RolePermissionSeeder extends Seeder
         ];
 
         $permissions = collect($permissionsArray)
-            ->map(fn ($actions, $resource) =>
-                [
-                    'name' => collect($actions)->map(fn ($action) => "$resource:$action"),
-                    'guard_name' => 'web'
-                ]
+            ->flatMap(fn ($actions, $resource) =>
+                collect($actions)->map(fn ($action) => [
+                    'name' => "$resource:$action",
+                    'guard_name' => 'web',
+                ])
             )
             ->toArray();
 

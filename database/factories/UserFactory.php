@@ -28,6 +28,7 @@ class UserFactory extends Factory
             'last_name' => $last_name,
             'middle_name' => $middle_name,
             'email' => strtolower($first_name.'.'.$last_name).'@example.com',
+            'remember_token' => Str::random(10),
             'password' => Hash::make('password'),
             'is_active' => true,
             'email_verified_at' => now(),
