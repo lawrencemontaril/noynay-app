@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RescheduleAppointmentRequest;
 use App\Services\AppointmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Appointment;
 use Inertia\Inertia;
 use App\Http\Requests\StoreAppointmentRequest;
-use App\Http\Requests\UpdateAppointmentRequest;
+use App\Events\AppointmentRescheduledEvent;
+use App\Events\AppointmentCancelledEvent;
 
 class AppointmentController extends Controller
 {
@@ -25,8 +27,8 @@ class AppointmentController extends Controller
             ->when($request->filled('status') && $request->input('status') !== 'all', fn ($q) =>
                 $q->where('status', $request->input('status'))
             )
-            ->when($request->filled('service') && $request->input('service') !== 'all', fn ($q) =>
-                $q->where('service', $request->input('service'))
+            ->when($request->filled('type') && $request->input('type') !== 'all', fn ($q) =>
+                $q->where('type', $request->input('type'))
             )
             ->when($request->filled('id') && $request->input('id') !== '', fn ($q) =>
                 $q->where('appointments.id', $request->input('id'))
@@ -84,26 +86,30 @@ class AppointmentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateAppointmentRequest $request, Appointment $appointment, AppointmentService $appointmentService)
+    public function reschedule(RescheduleAppointmentRequest $request, Appointment $appointment, AppointmentService $appointmentService)
     {
-        $appointmentService->update($appointment->id, $request->validated());
+        $appointmentService->reschedule($appointment, $request->validated());
+
+        event(new AppointmentRescheduledEvent($appointment));
 
         return redirect()
             ->route('appointments.index')
-            ->with('success', 'Appointment updated successfully.');
+            ->with('success', 'Your appointment has been rescheduled.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Cancel an appointment
      */
-    public function destroy(Appointment $appointment)
+    public function cancel(Appointment $appointment, AppointmentService $appointmentService)
     {
-        Gate::authorize('delete', $appointment);
+        Gate::authorize('update', $appointment);
 
-        $appointment->delete();
+        $appointmentService->cancel($appointment);
+
+        event(new AppointmentCancelledEvent($appointment));
 
         return redirect()
             ->route('appointments.index')
-            ->with('success', 'Appointment deleted successfully');
+            ->with('success', 'Your appointment has been cancelled.');
     }
 }

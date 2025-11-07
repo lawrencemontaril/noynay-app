@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ActivityTimeline from '@/components/ActivityTimeline.vue';
 import DataCard from '@/components/DataCard.vue';
 import EditAppointmentDialog from '@/components/EditAppointmentDialog.vue';
 import PatientProfileTabs from '@/components/PatientProfileTabs.vue';
@@ -9,14 +10,15 @@ import { useFormatters } from '@/composables/useFormatters';
 import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import PatientAppointmentLayout from '@/layouts/PatientAppointmentLayout.vue';
-import { Appointment, BreadcrumbItem, Patient } from '@/types';
-import { ALL_SERVICES } from '@/types/constants';
+import { Activity, Appointment, BreadcrumbItem, Patient } from '@/types';
+import { ALL_SERVICES, APPOINTMENT_STATUSES } from '@/types/constants';
 import { Pencil } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
 const props = defineProps<{
     patient: Patient;
     appointment: Appointment;
+    activities?: Activity[];
 }>();
 
 const { hasPermissionTo } = usePermissions();
@@ -45,16 +47,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const isEditDialogOpen = ref(false);
-
-const statuses: Record<Appointment['status'], { label: string; badge: 'default' | 'warning' | 'destructive' }> = {
-    pending: { label: 'Pending', badge: 'warning' },
-    approved: { label: 'Approved', badge: 'default' },
-    completed: { label: 'Completed', badge: 'default' },
-    rejected: { label: 'Rejected', badge: 'destructive' },
-    cancelled: { label: 'Cancelled', badge: 'destructive' },
-};
-
-const appointmentStatus = computed(() => statuses[props.appointment.status]);
 </script>
 
 <template>
@@ -72,10 +64,12 @@ const appointmentStatus = computed(() => statuses[props.appointment.status]);
                         <CardTitle class="inline-flex items-center gap-2 text-xl font-semibold capitalize">
                             {{ ALL_SERVICES.find((service) => service.value === appointment.type)?.label }} appointment
                             <Badge
-                                :variant="appointmentStatus.badge"
+                                :variant="
+                                    APPOINTMENT_STATUSES.find((status) => status.value === appointment.status)?.badge
+                                "
                                 class="capitalize"
                             >
-                                {{ appointment.status }}
+                                {{ APPOINTMENT_STATUSES.find((status) => status.value === appointment.status)?.label }}
                             </Badge>
                         </CardTitle>
                         <p class="text-sm text-muted-foreground">
@@ -132,6 +126,8 @@ const appointmentStatus = computed(() => statuses[props.appointment.status]);
                     </DataCard>
                 </CardContent>
             </Card>
+
+            <ActivityTimeline :activities="activities" />
 
             <EditAppointmentDialog
                 v-model:open="isEditDialogOpen"

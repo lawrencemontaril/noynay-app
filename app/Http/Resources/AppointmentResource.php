@@ -28,7 +28,8 @@ class AppointmentResource extends PaginatedJsonResource
             'patient' => PatientResource::make($this->whenLoaded('patient')),
             'invoice' => InvoiceResource::make($this->whenLoaded('invoice')),
             'consultations' => ConsultationResource::collection($this->whenLoaded('consultations')),
-            'laboratory_results' => LaboratoryResultResource::collection($this->whenLoaded('laboratoryResults'))
+            'laboratory_results' => LaboratoryResultResource::collection($this->whenLoaded('laboratoryResults')),
+            'activities' => ActivityResource::collection($this->whenLoaded('activities'))
         ];
     }
 }

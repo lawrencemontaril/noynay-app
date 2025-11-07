@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Notifications\AppointmentApproved;
 use App\Notifications\AppointmentCompleted;
 use App\Notifications\AppointmentCreated;
+use App\Notifications\AppointmentRescheduled;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Notification;
@@ -69,12 +70,10 @@ class AppointmentService
     }
 
     /**
-     * Update an appointment (including its services).
+     * Update an appointment
      */
-    public function update(int $id, array $data): Appointment
+    public function update(Appointment $appointment, array $data): Appointment
     {
-        $appointment = $this->find($id);
-
         if (isset($data['scheduled_at'])) {
             $scheduledAt = Carbon::parse($data['scheduled_at']);
 
@@ -112,12 +111,34 @@ class AppointmentService
     }
 
     /**
-     * Cancel an appointment.
+     * Reschedule an appointment (triggered by user).
      */
-    public function cancel(int $id): bool
+    public function reschedule(Appointment $appointment, array $data): Appointment
     {
-        $appointment = $this->find($id);
+        $scheduledAt = Carbon::parse($data['scheduled_at']);
 
+        // Ensure new datetime isn’t already full (excluding this one)
+        if ($this->isFull($scheduledAt, $appointment->id)) {
+            throw ValidationException::withMessages([
+                'scheduled_at' => 'The selected date and time has reached the maximum number of appointments ('.static::MAX_APPOINTMENTS_PER_SLOT.').',
+            ]);
+        }
+
+        $appointment->update([
+            'complaints' => $data['complaints'] ?? $appointment->complaints,
+            'scheduled_at' => $scheduledAt
+        ]);
+
+        $this->notifyAdminsOfAppointmentReschedules($appointment);
+
+        return $appointment;
+    }
+
+    /**
+     * Cancel an appointment (triggered by user)
+     */
+    public function cancel(Appointment $appointment): bool
+    {
         return $appointment->update(['status' => 'cancelled']);
     }
 
@@ -166,6 +187,16 @@ class AppointmentService
         $admins = User::role('admin')->get();
 
         Notification::send($admins, new AppointmentCreated($appointment));
+    }
+
+    /**
+     * Notify admins of appointment reschedules.
+     */
+    protected function notifyAdminsOfAppointmentReschedules(Appointment $appointment)
+    {
+        $admins = User::role('admin')->get();
+
+        Notification::send($admins, new AppointmentRescheduled($appointment));
     }
 
     /**

@@ -16,12 +16,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ObservedBy(AppointmentObserver::class)]
 #[ScopedBy(ExcludeArchivedPatient::class)]
 class Appointment extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     /*
     |--------------------------------------------------------------------------
@@ -44,6 +46,15 @@ class Appointment extends Model
             'is_cancellable' => 'boolean',
             'is_operatable' => 'boolean',
         ];
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['complaints', 'type', 'status', 'scheduled_at'])
+            ->logOnlyDirty()
+            ->useLogName('appointment')
+            ->setDescriptionForEvent(fn (string $eventName) => "Appointment has been {$eventName}");
     }
 
     public const TYPE_LABELS = [

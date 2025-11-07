@@ -178,8 +178,8 @@ Route::middleware(['auth', 'verified', 'is_active', 'role:patient', 'redirect_by
         Route::get('/appointments', 'index')->name('appointments.index');
         Route::get('/appointments/create', 'create')->name('appointments.create');
         Route::post('/appointments', 'store')->name('appointments.store');
-        Route::patch('/appointments/{appointment}', 'update')->name('appointments.update');
-        Route::delete('/appointments/{appointment}', 'destroy')->name('appointments.destroy');
+        Route::patch('/appointments/{appointment}/reschedule', 'reschedule')->name('appointments.reschedule');
+        Route::patch('/appointments/{appointment}/cancel', 'cancel')->name('appointments.cancel');
     });
 
     /**

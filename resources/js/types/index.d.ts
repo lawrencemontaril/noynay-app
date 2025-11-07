@@ -172,6 +172,7 @@ export interface Appointment {
     invoice?: Invoice;
     consultations?: Consultation[];
     laboratory_results?: LaboratoryResult[];
+    activities?: Activity[];
 }
 
 export interface Consultation {
@@ -269,4 +270,13 @@ export interface Payment {
     updated_at: DateTimeResource;
 
     invoice?: Invoice;
+}
+
+export interface Activity {
+    id: number;
+    description: string;
+    event: string;
+    properties: any;
+    causer: User | null;
+    created_at: DateTimeResource;
 }

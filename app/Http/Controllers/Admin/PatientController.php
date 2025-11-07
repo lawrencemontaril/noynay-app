@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Filters\PatientFilter;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ActivityResource;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -101,6 +102,7 @@ class PatientController extends Controller
         return Inertia::render('admin/patients/PatientsAppointmentDetail', [
             'patient' => $patient->toResource(),
             'appointment' => $appointment->toResource(),
+            'activities' => Inertia::optional(fn () => ActivityResource::collection($appointment->activities->load('causer')))
         ]);
     }
 

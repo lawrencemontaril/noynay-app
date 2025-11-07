@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import InputError from '@/components/InputError.vue';
 import Button from '@/components/ui/button/Button.vue';
 import Calendar from '@/components/ui/calendar/Calendar.vue';
 import { Dialog, DialogFooter, DialogHeader, DialogScrollContent, DialogTitle } from '@/components/ui/dialog';
@@ -57,12 +58,12 @@ watch(
     },
 );
 
-const updateAppointment = handleSubmit((validatedValues) => {
+const rescheduleAppointment = handleSubmit((validatedValues) => {
     const scheduled_at = new Date(`${validatedValues.scheduled_date}T${validatedValues.scheduled_time}`).toISOString();
     inertiaForm.scheduled_at = scheduled_at;
     inertiaForm.complaints = validatedValues.complaints;
 
-    inertiaForm.patch(route('appointments.update', props.appointment?.id), {
+    inertiaForm.patch(route('appointments.reschedule', props.appointment?.id), {
         onError: (serverErrors) => {
             setErrors(serverErrors);
         },
@@ -94,7 +95,12 @@ const scheduled_date = computed({
                 <DialogTitle>Reschedule Appointment #{{ appointment.id }}</DialogTitle>
             </DialogHeader>
 
-            <form @submit.prevent="updateAppointment">
+            <form @submit.prevent="rescheduleAppointment">
+                <InputError
+                    :message="inertiaForm.errors.scheduled_at"
+                    class="mb-4"
+                />
+
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <FormField name="scheduled_date">
                         <FormItem>

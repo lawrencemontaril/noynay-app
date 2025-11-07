@@ -16,12 +16,10 @@ const closeDialog = () => {
     emit('update:open', false);
 };
 
-const inertiaForm = useInertiaForm({
-    status: 'cancelled',
-});
+const inertiaForm = useInertiaForm({});
 
-const updateAppointment = () => {
-    inertiaForm.patch(route('appointments.update', props.appointment?.id), {
+const cancelAppointment = () => {
+    inertiaForm.patch(route('appointments.cancel', props.appointment?.id), {
         onSuccess: () => {
             closeDialog();
         },
@@ -39,7 +37,7 @@ const updateAppointment = () => {
                 <DialogTitle>Cancel Appointment #{{ appointment.id }}</DialogTitle>
             </DialogHeader>
 
-            <form @submit.prevent="updateAppointment">
+            <form @submit.prevent="cancelAppointment">
                 <DataCard title="Appointment Date">
                     <p class="text-sm">{{ appointment.scheduled_at.formatted_date }}</p>
                 </DataCard>

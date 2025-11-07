@@ -63,7 +63,7 @@ class AppointmentController extends Controller
      */
     public function update(UpdateAppointmentRequest $request, Appointment $appointment, AppointmentService $appointmentService)
     {
-        $appointmentService->update($appointment->id, $request->validated());
+        $appointmentService->update($appointment, $request->validated());
 
         return redirect()
             ->back()
