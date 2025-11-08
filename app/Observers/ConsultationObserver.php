@@ -3,20 +3,38 @@
 namespace App\Observers;
 
 use App\Models\Consultation;
+use App\Models\User;
 use App\Notifications\ConsultationCreated;
+use App\Notifications\PendingInvoice;
+use App\Services\AppointmentService;
 
 class ConsultationObserver
 {
+    public function creating(Consultation $consultation): void
+    {
+        $appointmentService = app(AppointmentService::class);
+
+        // Send a pending invoice notification to cashier
+        if (! $appointmentService->hasBeenServiced($consultation->appointment)) {
+            $cashiers = User::role('cashier')->get();
+
+            foreach ($cashiers as $cashier) {
+                $cashier->notify(new PendingInvoice($consultation->appointment));
+            }
+        }
+    }
+
     /**
      * Handle the Consultation "created" event.
      */
     public function created(Consultation $consultation): void
     {
-        if ($consultation->appointment()->exists()) {
-            $appointment = $consultation->appointment;
-            $appointment->status = 'completed';
-            $appointment->save();
-        }
+        // Mark appointment as completed
+        // if ($consultation->appointment()->exists() && $consultation->appointment->invoice()->exists()) {
+        //     $appointment = $consultation->appointment;
+        //     $appointment->status = 'completed';
+        //     $appointment->save();
+        // }
 
         $user = $consultation->appointment?->patient?->user;
 

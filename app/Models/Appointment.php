@@ -15,7 +15,9 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\ActivitylogServiceProvider;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -128,7 +130,17 @@ class Appointment extends Model
     protected function isOperatable(): Attribute
     {
         return Attribute::get(
-            fn () => in_array($this->status, ['approved', 'completed']) && $this->invoice()->exists()
+            fn () => in_array($this->status, ['approved', 'completed'])
+        );
+    }
+
+    protected function hasBeenServiced(): Attribute
+    {
+        return Attribute::get(
+            fn () => (
+                $this->consultations()->exists() ||
+                $this->laboratoryResults()->exists()
+            )
         );
     }
 

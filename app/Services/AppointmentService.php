@@ -9,6 +9,8 @@ use App\Notifications\AppointmentApproved;
 use App\Notifications\AppointmentCompleted;
 use App\Notifications\AppointmentCreated;
 use App\Notifications\AppointmentRescheduled;
+use App\Notifications\ConsultationRequest;
+use App\Notifications\LaboratoryResultRequest;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Notification;
@@ -103,7 +105,7 @@ class AppointmentService
             ]);
         }
 
-        $this->notifyCashiersOfAppointmentApprovals($appointment);
+        $this->notifyStaffsOfAppointmentApprovals($appointment);
         $this->notifyPatientOfAppointmentCompletion($appointment);
         $this->notifyPatientOfAppointmentApprovals($appointment);
 
@@ -180,6 +182,15 @@ class AppointmentService
     }
 
     /**
+     * Check if the appointment has any consultation or laboratory result
+     */
+    public function hasBeenServiced(Appointment $appointment): bool
+    {
+        return $appointment->consultations()->exists() ||
+            $appointment->laboratoryResults()->exists();
+    }
+
+    /**
      * Notify admins of appointment creation.
      */
     protected function notifyAdminsOfAppointmentCreation(Appointment $appointment)
@@ -202,12 +213,28 @@ class AppointmentService
     /**
      * Notify cashiers of appointment approvals.
      */
-    protected function notifyCashiersOfAppointmentApprovals(Appointment $appointment)
+    protected function notifyStaffsOfAppointmentApprovals(Appointment $appointment)
     {
         if ($appointment->wasChanged('status') && $appointment->status === 'approved') {
-            $cashiers = User::role('cashier')->get();
+            // $cashiers = User::role('cashier')->get();
 
-            Notification::send($cashiers, new AppointmentApproved($appointment));
+            // Notification::send($cashiers, new AppointmentApproved($appointment));
+
+            $labTypes = ['pregnancy_test', 'papsmear', 'cbc', 'urinalysis', 'fecalysis'];
+
+            if (in_array($appointment->type, $labTypes)) {
+                // Send to laboratory staff
+                $labStaff = User::role('laboratory_staff')->get();
+                foreach ($labStaff as $user) {
+                    $user->notify(new LaboratoryResultRequest($appointment));
+                }
+            } else {
+                // Send to doctors
+                $doctors = User::role('doctor')->get();
+                foreach ($doctors as $user) {
+                    $user->notify(new ConsultationRequest($appointment));
+                }
+            }
         }
     }
 

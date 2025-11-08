@@ -12,6 +12,7 @@ use App\Models\Patient;
 use Inertia\Inertia;
 use App\Http\Requests\StorePatientRequest;
 use App\Http\Requests\UpdatePatientRequest;
+use Spatie\Activitylog\Models\Activity;
 
 class PatientController extends Controller
 {
@@ -102,7 +103,9 @@ class PatientController extends Controller
         return Inertia::render('admin/patients/PatientsAppointmentDetail', [
             'patient' => $patient->toResource(),
             'appointment' => $appointment->toResource(),
-            'activities' => Inertia::optional(fn () => ActivityResource::collection($appointment->activities->load('causer')))
+            'activities' => Inertia::optional(
+                fn () => ActivityResource::collection($appointment->activities()->with('causer')->latest()->get())
+            )
         ]);
     }
 

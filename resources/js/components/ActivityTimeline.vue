@@ -2,6 +2,7 @@
 import { useFormatters } from '@/composables/useFormatters';
 import { Activity } from '@/types';
 import { router } from '@inertiajs/vue3';
+import { RefreshCcw } from 'lucide-vue-next';
 import { ref } from 'vue';
 import Button from './ui/button/Button.vue';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -32,22 +33,40 @@ const loadActivities = () => {
         <CardHeader class="flex items-center justify-between border-b">
             <CardTitle class="text-lg font-semibold">Activity Log</CardTitle>
 
-            <Button
-                v-if="!hasLoaded"
-                @click="loadActivities"
-                :disabled="isLoading"
-                size="sm"
-                variant="outline"
-            >
-                <span v-if="!isLoading">Load Logs</span>
-                <span v-else>Loading...</span>
-            </Button>
+            <div class="flex items-center gap-2">
+                <Button
+                    v-if="!hasLoaded"
+                    @click="loadActivities"
+                    :disabled="isLoading"
+                    size="sm"
+                >
+                    <RefreshCcw :class="{ 'animate-spin': isLoading }" />
+                    <span>{{ isLoading ? 'Loading' : 'Load logs' }}</span>
+                </Button>
+
+                <Button
+                    v-else
+                    @click="loadActivities"
+                    :disabled="isLoading"
+                    size="sm"
+                >
+                    <RefreshCcw :class="{ 'animate-spin': isLoading }" />
+                    <span>{{ isLoading ? 'Refreshing' : 'Refresh' }}</span>
+                </Button>
+            </div>
         </CardHeader>
 
         <CardContent class="py-0">
+            <div
+                v-if="!hasLoaded"
+                class="py-6 text-center text-sm text-muted-foreground"
+            >
+                Activity log is not loaded
+            </div>
+
             <!-- Loading / Empty States -->
             <div
-                v-if="isLoading && !hasLoaded"
+                v-else-if="isLoading"
                 class="py-6 text-center text-sm text-muted-foreground"
             >
                 Loading activity log...
@@ -97,7 +116,7 @@ const loadActivities = () => {
                             </div>
 
                             <p class="text-xs whitespace-nowrap text-muted-foreground">
-                                {{ activity.created_at?.formatted_date }}
+                                {{ activity.created_at?.human }}
                             </p>
                         </div>
 
@@ -111,7 +130,7 @@ const loadActivities = () => {
                         >
                             <div
                                 v-if="Object.keys(activity.properties?.old || {}).length"
-                                class="flex-1 rounded-lg bg-muted/30 p-3 text-xs"
+                                class="flex-1 rounded-lg border bg-muted/30 p-3 text-xs"
                             >
                                 <p class="mb-1 font-semibold text-foreground">Old Values</p>
                                 <ul class="space-y-0.5">
@@ -127,7 +146,7 @@ const loadActivities = () => {
 
                             <div
                                 v-if="Object.keys(activity.properties?.attributes || {}).length"
-                                class="flex-1 rounded-lg bg-muted/30 p-3 text-xs"
+                                class="flex-1 rounded-lg border bg-muted/30 p-3 text-xs"
                             >
                                 <p class="mb-1 font-semibold text-foreground">New Values</p>
                                 <ul class="space-y-0.5">

@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import Container from '@/components/Container.vue';
 import Pagination from '@/components/Pagination.vue';
-import { Badge, type BadgeVariants } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Appointment, BreadcrumbItem, PaginatedData } from '@/types';
-import { ALL_SERVICES } from '@/types/constants';
+import { ALL_SERVICES, APPOINTMENT_STATUSES } from '@/types/constants';
 import { Link, useForm } from '@inertiajs/vue3';
 import { Calendar, X } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
@@ -53,18 +53,6 @@ function filterAppointments() {
 }
 
 watch(() => [inertiaForm.status, inertiaForm.type], filterAppointments);
-
-const statuses: {
-    label: string;
-    value: Appointment['status'];
-    badge: BadgeVariants['variant'];
-}[] = [
-    { label: 'Pending', value: 'pending', badge: 'warning' },
-    { label: 'Approved', value: 'approved', badge: 'default' },
-    { label: 'Completed', value: 'completed', badge: 'default' },
-    { label: 'Rejected', value: 'rejected', badge: 'destructive' },
-    { label: 'Cancelled', value: 'cancelled', badge: 'destructive' },
-];
 </script>
 
 <template>
@@ -122,7 +110,7 @@ const statuses: {
                                         <SelectGroup>
                                             <SelectItem value="all">All</SelectItem>
                                             <SelectItem
-                                                v-for="status in statuses"
+                                                v-for="status in APPOINTMENT_STATUSES"
                                                 :key="status.value"
                                                 :value="status.value"
                                             >
@@ -146,7 +134,7 @@ const statuses: {
 
                             <TableCell class="max-w-48 truncate capitalize">
                                 {{
-                                    ALL_SERVICES.find((service) => service.value === appointment.type)?.label ||
+                                    ALL_SERVICES.find((type) => type.value === appointment.type)?.label ||
                                     appointment.type ||
                                     'N/A'
                                 }}
@@ -155,8 +143,16 @@ const statuses: {
                             <TableCell>{{ appointment.scheduled_at.formatted_date }}</TableCell>
 
                             <TableCell class="capitalize">
-                                <Badge :variant="statuses.find((s) => s.value === appointment.status)?.badge">
-                                    {{ appointment.status }}
+                                <Badge
+                                    :variant="
+                                        APPOINTMENT_STATUSES.find((status) => status.value === appointment.status)
+                                            ?.badge
+                                    "
+                                >
+                                    {{
+                                        APPOINTMENT_STATUSES.find((status) => status.value === appointment.status)
+                                            ?.label
+                                    }}
                                 </Badge>
                             </TableCell>
 

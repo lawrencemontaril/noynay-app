@@ -33,6 +33,13 @@ class InvoiceService
             $invoice->invoiceItems()->createMany($data['items']);
         }
 
+        // Mark appointment as completed
+        if ($invoice->appointment()->exists()) {
+            $appointment = $invoice->appointment;
+            $appointment->status = 'completed';
+            $appointment->save();
+        }
+
         $this->notifyInvoiceCreation($invoice);
 
         return $invoice;
@@ -61,22 +68,6 @@ class InvoiceService
 
         if ($user) {
             $user->notify(new InvoiceCreated($invoice));
-        }
-
-        $labTypes = ['pregnancy_test', 'papsmear', 'cbc', 'urinalysis', 'fecalysis'];
-
-        if (in_array($invoice->appointment->type, $labTypes)) {
-            // Send to laboratory staff
-            $labStaff = User::role('laboratory_staff')->get();
-            foreach ($labStaff as $user) {
-                $user->notify(new LaboratoryResultRequest($invoice));
-            }
-        } else {
-            // Send to doctors
-            $doctors = User::role('doctor')->get();
-            foreach ($doctors as $user) {
-                $user->notify(new ConsultationRequest($invoice));
-            }
         }
     }
 }

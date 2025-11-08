@@ -3,7 +3,10 @@
 namespace App\Observers;
 
 use App\Models\LaboratoryResult;
+use App\Models\User;
 use App\Notifications\LaboratoryResultCreated;
+use App\Notifications\PendingInvoice;
+use App\Services\AppointmentService;
 
 class LaboratoryResultObserver
 {
@@ -19,10 +22,15 @@ class LaboratoryResultObserver
 
             $user->notify(new LaboratoryResultCreated($laboratoryResult));
 
-            if ($laboratoryResult->appointment()->exists()) {
-                $appointment = $laboratoryResult->appointment;
-                $appointment->status = 'completed';
-                $appointment->save();
+            $appointmentService = app(AppointmentService::class);
+
+            // Send a pending invoice notification to cashier
+            if (! $appointmentService->hasBeenServiced($laboratoryResult->appointment)) {
+                $cashiers = User::role('cashier')->get();
+
+                foreach ($cashiers as $cashier) {
+                    $cashier->notify(new PendingInvoice($laboratoryResult->appointment));
+                }
             }
         } else {
             $laboratoryResult->status = 'pending';

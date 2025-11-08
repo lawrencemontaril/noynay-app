@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Filters\AppointmentFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RescheduleAppointmentRequest;
 use App\Services\AppointmentService;
@@ -22,24 +23,15 @@ class AppointmentController extends Controller
     {
         Gate::authorize('viewAny', Appointment::class);
 
-        $appointments = auth()->user()->patient
-            ->appointments()
-            ->when($request->filled('status') && $request->input('status') !== 'all', fn ($q) =>
-                $q->where('status', $request->input('status'))
-            )
-            ->when($request->filled('type') && $request->input('type') !== 'all', fn ($q) =>
-                $q->where('type', $request->input('type'))
-            )
-            ->when($request->filled('id') && $request->input('id') !== '', fn ($q) =>
-                $q->where('appointments.id', $request->input('id'))
-            )
+        $appointments = (new AppointmentFilter($request))
+            ->apply(auth()->user()->patient->appointments())
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
         return Inertia::render('user/appointments/AppointmentsIndex', [
             'appointments' => $appointments->toResourceCollection(),
-            'filters' => $request->only(['status', 'service'])
+            'filters' => $request->only(['status', 'type'])
         ]);
     }
 

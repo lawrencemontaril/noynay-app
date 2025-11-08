@@ -13,12 +13,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ObservedBy(InvoiceObserver::class)]
 #[ScopedBy([ExcludeArchivedAppointment::class])]
 class Invoice extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     /*
     |--------------------------------------------------------------------------
@@ -29,6 +31,15 @@ class Invoice extends Model
         'appointment_id',
         'status',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['status'])
+            ->logOnlyDirty()
+            ->useLogName('invoice')
+            ->setDescriptionForEvent(fn (string $eventName) => "Invoice has been {$eventName}");
+    }
 
     /*
     |--------------------------------------------------------------------------

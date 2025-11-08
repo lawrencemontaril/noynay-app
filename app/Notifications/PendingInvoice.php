@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ConsultationRequest extends Notification
+class PendingInvoice extends Notification
 {
     use Queueable;
 
@@ -16,7 +16,7 @@ class ConsultationRequest extends Notification
      * Create a new notification instance.
      */
     public function __construct(
-        protected Appointment $appointment
+        public Appointment $appointment
     ) {
         //
     }
@@ -42,7 +42,7 @@ class ConsultationRequest extends Notification
         $user = $patient->user;
 
         return [
-            'message' => "New consultation request for {$user->first_name} {$user->last_name}.",
+            'message' => "Pending invoice for {$user->first_name} {$user->last_name}.",
             'link' => "/admin/appointments?id={$this->appointment->id}",
         ];
     }

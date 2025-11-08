@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use App\Models\Invoice;
+use App\Models\Appointment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -16,7 +16,7 @@ class LaboratoryResultRequest extends Notification
      * Create a new notification instance.
      */
     public function __construct(
-        protected Invoice $invoice
+        protected Appointment $appointment
     ) {
         //
     }
@@ -38,13 +38,12 @@ class LaboratoryResultRequest extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $appointment = $this->invoice->appointment;
-        $patient = $appointment->patient;
+        $patient = $this->appointment->patient;
         $user = $patient->user;
 
         return [
-            'message' => "New laboratory request for {$user->first_name} {$user->last_name} ({$appointment->type_label}).",
-            'link' => "/admin/appointments?id={$appointment->id}",
+            'message' => "New laboratory request for {$user->first_name} {$user->last_name} ({$this->appointment->type_label}).",
+            'link' => "/admin/appointments?id={$this->appointment->id}",
         ];
     }
 }
