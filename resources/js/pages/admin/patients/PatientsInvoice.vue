@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ActivityTimeline from '@/components/ActivityTimeline.vue';
 import CreateInvoiceItemDialog from '@/components/CreateInvoiceItemDialog.vue';
 import CreatePaymentDialog from '@/components/CreatePaymentDialog.vue';
 import EditInvoiceDialog from '@/components/EditInvoiceDialog.vue';
@@ -12,7 +13,7 @@ import { useFormatters } from '@/composables/useFormatters';
 import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import PatientAppointmentLayout from '@/layouts/PatientAppointmentLayout.vue';
-import { Appointment, BreadcrumbItem, Invoice, Patient } from '@/types';
+import { Activity, Appointment, BreadcrumbItem, Invoice, Patient } from '@/types';
 import { INVOICE_STATUSES } from '@/types/constants';
 import { FileText, LoaderCircle } from 'lucide-vue-next';
 import { ref } from 'vue';
@@ -21,6 +22,7 @@ const props = defineProps<{
     patient: Patient;
     appointment: Appointment;
     invoice: Invoice | null;
+    activities?: Activity[];
 }>();
 
 const { hasRole, hasPermissionTo } = usePermissions();
@@ -260,6 +262,11 @@ const downloadInvoice = async () => {
             >
                 <p class="text-sm text-muted-foreground">No invoice yet.</p>
             </div>
+
+            <ActivityTimeline
+                v-if="invoice"
+                :activities="activities"
+            />
 
             <CreateInvoiceItemDialog
                 v-if="hasRole('cashier')"

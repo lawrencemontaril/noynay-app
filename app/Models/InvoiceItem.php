@@ -6,10 +6,13 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class InvoiceItem extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     /*
     |--------------------------------------------------------------------------
@@ -22,6 +25,20 @@ class InvoiceItem extends Model
         'quantity',
         'unit_price',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['description', 'quantity', 'unit_price'])
+            ->logOnlyDirty()
+            ->useLogName('invoice')
+            ->setDescriptionForEvent(fn (string $eventName) => ucfirst($eventName)." the invoice item.");
+    }
+
+    public function tapActivity(Activity $activity, string $eventName): void
+    {
+        $activity->subject()->associate($this->invoice);
+    }
 
     /*
     |--------------------------------------------------------------------------

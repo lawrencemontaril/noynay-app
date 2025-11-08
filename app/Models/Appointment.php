@@ -56,7 +56,7 @@ class Appointment extends Model
             ->logOnly(['complaints', 'type', 'status', 'scheduled_at'])
             ->logOnlyDirty()
             ->useLogName('appointment')
-            ->setDescriptionForEvent(fn (string $eventName) => "Appointment has been {$eventName}");
+            ->setDescriptionForEvent(fn (string $eventName) => ucfirst($eventName)." the appointment.");
     }
 
     public const TYPE_LABELS = [

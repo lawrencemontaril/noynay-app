@@ -147,7 +147,9 @@ class DashboardController extends Controller
                 ->whereDoesntHave('invoice')
                 ->where(function ($q) {
                     return $q->whereHas('consultations')
-                        ->orWhereHas('laboratoryResults');
+                        ->orWhereHas('laboratoryResults', function ($q) {
+                            return $q->released();
+                        });
                 })
                 ->latest()
                 ->limit(10)

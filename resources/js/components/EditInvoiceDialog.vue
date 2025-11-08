@@ -35,6 +35,7 @@ const inertiaForm = useInertiaForm({
 });
 
 const itemSchema = z.object({
+    id: z.number().optional(),
     description: z.string().min(1, 'Description is required'),
     quantity: z.coerce.number().int().min(1, 'Quantity must be at least 1'),
     unit_price: z.coerce.number().min(0, 'Price must be positive'),
@@ -60,6 +61,7 @@ watch(
         setValues({
             appointment_id: props.invoice?.appointment_id,
             items: props.invoice?.invoice_items!.map((item) => ({
+                id: item.id,
                 description: item.description,
                 quantity: item.quantity,
                 unit_price: item.unit_price,

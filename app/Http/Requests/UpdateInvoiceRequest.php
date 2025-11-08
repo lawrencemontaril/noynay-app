@@ -35,6 +35,12 @@ class UpdateInvoiceRequest extends FormRequest
                 'array',
                 'min:1',
             ],
+            'items.*.id' => [
+                'nullable',
+                'integer',
+                Rule::exists('invoice_items', 'id')
+                    ->where('invoice_id', $this->invoice->id),
+            ],
             'items.*.description' => [
                 'required',
                 'string',

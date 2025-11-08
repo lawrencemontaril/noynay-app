@@ -84,4 +84,16 @@ class LaboratoryResult extends Model
     {
         $query->whereHas('appointment.patient', fn ($q) => $q->search($keyword));
     }
+
+    #[Scope]
+    protected function pending(Builder $query)
+    {
+        $query->where('status', 'pending');
+    }
+
+    #[Scope]
+    protected function released(Builder $query)
+    {
+        $query->where('status', 'released');
+    }
 }

@@ -2,26 +2,13 @@
 
 namespace App\Services;
 
-use App\Http\Requests\UpdateInvoiceRequest;
 use App\Models\Invoice;
-use App\Models\User;
-use App\Notifications\ConsultationRequest;
 use App\Notifications\InvoiceCreated;
-use App\Notifications\InvoicePaid;
-use App\Notifications\LaboratoryResultRequest;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 
 class InvoiceService
 {
-    /**
-     * Get an invoice by ID (with services).
-     */
-    public function find(int $id): Invoice
-    {
-        return Invoice::findOrFail($id);
-    }
-
     /**
      * Create a new invoice
      */
@@ -50,18 +37,49 @@ class InvoiceService
      */
     public function update(Invoice $invoice, array $data): Invoice
     {
-        // Replace invoice items if provided
-        if ($items = data_get($data, 'items')) {
-            $invoice->invoiceItems()->delete();
-            $invoice->invoiceItems()->createMany($items);
-        }
-
-        // Update invoice fields except items
         $invoice->update(Arr::except($data, ['items']));
 
-        return $invoice;
+        if (isset($data['items'])) {
+            $this->syncInvoiceItems($invoice, collect($data['items']));
+        }
+
+        return $invoice->load('invoiceItems');
     }
 
+    protected function syncInvoiceItems(Invoice $invoice, Collection $items): void
+    {
+        $existingIds = $invoice->invoiceItems()->pluck('id')->all();
+
+        $toUpdate = $items->whereNotNull('id')->keyBy('id');
+        $toCreate = $items->whereNull('id');
+
+        // Update
+        foreach ($toUpdate as $id => $attributes) {
+            $invoice->invoiceItems()->where('id', $id)->update($attributes);
+        }
+
+        // Delete removed items
+        $idsToKeep = $toUpdate->keys()->all();
+        $idsToDelete = array_diff($existingIds, $idsToKeep);
+        if ($idsToDelete) {
+            $invoice->invoiceItems()->whereIn('id', $idsToDelete)->delete();
+        }
+
+        // Create new ones
+        if ($toCreate->isNotEmpty()) {
+            $invoice->invoiceItems()->createMany($toCreate->all());
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notifications
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Notify user of invoice creation
+     */
     protected function notifyInvoiceCreation(Invoice $invoice)
     {
         $user = $invoice->appointment?->patient?->user;

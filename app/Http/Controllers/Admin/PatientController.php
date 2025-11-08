@@ -148,7 +148,10 @@ class PatientController extends Controller
         return Inertia::render('admin/patients/PatientsInvoice', [
             'patient' => $patient->toResource(),
             'appointment' => $appointment->toResource(),
-            'invoice' => $appointment?->invoice?->toResource(),
+            'invoice' => $appointment->invoice?->toResource(),
+            'activities' => Inertia::optional(
+                fn () => ActivityResource::collection($appointment->invoice?->activities()->with('causer')->latest()->get())
+            )
         ]);
     }
 

@@ -12,7 +12,6 @@ use App\Notifications\AppointmentRescheduled;
 use App\Notifications\ConsultationRequest;
 use App\Notifications\LaboratoryResultRequest;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
@@ -53,22 +52,6 @@ class AppointmentService
         $this->notifyAdminsOfAppointmentCreation($appointment);
 
         return $appointment;
-    }
-
-    /**
-     * Get an appointment by ID (with services).
-     */
-    public function find(int $id): Appointment
-    {
-        return Appointment::with(['patient'])->findOrFail($id);
-    }
-
-    /**
-     * List all appointments (with patients and services).
-     */
-    public function all(): Collection
-    {
-        return Appointment::with(['patient'])->latest()->get();
     }
 
     /**
@@ -144,15 +127,11 @@ class AppointmentService
         return $appointment->update(['status' => 'cancelled']);
     }
 
-    /**
-     * Delete an appointment and its services.
-     */
-    public function delete(int $id): bool
-    {
-        $appointment = $this->find($id);
-
-        return $appointment->delete();
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | Checks and conditions
+    |--------------------------------------------------------------------------
+    */
 
     /**
      * Check if a datetime slot already has 5 or more appointments.
@@ -189,6 +168,12 @@ class AppointmentService
         return $appointment->consultations()->exists() ||
             $appointment->laboratoryResults()->exists();
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notifications
+    |--------------------------------------------------------------------------
+    */
 
     /**
      * Notify admins of appointment creation.

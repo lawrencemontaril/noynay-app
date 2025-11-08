@@ -21,19 +21,28 @@ const sidebarNavItems: NavItem[] = [
     },
     {
         title: 'Invoice',
-        href: route('admin.patients.appointments.invoice', { patient: props.patientId, appointment: props.appointmentId }),
+        href: route('admin.patients.appointments.invoice', {
+            patient: props.patientId,
+            appointment: props.appointmentId,
+        }),
         isActive: route().current('admin.patients.appointments.invoice'),
         access: hasPermissionTo('invoices:view'),
     },
     {
         title: 'Consultations',
-        href: route('admin.patients.appointments.consultations', { patient: props.patientId, appointment: props.appointmentId }),
+        href: route('admin.patients.appointments.consultations', {
+            patient: props.patientId,
+            appointment: props.appointmentId,
+        }),
         isActive: route().current('admin.patients.appointments.consultations'),
         access: hasPermissionTo('consultations:view'),
     },
     {
         title: 'Laboratory Results',
-        href: route('admin.patients.appointments.laboratory_results', { patient: props.patientId, appointment: props.appointmentId }),
+        href: route('admin.patients.appointments.laboratory_results', {
+            patient: props.patientId,
+            appointment: props.appointmentId,
+        }),
         isActive: route().current('admin.patients.appointments.laboratory_results'),
         access: hasPermissionTo('laboratory_results:view'),
     },
@@ -52,7 +61,13 @@ const sidebarNavItems: NavItem[] = [
                         <Button
                             v-if="item.access"
                             variant="ghost"
-                            :class="['w-full justify-start', { 'bg-muted': item.isActive }]"
+                            :class="[
+                                'w-full justify-start',
+                                {
+                                    'bg-primary text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground':
+                                        item.isActive,
+                                },
+                            ]"
                             as-child
                         >
                             <Link
