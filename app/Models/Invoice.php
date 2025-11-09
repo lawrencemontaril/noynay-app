@@ -38,7 +38,7 @@ class Invoice extends Model
             ->logOnly(['status'])
             ->logOnlyDirty()
             ->useLogName('invoice')
-            ->setDescriptionForEvent(fn (string $eventName) => ucfirst($eventName)." the invoice.");
+            ->setDescriptionForEvent(fn (string $eventName) => ucfirst($eventName)." the invoice");
     }
 
     /*

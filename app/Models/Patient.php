@@ -14,11 +14,13 @@ use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ObservedBy(PatientObserver::class)]
 class Patient extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     /*
     |--------------------------------------------------------------------------
@@ -42,6 +44,16 @@ class Patient extends Model
         return [
             'birthdate' => 'date',
         ];
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->logExcept(['user_id'])
+            ->useLogName('patient')
+            ->setDescriptionForEvent(fn (string $eventName) => ucfirst($eventName)." the patient");
     }
 
     /*

@@ -53,10 +53,11 @@ class Appointment extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['complaints', 'type', 'status', 'scheduled_at'])
+            ->logFillable()
             ->logOnlyDirty()
+            ->logExcept(['patient_id'])
             ->useLogName('appointment')
-            ->setDescriptionForEvent(fn (string $eventName) => ucfirst($eventName)." the appointment.");
+            ->setDescriptionForEvent(fn (string $eventName) => ucfirst($eventName)." the appointment");
     }
 
     public const TYPE_LABELS = [

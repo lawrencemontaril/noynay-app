@@ -11,11 +11,15 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ObservedBy(LaboratoryResultObserver::class)]
 #[ScopedBy([ExcludeArchivedAppointment::class])]
 class LaboratoryResult extends Model
 {
+    use LogsActivity;
+
     /*
     |--------------------------------------------------------------------------
     | Properties
@@ -43,6 +47,16 @@ class LaboratoryResult extends Model
         'urinalysis' => 'Urinalysis',
         'fecalysis' => 'Fecalysis',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->logExcept(['appointment_id'])
+            ->useLogName('laboratory_result')
+            ->setDescriptionForEvent(fn (string $eventName) => ucfirst($eventName)." the laboratory result");
+    }
 
     /*
     |--------------------------------------------------------------------------

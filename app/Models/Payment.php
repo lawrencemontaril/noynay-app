@@ -26,8 +26,9 @@ class Payment extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['amount'])
+            ->logFillable()
             ->logOnlyDirty()
+            ->logExcept(['invoice_id'])
             ->useLogName('invoice')
             ->setDescriptionForEvent(fn (string $eventName) => ucfirst($eventName)." the payment.");
     }

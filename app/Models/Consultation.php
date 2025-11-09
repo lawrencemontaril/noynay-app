@@ -12,12 +12,14 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ObservedBy(ConsultationObserver::class)]
 #[ScopedBy([ExcludeArchivedAppointment::class])]
 class Consultation extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     /*
     |--------------------------------------------------------------------------
@@ -36,7 +38,6 @@ class Consultation extends Model
         'heart_rate',
         'weight_kg',
         'height_cm',
-        'bmi',
         'temperature_c',
         'oxygen_saturation',
     ];
@@ -66,6 +67,16 @@ class Consultation extends Model
         'issuance_of_medical_certificate' => 'Issuance of Medical Certificate',
         'pedia_adult_vaccination_services' => 'Pedia / Adult Immunization / Vaccination Services',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->logExcept(['appointment_id'])
+            ->useLogName('consultation')
+            ->setDescriptionForEvent(fn (string $eventName) => ucfirst($eventName)." the consultation.");
+    }
 
     /*
     |--------------------------------------------------------------------------

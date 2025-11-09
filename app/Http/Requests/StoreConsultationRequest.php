@@ -110,16 +110,4 @@ class StoreConsultationRequest extends FormRequest
             }
         });
     }
-
-    protected function passedValidation()
-    {
-        if ($this->weight_kg && $this->height_cm) {
-            $heightM = $this->height_cm / 100;
-            $bmi = round($this->weight_kg / ($heightM * $heightM), 1);
-
-            $this->merge([
-                'bmi' => $bmi,
-            ]);
-        }
-    }
 }
