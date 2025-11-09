@@ -159,9 +159,10 @@ watch([q], () => filterConsultations());
                                     >
                                         <Link
                                             :href="
-                                                route('admin.patients.appointments.consultations', {
-                                                    patient: consultation?.appointment?.patient?.id,
-                                                    appointment: consultation?.appointment?.id,
+                                                route('admin.patients.appointments.consultations.show', {
+                                                    patient: consultation.appointment?.patient?.id,
+                                                    appointment: consultation.appointment?.id,
+                                                    consultation: consultation.id,
                                                 })
                                             "
                                             prefetch

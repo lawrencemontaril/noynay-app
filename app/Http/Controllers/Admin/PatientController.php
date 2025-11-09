@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Spatie\Activitylog\Models\Activity;
+use App\Models\{Appointment, Consultation, Invoice, LaboratoryResult, Patient};
 use App\Filters\PatientFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ActivityResource;
-use App\Models\Appointment;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-use App\Models\Patient;
+use App\Http\Requests\{StorePatientRequest, UpdatePatientRequest};
 use Inertia\Inertia;
-use App\Http\Requests\StorePatientRequest;
-use App\Http\Requests\UpdatePatientRequest;
-use Spatie\Activitylog\Models\Activity;
 
 class PatientController extends Controller
 {
@@ -72,6 +70,9 @@ class PatientController extends Controller
 
         return Inertia::render('admin/patients/PatientsShow', [
             'patient' => $patient->toResource(),
+            'activities' => Inertia::optional(
+                fn () => ActivityResource::collection($patient->activities()->with('causer')->latest()->get())
+            )
         ]);
     }
 
@@ -80,7 +81,7 @@ class PatientController extends Controller
      */
     public function appointments(Patient $patient)
     {
-        Gate::authorize('viewAppointments', $patient);
+        Gate::authorize('viewAny', Appointment::class);
 
         $appointments = $patient->appointments()
             ->latest()
@@ -94,11 +95,11 @@ class PatientController extends Controller
     }
 
     /**
-     * Display the patient's appointment history.
+     * Display the patient's appointment detail.
      */
     public function appointmentDetail(Patient $patient, Appointment $appointment)
     {
-        Gate::authorize('viewAppointments', $patient);
+        Gate::authorize('view', $appointment);
 
         return Inertia::render('admin/patients/PatientsAppointmentDetail', [
             'patient' => $patient->toResource(),
@@ -114,7 +115,7 @@ class PatientController extends Controller
      */
     public function consultations(Patient $patient, Appointment $appointment)
     {
-        Gate::authorize('viewConsultations', $patient);
+        Gate::authorize('viewAny', Consultation::class);
 
         $appointment->load(['invoice']);
 
@@ -125,9 +126,26 @@ class PatientController extends Controller
         ]);
     }
 
+    /**
+     * Display the patient's consultation detail.
+     */
+    public function consultationDetail(Patient $patient, Appointment $appointment, Consultation $consultation)
+    {
+        Gate::authorize('view', $consultation);
+
+        return Inertia::render('admin/patients/PatientsConsultationDetail', [
+            'patient' => $patient->toResource(),
+            'appointment' => $appointment->toResource(),
+            'consultation' => $consultation->toResource(),
+            'activities' => Inertia::optional(
+                fn () => ActivityResource::collection($consultation->activities()->with('causer')->latest()->get())
+            )
+        ]);
+    }
+
     public function laboratoryResults(Patient $patient, Appointment $appointment)
     {
-        Gate::authorize('viewLaboratoryResults', $patient);
+        Gate::authorize('viewAny', LaboratoryResult::class);
 
         $appointment->load(['invoice']);
 
@@ -139,11 +157,28 @@ class PatientController extends Controller
     }
 
     /**
+     * Display the patient's laboratory result detail.
+     */
+    public function laboratoryResultDetail(Patient $patient, Appointment $appointment, LaboratoryResult $laboratoryResult)
+    {
+        Gate::authorize('view', $laboratoryResult);
+
+        return Inertia::render('admin/patients/PatientsLaboratoryResultDetail', [
+            'patient' => $patient->toResource(),
+            'appointment' => $appointment->toResource(),
+            'laboratory_result' => $laboratoryResult->toResource(),
+            'activities' => Inertia::optional(
+                fn () => ActivityResource::collection($laboratoryResult->activities()->with('causer')->latest()->get())
+            )
+        ]);
+    }
+
+    /**
      * Display the patient's invoice history.
      */
     public function invoice(Patient $patient, Appointment $appointment)
     {
-        Gate::authorize('viewInvoices', $patient);
+        Gate::authorize('viewInvoice', $patient);
 
         return Inertia::render('admin/patients/PatientsInvoice', [
             'patient' => $patient->toResource(),

@@ -101,15 +101,17 @@ const loadActivities = () => {
                             <div class="flex flex-wrap items-center gap-2">
                                 <p class="leading-tight font-medium text-foreground">
                                     {{
-                                        getFullName(
-                                            activity.causer?.last_name!,
-                                            activity.causer?.first_name!,
-                                            activity.causer?.middle_name!,
-                                        )
+                                        activity.causer
+                                            ? getFullName(
+                                                  activity.causer.last_name,
+                                                  activity.causer.first_name,
+                                                  activity.causer.middle_name,
+                                              )
+                                            : 'System'
                                     }}
                                 </p>
                                 <span
-                                    class="rounded-full border border-muted/30 bg-muted/50 px-2 py-0.5 text-xs text-muted-foreground capitalize"
+                                    class="rounded-full border border-muted/30 bg-muted/50 px-2 py-0.5 text-xs text-muted-foreground"
                                 >
                                     {{ activity.description || activity.event }}
                                 </span>

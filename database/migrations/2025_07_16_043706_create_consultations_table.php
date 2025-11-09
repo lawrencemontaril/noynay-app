@@ -27,6 +27,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('respiratory_rate')->nullable();
             $table->decimal('weight_kg', 6, 2)->nullable();
             $table->decimal('height_cm', 6, 2)->nullable();
+            $table->decimal('bmi', 8, 2)->nullable();
             $table->decimal('temperature_c', 4, 2)->nullable();
             $table->decimal('oxygen_saturation', 5, 2)->nullable();
 

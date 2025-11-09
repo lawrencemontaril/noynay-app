@@ -76,20 +76,20 @@ const isActive = (url: string, params?: object | number) => {
                 v-if="hasPermissionTo('appointments:view')"
                 :variant="
                     isActive('admin.patients.appointments') ||
-                    isActive('admin.patients.appointments.*', { patient: patient.id })
+                    isActive('admin.patients.appointments*', { patient: patient.id })
                         ? 'secondary'
                         : 'ghost'
                 "
                 class="rounded-none border-b-2 px-6 py-3 font-medium transition-all duration-150"
                 :class="
                     isActive('admin.patients.appointments') ||
-                    isActive('admin.patients.appointments.*', { patient: patient.id })
+                    isActive('admin.patients.appointments*', { patient: patient.id })
                         ? 'border-primary text-primary'
                         : 'border-transparent hover:border-muted'
                 "
                 :disabled="
                     isActive('admin.patients.appointments') ||
-                    isActive('admin.patients.appointments.*', { patient: patient.id })
+                    isActive('admin.patients.appointments*', { patient: patient.id })
                 "
                 as-child
             >

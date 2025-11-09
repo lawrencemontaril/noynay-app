@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\{ObservedBy, Scope, ScopedBy};
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\{Builder, Model};
+use Illuminate\Database\Eloquent\{Builder, Model, SoftDeletes};
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use App\Enums\ConsultationType;
@@ -35,6 +35,7 @@ class Consultation extends Model
         'heart_rate',
         'weight_kg',
         'height_cm',
+        'bmi',
         'temperature_c',
         'oxygen_saturation',
     ];

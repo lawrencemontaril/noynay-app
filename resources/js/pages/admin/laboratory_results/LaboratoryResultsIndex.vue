@@ -214,9 +214,10 @@ const laboratoryResultStatusBadgeMap: Record<LaboratoryResult['status'], BadgeVa
                                     >
                                         <Link
                                             :href="
-                                                route('admin.patients.appointments.laboratory_results', {
-                                                    patient: laboratory_result?.appointment?.patient?.id,
-                                                    appointment: laboratory_result?.appointment?.id,
+                                                route('admin.patients.appointments.laboratory_results.show', {
+                                                    patient: laboratory_result.appointment?.patient?.id,
+                                                    appointment: laboratory_result.appointment?.id,
+                                                    laboratoryResult: laboratory_result.id,
                                                 })
                                             "
                                             prefetch

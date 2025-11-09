@@ -1,22 +1,9 @@
 <?php
 
-use App\Http\Controllers\InvoicePdfController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\ReportsController as AdminReportsController;
-use App\Http\Controllers\Admin\AppointmentController as AdminAppointmentController;
-use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Admin\PatientController as AdminPatientController;
-use App\Http\Controllers\Admin\ConsultationController as AdminConsultationController;
-use App\Http\Controllers\Admin\LaboratoryResultController as AdminLaboratoryResultController;
-use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
-use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
-use App\Http\Controllers\User\DashboardController as UserDashboardController;
-use App\Http\Controllers\User\AppointmentController as UserAppointmentController;
-use App\Http\Controllers\User\PatientController as UserPatientController;
-use App\Http\Controllers\User\InvoiceController as UserInvoiceController;
-use App\Http\Controllers\User\ConsultationController as UserConsultationController;
-use App\Http\Controllers\User\LaboratoryResultController as UserLaboratoryResultController;
+use App\Http\Controllers\InvoicePdfController;
+use App\Http\Controllers\Admin\{AppointmentController as AdminAppointmentController, ConsultationController as AdminConsultationController, DashboardController as AdminDashboardController, InvoiceController as AdminInvoiceController, LaboratoryResultController as AdminLaboratoryResultController, PatientController as AdminPatientController, PaymentController as AdminPaymentController, ReportsController as AdminReportsController, UserController as AdminUserController};
+use App\Http\Controllers\User\{AppointmentController as UserAppointmentController, ConsultationController as UserConsultationController, DashboardController as UserDashboardController, InvoiceController as UserInvoiceController, LaboratoryResultController as UserLaboratoryResultController, PatientController as UserPatientController};
 
 /*
 | -----------------------------------------------------------------------------
@@ -93,7 +80,9 @@ Route::prefix('admin')
                 Route::get('/patients/{patient}/appointments/{appointment}', 'appointmentDetail')->name('patients.appointments.show');
                 Route::get('/patients/{patient}/appointments/{appointment}/invoice', 'invoice')->name('patients.appointments.invoice');
                 Route::get('/patients/{patient}/appointments/{appointment}/consultations', 'consultations')->name('patients.appointments.consultations');
+                Route::get('/patients/{patient}/appointments/{appointment}/consultations/{consultation}', 'consultationDetail')->name('patients.appointments.consultations.show');
                 Route::get('/patients/{patient}/appointments/{appointment}/laboratory_results', 'laboratoryResults')->name('patients.appointments.laboratory_results');
+                Route::get('/patients/{patient}/appointments/{appointment}/laboratory_results/{laboratoryResult}', 'laboratoryResultDetail')->name('patients.appointments.laboratory_results.show');
             });
             Route::post('patients', 'store')->name('patients.store');
             Route::patch('patients/{patient}/restore', 'restore')->withTrashed()->name('patients.restore');

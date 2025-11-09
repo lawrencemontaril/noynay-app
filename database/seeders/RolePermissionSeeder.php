@@ -3,9 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Spatie\Permission\Models\{Permission, Role};
 
 class RolePermissionSeeder extends Seeder
 {
@@ -20,8 +19,8 @@ class RolePermissionSeeder extends Seeder
             'users' => ['view_any', 'view', 'create', 'update'],
             'patients' => ['view_any', 'view', 'create', 'update', 'delete', 'restore', 'force_delete'],
             'appointments' => ['view_any', 'view', 'create', 'update', 'delete', 'restore', 'force_delete'],
-            'consultations' => ['view_any', 'view', 'create', 'update', 'delete'],
-            'laboratory_results' => ['view_any', 'view', 'create', 'update', 'delete'],
+            'consultations' => ['view_any', 'view', 'create', 'update'],
+            'laboratory_results' => ['view_any', 'view', 'create', 'update'],
             'invoices' => ['view_any', 'view', 'create', 'update', 'delete'],
             'invoice_items' => ['create', 'update', 'delete'],
             'payments' => ['create', 'update', 'delete']
@@ -63,7 +62,7 @@ class RolePermissionSeeder extends Seeder
             'doctor' => [
                 'patients:view_any', 'patients:view',
                 'appointments:view_any', 'appointments:view',
-                'consultations:view_any', 'consultations:view', 'consultations:create', 'consultations:update', 'consultations:delete',
+                'consultations:view_any', 'consultations:view', 'consultations:create', 'consultations:update',
                 'laboratory_results:view_any', 'laboratory_results:view', 'laboratory_results:create',
                 'invoices:view', 'invoices:update',
                 'invoice_items:create', 'invoice_items:update', 'invoice_items:delete'

@@ -3,7 +3,6 @@ import CreateConsultationDialog from '@/components/CreateConsultationDialog.vue'
 import DeleteConsultationDialog from '@/components/DeleteConsultationDialog.vue';
 import EditConsultationDialog from '@/components/EditConsultationDialog.vue';
 import PatientProfileTabs from '@/components/PatientProfileTabs.vue';
-import ShowConsultationDialog from '@/components/ShowConsultationDialog.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { useFormatters } from '@/composables/useFormatters';
 import { usePermissions } from '@/composables/usePermissions';
@@ -11,6 +10,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import PatientAppointmentLayout from '@/layouts/PatientAppointmentLayout.vue';
 import { Appointment, BreadcrumbItem, Consultation, Patient } from '@/types';
 import { CONSULTATION_TYPES } from '@/types/constants';
+import { Link } from '@inertiajs/vue3';
 import { Ellipsis, Pencil, Trash2 } from 'lucide-vue-next';
 import { ref } from 'vue';
 
@@ -47,14 +47,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const selectedConsultation = ref<Consultation | null>(null);
 const isCreateDialogOpen = ref(false);
-const isShowDialogOpen = ref(false);
 const isEditDialogOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
-
-const openShowDialog = (consultation: Consultation) => {
-    selectedConsultation.value = consultation;
-    isShowDialogOpen.value = true;
-};
 
 const openEditDialog = (consultation: Consultation) => {
     selectedConsultation.value = consultation;
@@ -101,12 +95,22 @@ const openDeleteDialog = (consultation: Consultation) => {
                         <div class="flex flex-wrap gap-1 sm:gap-2">
                             <Button
                                 v-if="hasPermissionTo('consultations:view')"
-                                @click="openShowDialog(consultation)"
                                 variant="outline"
                                 size="sm"
                                 class="flex items-center gap-1 text-xs"
+                                as-child
                             >
-                                <Ellipsis class="h-4 w-4" /> Details
+                                <Link
+                                    :href="
+                                        route('admin.patients.appointments.consultations.show', {
+                                            patient: patient.id,
+                                            appointment: appointment.id,
+                                            consultation: consultation.id,
+                                        })
+                                    "
+                                >
+                                    <Ellipsis class="h-4 w-4" /> Details
+                                </Link>
                             </Button>
 
                             <Button
@@ -161,13 +165,6 @@ const openDeleteDialog = (consultation: Consultation) => {
                     :patient="patient"
                     :appointment="appointment"
                     is-type-editable
-                />
-
-                <ShowConsultationDialog
-                    v-if="hasPermissionTo('consultations:view')"
-                    v-model:open="isShowDialogOpen"
-                    :consultation="selectedConsultation"
-                    :patient="patient"
                 />
 
                 <EditConsultationDialog

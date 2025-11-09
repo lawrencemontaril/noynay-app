@@ -3,7 +3,6 @@ import CreateLaboratoryResultDialog from '@/components/CreateLaboratoryResultDia
 import DeleteLaboratoryResultDialog from '@/components/DeleteLaboratoryResultDialog.vue';
 import PatientProfileTabs from '@/components/PatientProfileTabs.vue';
 import RequestLaboratoryResultDialog from '@/components/RequestLaboratoryResultDialog.vue';
-import ShowLaboratoryResultDialog from '@/components/ShowLaboratoryResultDialog.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { useFormatters } from '@/composables/useFormatters';
 import { usePermissions } from '@/composables/usePermissions';
@@ -11,6 +10,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import PatientAppointmentLayout from '@/layouts/PatientAppointmentLayout.vue';
 import { Appointment, BreadcrumbItem, LaboratoryResult, Patient } from '@/types';
 import { LAB_TYPES } from '@/types/constants';
+import { Link } from '@inertiajs/vue3';
 import { Ellipsis, Trash2 } from 'lucide-vue-next';
 import { ref } from 'vue';
 
@@ -48,13 +48,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 const selectedLaboratoryResult = ref<LaboratoryResult | null>(null);
 const isCreateDialogOpen = ref(false);
 const isRequestDialogOpen = ref(false);
-const isShowDialogOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
-
-const openShowDialog = (laboratory_result: LaboratoryResult) => {
-    selectedLaboratoryResult.value = laboratory_result;
-    isShowDialogOpen.value = true;
-};
 
 const openDeleteDialog = (laboratory_result: LaboratoryResult) => {
     selectedLaboratoryResult.value = laboratory_result;
@@ -104,12 +98,22 @@ const openDeleteDialog = (laboratory_result: LaboratoryResult) => {
                         <div class="flex flex-wrap gap-1 sm:gap-2">
                             <Button
                                 v-if="hasPermissionTo('laboratory_results:view')"
-                                @click="openShowDialog(laboratory_result)"
                                 variant="outline"
                                 size="sm"
                                 class="flex items-center gap-1 text-xs"
+                                as-child
                             >
-                                <Ellipsis class="h-4 w-4" /> Details
+                                <Link
+                                    :href="
+                                        route('admin.patients.appointments.laboratory_results.show', {
+                                            patient: patient.id,
+                                            appointment: appointment.id,
+                                            laboratoryResult: laboratory_result.id,
+                                        })
+                                    "
+                                >
+                                    <Ellipsis /> Details
+                                </Link>
                             </Button>
 
                             <Button
@@ -119,7 +123,7 @@ const openDeleteDialog = (laboratory_result: LaboratoryResult) => {
                                 size="icon"
                                 class="h-8 w-8"
                             >
-                                <Trash2 class="h-4 w-4" />
+                                <Trash2 />
                             </Button>
                         </div>
                     </div>
@@ -154,13 +158,6 @@ const openDeleteDialog = (laboratory_result: LaboratoryResult) => {
                     v-model:open="isRequestDialogOpen"
                     :patient="patient"
                     :appointment="appointment"
-                />
-
-                <ShowLaboratoryResultDialog
-                    v-if="hasPermissionTo('laboratory_results:view')"
-                    v-model:open="isShowDialogOpen"
-                    :patient="patient"
-                    :laboratory_result="selectedLaboratoryResult"
                 />
 
                 <DeleteLaboratoryResultDialog

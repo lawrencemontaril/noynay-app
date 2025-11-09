@@ -2,9 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Patient;
-use App\Models\User;
 use Illuminate\Auth\Access\Response;
+use App\Models\{Patient, User};
 
 class PatientPolicy
 {
@@ -28,46 +27,11 @@ class PatientPolicy
     }
 
     /**
-     * Determine whether the user can view the model's appointments.
-     */
-    public function viewAppointments(User $user, Patient $patient): bool
-    {
-        $isOwner = optional($user->patient)->id === $patient->id;
-
-        return ($user->can('patients:view') || $isOwner)
-            && $user->can('appointments:view');
-    }
-
-    /**
-     * Determine whether the user can view the model's consultations.
-     */
-    public function viewConsultations(User $user, Patient $patient): bool
-    {
-        $isOwner = optional($user->patient)->id === $patient->id;
-
-        return ($user->can('patients:view') || $isOwner)
-            && $user->can('consultations:view');
-    }
-
-    /**
-     * Determine whether the user can view the model's consultations.
-     */
-    public function viewLaboratoryResults(User $user, Patient $patient): bool
-    {
-        $isOwner = optional($user->patient)->id === $patient->id;
-
-        return ($user->can('patients:view') || $isOwner)
-            && $user->can('laboratory_results:view');
-    }
-
-    /**
      * Determine whether the user can view the model's invoices.
      */
-    public function viewInvoices(User $user, Patient $patient): bool
+    public function viewInvoice(User $user, Patient $patient): bool
     {
-        $isOwner = optional($user->patient)->id === $patient->id;
-
-        return ($user->can('patients:view') || $isOwner)
+        return $user->can('patients:view')
             && $user->can('invoices:view');
     }
 

@@ -12,11 +12,15 @@ const props = defineProps<{
 
 const { hasPermissionTo } = usePermissions();
 
+const isActive = (url: string, params?: object | number) => {
+    return route().current(url, params);
+};
+
 const sidebarNavItems: NavItem[] = [
     {
         title: 'Details',
         href: route('admin.patients.appointments.show', { patient: props.patientId, appointment: props.appointmentId }),
-        isActive: route().current('admin.patients.appointments.show'),
+        isActive: isActive('admin.patients.appointments.show'),
         access: hasPermissionTo('appointments:view'),
     },
     {
@@ -25,7 +29,7 @@ const sidebarNavItems: NavItem[] = [
             patient: props.patientId,
             appointment: props.appointmentId,
         }),
-        isActive: route().current('admin.patients.appointments.invoice'),
+        isActive: isActive('admin.patients.appointments.invoice'),
         access: hasPermissionTo('invoices:view'),
     },
     {
@@ -34,7 +38,10 @@ const sidebarNavItems: NavItem[] = [
             patient: props.patientId,
             appointment: props.appointmentId,
         }),
-        isActive: route().current('admin.patients.appointments.consultations'),
+        isActive: isActive('admin.patients.appointments.consultations*', {
+            patient: props.patientId,
+            appointment: props.appointmentId,
+        }),
         access: hasPermissionTo('consultations:view'),
     },
     {
@@ -43,7 +50,10 @@ const sidebarNavItems: NavItem[] = [
             patient: props.patientId,
             appointment: props.appointmentId,
         }),
-        isActive: route().current('admin.patients.appointments.laboratory_results'),
+        isActive: isActive('admin.patients.appointments.laboratory_results*', {
+            patient: props.patientId,
+            appointment: props.appointmentId,
+        }),
         access: hasPermissionTo('laboratory_results:view'),
     },
 ];
@@ -84,7 +94,7 @@ const sidebarNavItems: NavItem[] = [
             <Separator class="my-6 md:hidden" />
 
             <div class="flex-1">
-                <section class="space-y-12">
+                <section class="space-y-4">
                     <slot />
                 </section>
             </div>

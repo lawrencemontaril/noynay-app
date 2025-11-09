@@ -40,7 +40,7 @@ class UpdateAppointmentRequest extends FormRequest
             'status' => [
                 'sometimes',
                 'string',
-                Rule::in(AppointmentStatus::class)
+                Rule::enum(AppointmentStatus::class)
             ],
         ];
     }

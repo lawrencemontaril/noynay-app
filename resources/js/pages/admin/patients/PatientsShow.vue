@@ -1,17 +1,20 @@
 <script setup lang="ts">
+import ActivityTimeline from '@/components/ActivityTimeline.vue';
 import Container from '@/components/Container.vue';
+import DataCard from '@/components/DataCard.vue';
 import EditPatientDialog from '@/components/EditPatientDialog.vue';
 import PatientProfileTabs from '@/components/PatientProfileTabs.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { useFormatters } from '@/composables/useFormatters';
 import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { BreadcrumbItem, Patient } from '@/types';
+import { Activity, BreadcrumbItem, Patient } from '@/types';
 import { Pencil } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 const props = defineProps<{
     patient: Patient;
+    activities?: Activity[];
 }>();
 
 const { getFullName } = useFormatters();
@@ -39,7 +42,7 @@ function openEditPatientDialog() {
     <AppLayout :breadcrumbs="breadcrumbs">
         <PatientProfileTabs :patient="patient" />
 
-        <Container>
+        <Container class="space-y-4">
             <div class="space-y-4 rounded-xl border bg-muted/40 p-6 shadow-sm">
                 <!-- Header / Edit button -->
                 <div class="flex items-center justify-between">
@@ -56,76 +59,74 @@ function openEditPatientDialog() {
                 </div>
 
                 <!-- Personal Information -->
-                <div class="space-y-4 rounded-xl border bg-background p-4">
-                    <h3 class="border-b pb-1 text-xs font-semibold text-muted-foreground uppercase">
-                        Personal Details
-                    </h3>
-                    <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-                        <div>
-                            <label class="text-xs font-medium text-muted-foreground">First Name</label>
-                            <p class="text-sm font-medium">{{ patient.first_name }}</p>
-                        </div>
-
-                        <div>
-                            <label class="text-xs font-medium text-muted-foreground">Last Name</label>
-                            <p class="text-sm font-medium">{{ patient.last_name }}</p>
-                        </div>
-
-                        <div>
-                            <label class="text-xs font-medium text-muted-foreground">Middle Name</label>
-                            <p class="text-sm font-medium">{{ patient.middle_name ?? 'N/A' }}</p>
-                        </div>
-
-                        <div>
-                            <label class="text-xs font-medium text-muted-foreground">Contact Number</label>
-                            <p class="text-sm font-medium">{{ patient.contact_number }}</p>
-                        </div>
+                <DataCard
+                    title="Personal Details"
+                    :columns="4"
+                >
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">First Name</label>
+                        <p class="text-sm font-medium">{{ patient.first_name }}</p>
                     </div>
-                </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">Last Name</label>
+                        <p class="text-sm font-medium">{{ patient.last_name }}</p>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">Middle Name</label>
+                        <p class="text-sm font-medium">{{ patient.middle_name ?? 'N/A' }}</p>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">Contact Number</label>
+                        <p class="text-sm font-medium">{{ patient.contact_number }}</p>
+                    </div>
+                </DataCard>
 
                 <!-- Demographics -->
-                <div class="space-y-4 rounded-xl border bg-background p-4">
-                    <h3 class="border-b pb-1 text-xs font-semibold text-muted-foreground uppercase">Demographics</h3>
-                    <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-                        <div>
-                            <label class="text-xs font-medium text-muted-foreground">Gender</label>
-                            <p class="text-sm font-medium capitalize">{{ patient.gender }}</p>
-                        </div>
-
-                        <div>
-                            <label class="text-xs font-medium text-muted-foreground">Civil Status</label>
-                            <p class="text-sm font-medium capitalize">{{ patient.civil_status }}</p>
-                        </div>
-
-                        <div>
-                            <label class="text-xs font-medium text-muted-foreground">Birthdate</label>
-                            <p class="text-sm font-medium">{{ patient.birthdate.formatted_date }}</p>
-                        </div>
-
-                        <div>
-                            <label class="text-xs font-medium text-muted-foreground">Age</label>
-                            <p class="text-sm font-medium">{{ patient.age.formatted_long }}</p>
-                        </div>
+                <DataCard
+                    title="Demographics"
+                    :columns="4"
+                >
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">Gender</label>
+                        <p class="text-sm font-medium capitalize">{{ patient.gender }}</p>
                     </div>
-                </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">Civil Status</label>
+                        <p class="text-sm font-medium capitalize">{{ patient.civil_status }}</p>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">Birthdate</label>
+                        <p class="text-sm font-medium">{{ patient.birthdate.formatted_date }}</p>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">Age</label>
+                        <p class="text-sm font-medium">{{ patient.age.formatted_long }}</p>
+                    </div>
+                </DataCard>
 
                 <!-- Contact Info -->
-                <div class="space-y-4 rounded-xl border bg-background p-4">
-                    <h3 class="border-b pb-1 text-xs font-semibold text-muted-foreground uppercase">
-                        Contact Information
-                    </h3>
-                    <div class="grid grid-cols-1 gap-3">
-                        <div>
-                            <label class="text-xs font-medium text-muted-foreground">Email Address</label>
-                            <p class="text-sm font-medium">{{ patient.user?.email }}</p>
-                        </div>
-                        <div>
-                            <label class="text-xs font-medium text-muted-foreground">Address</label>
-                            <p class="text-sm font-medium whitespace-pre-wrap">{{ patient.address }}</p>
-                        </div>
+                <DataCard
+                    title="Contact Information"
+                    :columns="2"
+                >
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">Email Address</label>
+                        <p class="text-sm font-medium">{{ patient.user?.email }}</p>
                     </div>
-                </div>
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">Address</label>
+                        <p class="text-sm font-medium whitespace-pre-wrap">{{ patient.address }}</p>
+                    </div>
+                </DataCard>
             </div>
+
+            <ActivityTimeline :activities="activities" />
 
             <EditPatientDialog
                 v-model:open="isEditPatientDialogOpen"
