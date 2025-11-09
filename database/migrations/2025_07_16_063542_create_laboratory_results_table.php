@@ -16,8 +16,8 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Appointment::class)->constrained()->cascadeOnDelete();
             $table->text('description')->nullable();
-            $table->enum('type', ['pregnancy_test', 'papsmear', 'cbc', 'urinalysis', 'fecalysis']);
-            $table->enum('status', ['pending', 'released'])->default('pending');
+            $table->string('type');
+            $table->string('status')->default('pending');
             $table->string('results_file_path')->nullable();
             $table->timestamps();
         });

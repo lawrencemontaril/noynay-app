@@ -42,7 +42,7 @@ class AppointmentRescheduled extends Notification
         $user = $patient->user;
 
         return [
-            'message' => "{$user->first_name} {$user->last_name} rescheduled their {$this->appointment->type_label} appointment on ".
+            'message' => "{$user->first_name} {$user->last_name} rescheduled their {$this->appointment->type->label()} appointment on ".
                 $this->appointment->scheduled_at->format('F j, Y g:i A').".",
             'link' => "/admin/appointments?id={$this->appointment->id}",
         ];

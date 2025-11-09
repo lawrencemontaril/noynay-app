@@ -2,6 +2,7 @@
 
 namespace App\Charts;
 
+use App\Enums\PatientCivilStatus;
 use App\Models\Patient;
 use ArielMejiaDev\LarapexCharts\LarapexChart;
 use Illuminate\Support\Facades\DB;
@@ -17,22 +18,26 @@ class PatientsByCivilStatusChart
 
     public function build()
     {
-        $civilStatuses = ['single', 'married', 'widowed', 'divorced', 'separated'];
-
-        // Fetch counts
         $counts = Patient::select('civil_status', DB::raw('count(*) as total'))
             ->groupBy('civil_status')
             ->pluck('total', 'civil_status')
             ->toArray();
 
-        // Fill missing with 0
-        $finalCounts = array_map(fn ($status) => $counts[$status] ?? 0, $civilStatuses);
+        $statuses = PatientCivilStatus::cases();
+
+        $labels = [];
+        $data = [];
+
+        foreach ($statuses as $status) {
+            $labels[] = $status->label();
+            $data[] = $counts[$status->value] ?? 0;
+        }
 
         return $this->chart->pieChart()
             ->setTitle('Patients by Civil Status')
             ->setSubtitle('Distribution of patients by civil status')
-            ->addData($finalCounts)
-            ->setLabels(array_map('ucfirst', $civilStatuses))
+            ->addData($data)
+            ->setLabels($labels)
             ->setColors([
                 '#3B82F6',
                 '#10B981',

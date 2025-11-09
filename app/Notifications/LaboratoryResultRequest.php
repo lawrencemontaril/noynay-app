@@ -42,7 +42,7 @@ class LaboratoryResultRequest extends Notification
         $user = $patient->user;
 
         return [
-            'message' => "New laboratory request for {$user->first_name} {$user->last_name} ({$this->appointment->type_label}).",
+            'message' => "New laboratory request for {$user->first_name} {$user->last_name} ({$this->appointment->type->label()}).",
             'link' => "/admin/appointments?id={$this->appointment->id}",
         ];
     }

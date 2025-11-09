@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\{Rule, Rules};
+use App\Enums\{PatientCivilStatus, PatientGender};
 
 class RegisterUserRequest extends FormRequest
 {
@@ -52,12 +52,12 @@ class RegisterUserRequest extends FormRequest
             'gender' => [
                 'required',
                 'string',
-                Rule::in(['male', 'female'])
+                Rule::enum(PatientGender::class)
             ],
             'civil_status' => [
                 'required',
                 'string',
-                Rule::in(['single', 'married', 'widowed', 'divorced', 'separated'])
+                Rule::enum(PatientCivilStatus::class)
             ],
             'birthdate' => [
                 'required',

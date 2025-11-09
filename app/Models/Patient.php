@@ -2,20 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use App\Observers\PatientObserver;
+use Illuminate\Database\Eloquent\Attributes\{ObservedBy, Scope};
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\{Builder, Model, SoftDeletes};
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany, HasManyThrough};
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use App\Enums\{PatientCivilStatus, PatientGender};
+use App\Observers\PatientObserver;
+use Carbon\Carbon;
 
 #[ObservedBy(PatientObserver::class)]
 class Patient extends Model
@@ -42,6 +38,8 @@ class Patient extends Model
     protected function casts(): array
     {
         return [
+            'gender' => PatientGender::class,
+            'civil_status' => PatientCivilStatus::class,
             'birthdate' => 'date',
         ];
     }
@@ -93,9 +91,8 @@ class Patient extends Model
     */
     protected function age(): Attribute
     {
-        return Attribute::make(
-            get: fn () => Carbon::parse($this->birthdate)
-                ->diffForHumans()
+        return Attribute::get(
+            fn () => Carbon::parse($this->birthdate)->diffForHumans()
         );
     }
 

@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Appointment::class)->unique()->constrained()->cascadeOnDelete();
-            $table->enum('status', ['unpaid', 'partially_paid', 'paid', 'cancelled'])->default('unpaid');
+            $table->string('status')->default('unpaid');
             $table->timestamps();
         });
     }

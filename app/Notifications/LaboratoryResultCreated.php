@@ -41,7 +41,7 @@ class LaboratoryResultCreated extends Notification
         $appointment = $this->laboratoryResult->appointment;
 
         return [
-            'message' => "Your laboratory result for {$appointment->type_label} is now available.",
+            'message' => "Your laboratory result for {$appointment->type->label()} is now available.",
             'link' => "/laboratory_results?id={$this->laboratoryResult->id}",
         ];
     }

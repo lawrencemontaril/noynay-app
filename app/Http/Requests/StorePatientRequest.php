@@ -4,9 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
-use App\Models\Patient;
-
 use Illuminate\Validation\Rule;
+use App\Enums\{PatientCivilStatus, PatientGender};
+use App\Models\Patient;
 
 class StorePatientRequest extends FormRequest
 {
@@ -51,12 +51,12 @@ class StorePatientRequest extends FormRequest
             'gender' => [
                 'required',
                 'string',
-                Rule::in(['male', 'female'])
+                Rule::enum(PatientGender::class)
             ],
             'civil_status' => [
                 'required',
                 'string',
-                Rule::in(['single', 'married', 'widowed', 'divorced', 'separated'])
+                Rule::in(PatientCivilStatus::class)
             ],
             'birthdate' => [
                 'required',

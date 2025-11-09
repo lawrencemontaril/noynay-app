@@ -2,6 +2,7 @@
 
 namespace App\Charts;
 
+use App\Enums\InvoiceStatus;
 use App\Models\Invoice;
 use ArielMejiaDev\LarapexCharts\LarapexChart;
 use Illuminate\Support\Facades\DB;
@@ -17,23 +18,27 @@ class InvoiceStatusChart
 
     public function build()
     {
-        $statuses = ['unpaid', 'partially_paid', 'paid', 'cancelled'];
-
-        // Fetch counts from DB
         $counts = DB::table('invoices')
             ->select('status', DB::raw('COUNT(*) as total'))
             ->groupBy('status')
             ->pluck('total', 'status')
             ->toArray();
 
-        // Fill missing statuses with 0
-        $finalCounts = array_map(fn ($status) => $counts[$status] ?? 0, $statuses);
+        $statuses = InvoiceStatus::cases();
+
+        $labels = [];
+        $data = [];
+
+        foreach ($statuses as $status) {
+            $labels[] = $status->label();
+            $data[] = $counts[$status->value] ?? 0;
+        }
 
         return $this->chart->pieChart()
             ->setTitle('Invoices by Status')
             ->setSubtitle('Distribution of invoices')
-            ->addData($finalCounts)
-            ->setLabels(array_map(fn ($s) => ucwords(str_replace('_', ' ', $s)), $statuses))
+            ->addData($data)
+            ->setLabels($labels)
             ->setColors([
                 '#FACC15', // yellow - unpaid
                 '#FB923C',

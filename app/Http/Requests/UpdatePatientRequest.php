@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use App\Enums\{PatientCivilStatus, PatientGender};
 
 class UpdatePatientRequest extends FormRequest
 {
@@ -49,12 +50,12 @@ class UpdatePatientRequest extends FormRequest
             'gender' => [
                 'required',
                 'string',
-                Rule::in(['male', 'female'])
+                Rule::enum(PatientGender::class)
             ],
             'civil_status' => [
                 'required',
                 'string',
-                Rule::in(['single', 'married', 'widowed', 'divorced', 'separated'])
+                Rule::enum(PatientCivilStatus::class)
             ],
             'birthdate' => [
                 'required',

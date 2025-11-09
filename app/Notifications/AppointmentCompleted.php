@@ -42,7 +42,7 @@ class AppointmentCompleted extends Notification
         $scheduled_at = $appointment->scheduled_at?->format('F j, Y g:i A');
 
         return [
-            'message' => "Your {$appointment->type_label} appointment on {$scheduled_at} has been completed.",
+            'message' => "Your {$appointment->type->label()} appointment on {$scheduled_at} has been completed.",
             'link' => "/appointments?id={$appointment->id}",
         ];
     }

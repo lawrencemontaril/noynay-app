@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\LaboratoryResultType;
 use App\Models\LaboratoryResult;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
@@ -37,7 +38,7 @@ class StoreLaboratoryResultRequest extends FormRequest
             'type' => [
                 'required',
                 'string',
-                Rule::in(['pregnancy_test', 'papsmear', 'cbc', 'urinalysis', 'fecalysis']),
+                Rule::enum(LaboratoryResultType::class),
             ],
             'results_file' => [
                 'nullable',

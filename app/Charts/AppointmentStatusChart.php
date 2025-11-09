@@ -2,6 +2,7 @@
 
 namespace App\Charts;
 
+use App\Enums\AppointmentStatus;
 use App\Models\Appointment;
 use ArielMejiaDev\LarapexCharts\LarapexChart;
 use Illuminate\Support\Facades\DB;
@@ -17,23 +18,26 @@ class AppointmentStatusChart
 
     public function build()
     {
-        // Define the statuses you want to show in the chart
-        $statuses = ['pending', 'approved', 'cancelled', 'rejected', 'completed'];
-
-        // Fetch counts from DB
         $counts = Appointment::select('status', DB::raw('count(*) as total'))
             ->groupBy('status')
             ->pluck('total', 'status')
             ->toArray();
 
-        // Ensure all statuses exist (fill missing with 0)
-        $finalCounts = array_map(fn ($status) => $counts[$status] ?? 0, $statuses);
+        $statuses = AppointmentStatus::cases();
+
+        $labels = [];
+        $data = [];
+
+        foreach ($statuses as $status) {
+            $labels[] = $status->label();
+            $data[] = $counts[$status->value] ?? 0;
+        }
 
         return $this->chart->pieChart()
             ->setTitle('Appointment Status Chart')
             ->setSubtitle('Distribution of appointment statuses')
-            ->addData($finalCounts)
-            ->setLabels(array_map('ucfirst', $statuses))
+            ->addData($data)
+            ->setLabels($labels)
             ->setColors([
                 '#FACC15',
                 '#22C55E',

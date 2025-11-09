@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use App\Enums\{AppointmentStatus, AppointmentType};
 
 class UpdateAppointmentRequest extends FormRequest
 {
@@ -34,19 +35,12 @@ class UpdateAppointmentRequest extends FormRequest
             'service' => [
                 'sometimes',
                 'string',
-                Rule::in([
-                    'consultation',
-                    'family_planning_counseling', 'natural_methods',
-                    'chelation_therapy', 'magnetic_resonance_analysis', 'multifunctional_high_potential_therapeutic_services', 'weight_loss_management', 'psychosocial_and_spiritual_counseling',
-                    'pregnancy_test', 'papsmear', 'cbc', 'urinalysis', 'fecalysis',
-                    'pre_natal_and_post_natal', 'normal_spontaneous_delivery', 'immunization', 'ear_pearcing', 'nebulization', 'foley_catheter_insertion', 'surgical_wound_dressing', 'cord_dressing', 'suture_removal', 'issuance_of_bc_newborn_screening',
-                    'general_opd_consultation', 'medical_opd_consultation', 'minor_surgical_procedures', 'issuance_of_medical_certificate', 'pedia_adult_vaccination_services'
-                ]),
+                Rule::enum(AppointmentType::class),
             ],
             'status' => [
                 'sometimes',
                 'string',
-                Rule::in(['pending', 'approved', 'rejected', 'cancelled', 'completed'])
+                Rule::in(AppointmentStatus::class)
             ],
         ];
     }

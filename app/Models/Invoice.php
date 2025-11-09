@@ -2,19 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use App\Observers\InvoiceObserver;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use App\Models\Scopes\ExcludeArchivedAppointment;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Attributes\{ObservedBy, Scope, ScopedBy};
+use Illuminate\Database\Eloquent\{Builder, Model};
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use App\Enums\InvoiceStatus;
+use App\Observers\InvoiceObserver;
+use App\Models\Scopes\ExcludeArchivedAppointment;
 
 #[ObservedBy(InvoiceObserver::class)]
 #[ScopedBy([ExcludeArchivedAppointment::class])]
@@ -31,6 +28,13 @@ class Invoice extends Model
         'appointment_id',
         'status',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'status' => InvoiceStatus::class
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -78,23 +82,23 @@ class Invoice extends Model
     */
     protected function total(): Attribute
     {
-        return Attribute::make(
-            get: fn () => $this->invoiceItems
+        return Attribute::get(
+            fn () => $this->invoiceItems
                 ->sum(fn ($item) => $item->lineTotal)
         );
     }
 
     protected function totalPaid(): Attribute
     {
-        return Attribute::make(
-            get: fn () => $this->payments->sum('amount')
+        return Attribute::get(
+            fn () => $this->payments->sum('amount')
         );
     }
 
     protected function balance(): Attribute
     {
-        return Attribute::make(
-            get: fn () => max(0, $this->total - $this->total_paid)
+        return Attribute::get(
+            fn () => max(0, $this->total - $this->total_paid)
         );
     }
 
@@ -107,5 +111,23 @@ class Invoice extends Model
     protected function searchPatient(Builder $query, ?string $keyword = '')
     {
         $query->whereHas('appointment.patient', fn ($q) => $q->search($keyword));
+    }
+
+    #[Scope]
+    protected function unpaid(Builder $query)
+    {
+        $query->where('status', InvoiceStatus::UNPAID);
+    }
+
+    #[Scope]
+    protected function partiallyPaid(Builder $query)
+    {
+        $query->where('status', InvoiceStatus::PARTIALLY_PAID);
+    }
+
+    #[Scope]
+    protected function paid(Builder $query)
+    {
+        $query->where('status', InvoiceStatus::PAID);
     }
 }

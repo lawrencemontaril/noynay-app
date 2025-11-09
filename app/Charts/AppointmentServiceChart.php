@@ -2,6 +2,7 @@
 
 namespace App\Charts;
 
+use App\Enums\AppointmentType;
 use App\Models\Appointment;
 use ArielMejiaDev\LarapexCharts\LarapexChart;
 use Illuminate\Support\Facades\DB;
@@ -24,8 +25,10 @@ class AppointmentServiceChart
 
         $labels = [];
         $data = [];
+
         foreach ($counts as $service => $total) {
-            $labels[] = Appointment::TYPE_LABELS[$service] ?? $service;
+            $enum = AppointmentType::tryFrom($service);
+            $labels[] = $enum ? $enum->label() : $service;
             $data[] = $total;
         }
 

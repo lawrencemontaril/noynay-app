@@ -2,6 +2,7 @@
 
 namespace App\Charts;
 
+use App\Enums\LaboratoryResultType;
 use App\Models\LaboratoryResult;
 use ArielMejiaDev\LarapexCharts\LarapexChart;
 use Illuminate\Support\Facades\DB;
@@ -17,31 +18,25 @@ class LaboratoryResultsByTypeChart
 
     public function build()
     {
-        $types = ['pregnancy_test', 'papsmear', 'cbc', 'urinalysis', 'fecalysis'];
-
-        // Count results per type
         $counts = LaboratoryResult::select('type', DB::raw('COUNT(*) as total'))
             ->groupBy('type')
             ->pluck('total', 'type')
             ->toArray();
 
-        // Fill missing types with 0
-        $finalCounts = array_map(fn ($t) => $counts[$t] ?? 0, $types);
+        $labels = [];
+        $data = [];
 
-        // Map labels
-        $labels = [
-            'pregnancy_test' => 'Pregnancy Test',
-            'papsmear' => 'Papsmear',
-            'cbc' => 'Complete Blood Count',
-            'urinalysis' => 'Urinalysis',
-            'fecalysis' => 'Fecalysis',
-        ];
+        foreach ($counts as $service => $total) {
+            $enum = LaboratoryResultType::tryFrom($service);
+            $labels[] = $enum ? $enum->label() : $service;
+            $data[] = $total;
+        }
 
         return $this->chart->pieChart()
             ->setTitle('Laboratory Results by Type')
             ->setSubtitle('Distribution of laboratory tests conducted')
-            ->addData($finalCounts)
-            ->setLabels(array_values($labels))
+            ->addData($data)
+            ->setLabels($labels)
             ->setColors([
                 '#F87171', // red
                 '#60A5FA', // blue

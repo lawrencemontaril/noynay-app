@@ -92,8 +92,10 @@ class UpdateConsultationRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            if ($this->systolic <= $this->diastolic) {
-                $validator->errors()->add('systolic', 'Systolic must be greater than diastolic.');
+            if (! is_null($this->systolic) && ! is_null($this->diastolic)) {
+                if ($this->systolic <= $this->diastolic) {
+                    $validator->errors()->add('systolic', 'Systolic must be greater than diastolic.');
+                }
             }
         });
     }

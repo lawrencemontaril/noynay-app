@@ -2,17 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use App\Observers\LaboratoryResultObserver;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use App\Models\Scopes\ExcludeArchivedAppointment;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\{ObservedBy, Scope, ScopedBy};
+use Illuminate\Database\Eloquent\{Builder, Model};
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use App\Enums\{LaboratoryResultStatus, LaboratoryResultType};
+use App\Observers\LaboratoryResultObserver;
+use App\Models\Scopes\ExcludeArchivedAppointment;
 
 #[ObservedBy(LaboratoryResultObserver::class)]
 #[ScopedBy([ExcludeArchivedAppointment::class])]
@@ -36,17 +34,10 @@ class LaboratoryResult extends Model
     protected function casts(): array
     {
         return [
-            'scheduled_at' => 'datetime',
+            'type' => LaboratoryResultType::class,
+            'status' => LaboratoryResultStatus::class
         ];
     }
-
-    public const TYPE_LABELS = [
-        'pregnancy_test' => 'Pregnancy Test',
-        'papsmear' => 'Papsmear',
-        'cbc' => 'Complete Blood Count',
-        'urinalysis' => 'Urinalysis',
-        'fecalysis' => 'Fecalysis',
-    ];
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -69,15 +60,6 @@ class LaboratoryResult extends Model
             get: fn () => $this->results_file_path ? \Storage::url($this->results_file_path) : null
         );
     }
-
-    protected function typeLabel(): Attribute
-    {
-        return Attribute::get(fn () =>
-            self::TYPE_LABELS[$this->type]
-            ?? ucfirst(str_replace('_', ' ', $this->type))
-        );
-    }
-
     /*
     |--------------------------------------------------------------------------
     | Relationships
@@ -102,12 +84,12 @@ class LaboratoryResult extends Model
     #[Scope]
     protected function pending(Builder $query)
     {
-        $query->where('status', 'pending');
+        $query->where('status', LaboratoryResultStatus::PENDING);
     }
 
     #[Scope]
     protected function released(Builder $query)
     {
-        $query->where('status', 'released');
+        $query->where('status', LaboratoryResultStatus::RELEASED);
     }
 }

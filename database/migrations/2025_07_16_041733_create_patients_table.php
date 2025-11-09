@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('middle_name')->nullable();
-            $table->enum('gender', ['male', 'female']);
-            $table->enum('civil_status', ['single', 'married', 'widowed', 'divorced', 'separated']);
+            $table->string('gender');
+            $table->string('civil_status');
             $table->date('birthdate');
             $table->string('contact_number');
             $table->text('address');
