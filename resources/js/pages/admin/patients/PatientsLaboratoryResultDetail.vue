@@ -152,6 +152,15 @@ const isDeleteDialogOpen = ref(false);
                     <DataCard title="Description">
                         <p class="text-sm">{{ laboratory_result?.description ?? 'N/A' }}</p>
                     </DataCard>
+
+                    <iframe
+                        v-if="laboratory_result.results_file_url"
+                        :src="`${laboratory_result.results_file_url}#navpanes=0`"
+                        type="application/pdf"
+                        frameborder="0"
+                        width="100%"
+                        height="600px"
+                    ></iframe>
                 </CardContent>
             </Card>
 

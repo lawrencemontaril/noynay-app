@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\{Builder, Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany, HasOne, MorphMany};
-use Spatie\Activitylog\{ActivitylogServiceProvider, LogOptions};
+use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use App\Enums\{AppointmentStatus, AppointmentType};
 use App\Models\Scopes\ExcludeArchivedPatient;
