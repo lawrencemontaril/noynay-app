@@ -12,7 +12,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { Appointment, BreadcrumbItem, PaginatedData, Patient } from '@/types';
 import { ALL_SERVICES, APPOINTMENT_STATUSES } from '@/types/constants';
 import { Link } from '@inertiajs/vue3';
-import { Ellipsis, Pencil, Trash2 } from 'lucide-vue-next';
+import { Archive, Ellipsis, Pencil } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 const props = defineProps<{
@@ -118,11 +118,11 @@ const openDeleteDialog = (appointment: Appointment) => {
                             <Button
                                 v-if="hasPermissionTo('appointments:delete')"
                                 @click="openDeleteDialog(appointment)"
-                                variant="destructive"
+                                variant="secondary"
                                 size="icon"
                                 class="h-8 w-8"
                             >
-                                <Trash2 class="h-4 w-4" />
+                                <Archive class="h-4 w-4" />
                             </Button>
                         </div>
                     </div>
