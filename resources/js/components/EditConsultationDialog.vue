@@ -54,7 +54,6 @@ const formSchema = toTypedSchema(
     z
         .object({
             appointment_id: z.number({ required_error: 'Appointment is required.' }),
-            type: z.string({ required_error: 'Type field is required.' }),
             chief_complaints: z.string({ required_error: 'Chief Complaints field is required.' }),
             assessment: z.string({ required_error: 'Assessment field is required.' }),
             plan: z.string({ required_error: 'Plan field is required.' }),
