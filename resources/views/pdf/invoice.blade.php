@@ -166,11 +166,11 @@
         </p>
         <p>
             <strong>Status:</strong>
-            <span class="badge {{ $invoice->status }}">
-                {{ str_replace('_', ' ', ucfirst($invoice->status)) }}
+            <span class="badge {{ $invoice->status->value }}">
+                {{ str_replace('_', ' ', ucfirst($invoice->status->value)) }}
             </span>
         </p>
-        <p><strong>Service:</strong> {{ App\Models\Appointment::TYPE_LABELS[$invoice->appointment->type] }}</p>
+        <p><strong>Service:</strong> {{ $invoice->appointment->type->label() }}</p>
         <p><strong>Scheduled at:</strong> {{ $invoice->appointment->scheduled_at->format('F d, Y h:i A') }}</p>
     </div>
 
