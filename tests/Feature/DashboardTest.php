@@ -12,8 +12,7 @@ test('guests are redirected to the login page', function () {
 });
 
 test('authenticated admin users can visit the dashboard', function () {
-    $user = User::factory()->create();
-    $user->assignRole('admin');
+    $user = User::factory()->adminRole()->create();
 
     $this->actingAs($user);
 
@@ -22,8 +21,7 @@ test('authenticated admin users can visit the dashboard', function () {
 });
 
 test('authenticated patient users can visit the dashboard', function () {
-    $user = User::factory()->create();
-    $user->assignRole('patient');
+    $user = User::factory()->patientRole()->create();
 
     $this->actingAs($user);
 

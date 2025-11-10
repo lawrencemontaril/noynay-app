@@ -39,7 +39,7 @@ class RolePermissionSeeder extends Seeder
         Permission::whereNotIn('name', collect($permissions)->pluck('name'))->delete();
 
         // And insert new ones...
-        Permission::upsert($permissions, ['name'], ['guard_name']);
+        Permission::upsert($permissions, ['name', 'guard_name'], ['guard_name']);
 
         $rolePermissions = [
             'admin' => [
