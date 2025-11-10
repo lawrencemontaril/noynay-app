@@ -1,7 +1,6 @@
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
-import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -24,10 +23,9 @@ export default defineConfig({
                 },
             },
         }),
-        visualizer({ open: true }),
     ],
     build: {
-        sourcemap: false, // don't generate .map files
+        sourcemap: false,
         rollupOptions: {
             output: {
                 manualChunks: {
