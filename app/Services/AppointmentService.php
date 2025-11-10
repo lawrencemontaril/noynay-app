@@ -4,7 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
-use App\Enums\AppointmentStatus;
+use App\Enums\{AppointmentStatus, AppointmentType};
 use App\Models\{Appointment, LaboratoryResult, User};
 use App\Notifications\{AppointmentApproved, AppointmentCompleted, AppointmentCreated, AppointmentRescheduled, ConsultationRequest, LaboratoryResultRequest};
 use Carbon\Carbon;
@@ -72,11 +72,11 @@ class AppointmentService
             'status' => $data['status'] ?? $appointment->status,
         ]);
 
-        if ($appointment->status === AppointmentStatus::APPROVED && in_array($appointment->type ?? '', ['pregnancy_test', 'papsmear', 'cbc', 'urinalysis', 'fecalysis'])) {
+        if ($appointment->status === AppointmentStatus::APPROVED && in_array($appointment->type ?? '', [AppointmentType::PREGNANCY_TEST, AppointmentType::PAPSMEAR, AppointmentType::CBC, AppointmentType::URINALYSIS, AppointmentType::FECALYSIS])) {
             LaboratoryResult::create([
                 'appointment_id' => $appointment->id,
                 'description' => null,
-                'type' => $appointment->type,
+                'type' => $appointment->type->value,
                 'status' => 'pending',
                 'results_file_path' => null,
             ]);
