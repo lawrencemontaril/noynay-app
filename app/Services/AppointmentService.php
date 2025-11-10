@@ -72,7 +72,7 @@ class AppointmentService
             'status' => $data['status'] ?? $appointment->status,
         ]);
 
-        if ($appointment->status === AppointmentStatus::APPROVED && in_array($appointment->type ?? '', [AppointmentType::PREGNANCY_TEST, AppointmentType::PAPSMEAR, AppointmentType::CBC, AppointmentType::URINALYSIS, AppointmentType::FECALYSIS])) {
+        if ($appointment->status === AppointmentStatus::APPROVED && in_array($appointment->type, [AppointmentType::PREGNANCY_TEST, AppointmentType::PAPSMEAR, AppointmentType::CBC, AppointmentType::URINALYSIS, AppointmentType::FECALYSIS])) {
             LaboratoryResult::create([
                 'appointment_id' => $appointment->id,
                 'description' => null,
