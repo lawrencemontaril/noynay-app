@@ -126,7 +126,7 @@ const isDeleteDialogOpen = ref(false);
                         <div>
                             <label class="text-xs font-medium text-muted-foreground">Name</label>
                             <p class="text-sm font-semibold">
-                                {{ getFullName(patient?.last_name!, patient?.first_name!, patient?.middle_name!) }}
+                                {{ getFullName(patient.last_name, patient.first_name, patient.middle_name) }}
                             </p>
                         </div>
                         <div>

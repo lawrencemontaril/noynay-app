@@ -2,18 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\Appointment;
-use App\Models\LaboratoryResult;
-use App\Models\User;
-use App\Notifications\AppointmentApproved;
-use App\Notifications\AppointmentCompleted;
-use App\Notifications\AppointmentCreated;
-use App\Notifications\AppointmentRescheduled;
-use App\Notifications\ConsultationRequest;
-use App\Notifications\LaboratoryResultRequest;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
+use App\Enums\AppointmentStatus;
+use App\Models\{Appointment, LaboratoryResult, User};
+use App\Notifications\{AppointmentApproved, AppointmentCompleted, AppointmentCreated, AppointmentRescheduled, ConsultationRequest, LaboratoryResultRequest};
+use Carbon\Carbon;
 
 class AppointmentService
 {
@@ -78,7 +72,7 @@ class AppointmentService
             'status' => $data['status'] ?? $appointment->status,
         ]);
 
-        if ($appointment->status === 'approved' && in_array($appointment->type ?? '', ['pregnancy_test', 'papsmear', 'cbc', 'urinalysis', 'fecalysis'])) {
+        if ($appointment->status === AppointmentStatus::APPROVED && in_array($appointment->type ?? '', ['pregnancy_test', 'papsmear', 'cbc', 'urinalysis', 'fecalysis'])) {
             LaboratoryResult::create([
                 'appointment_id' => $appointment->id,
                 'description' => null,
