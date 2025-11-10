@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useFormatters } from '@/composables/useFormatters';
+import { usePermissions } from '@/composables/usePermissions';
 import { Activity } from '@/types';
 import { router } from '@inertiajs/vue3';
 import { RefreshCcw } from 'lucide-vue-next';
@@ -12,6 +13,7 @@ defineProps<{
 }>();
 
 const { getFullName } = useFormatters();
+const { hasAnyRole } = usePermissions();
 
 const isLoading = ref(false);
 const hasLoaded = ref(false);
@@ -29,7 +31,10 @@ const loadActivities = () => {
 </script>
 
 <template>
-    <Card class="gap-0">
+    <Card
+        v-if="hasAnyRole(['admin', 'system_admin'])"
+        class="gap-0"
+    >
         <CardHeader class="flex items-center justify-between border-b">
             <CardTitle class="text-lg font-semibold">Activity Log</CardTitle>
 
