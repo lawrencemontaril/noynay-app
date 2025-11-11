@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\ActivityResource;
 use App\Models\User;
+use App\Http\Requests\{StoreUserRequest, UpdateUserRequest};
 use Inertia\Inertia;
-use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\UpdateUserRequest;
 
 class UserController extends Controller
 {
@@ -77,6 +77,9 @@ class UserController extends Controller
 
         return Inertia::render('admin/users/UsersShow', [
             'user' => $user->toResource(),
+            'activities' => Inertia::optional(
+                fn () => ActivityResource::collection($user->activities()->with('causer')->latest()->get())
+            )
         ]);
     }
 

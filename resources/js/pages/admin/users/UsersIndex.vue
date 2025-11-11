@@ -14,9 +14,9 @@ import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, PaginatedData, User } from '@/types';
 import { USER_ROLES } from '@/types/constants';
-import { router } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
-import { Pencil, Search, Trash, X } from 'lucide-vue-next';
+import { Eye, Pencil, Search, Trash, X } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 
 const props = defineProps<{
@@ -167,7 +167,7 @@ watch([q, role, is_active], () => filterUsers());
                                 {{ user.email }}
                             </TableCell>
 
-                            <TableCell>{{ USER_ROLES.find((r) => r.value === user.role)?.label }}</TableCell>
+                            <TableCell>{{ USER_ROLES.find((role) => role.value === user.role)?.label }}</TableCell>
 
                             <TableCell>
                                 <Badge :variant="`${user.is_active ? 'default' : 'destructive'}`">
@@ -179,6 +179,20 @@ watch([q, role, is_active], () => filterUsers());
                                 v-if="hasAnyPermissionTo(['users:update', 'users:delete'])"
                                 class="flex items-center gap-2"
                             >
+                                <Button
+                                    v-if="hasPermissionTo('users:view')"
+                                    variant="info"
+                                    size="icon"
+                                    as-child
+                                >
+                                    <Link
+                                        :href="route('admin.users.show', user.id)"
+                                        prefetch
+                                    >
+                                        <Eye />
+                                    </Link>
+                                </Button>
+
                                 <Button
                                     v-if="hasPermissionTo('users:update')"
                                     @click="openEditDialog(user)"

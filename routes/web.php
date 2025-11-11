@@ -62,6 +62,7 @@ Route::prefix('admin')
         Route::controller(AdminUserController::class)->group(function () {
             Route::get('users', 'index')->name('users.index');
             Route::get('users/search', 'search')->name('users.search');
+            Route::get('users/{user}', 'show')->name('users.show');
             Route::post('users', 'store')->name('users.store');
             Route::patch('users/{user}', 'update')->name('users.update');
             Route::delete('users/{user}', 'destroy')->name('users.destroy');
