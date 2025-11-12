@@ -56,10 +56,19 @@ class LaboratoryResult extends Model
     */
     protected function resultsFileUrl(): Attribute
     {
-        return Attribute::make(
-            get: fn () => $this->results_file_path ? \Storage::url($this->results_file_path) : null
+        return Attribute::get(
+            fn () => $this->results_file_path ? \Storage::url($this->results_file_path) : null
         );
     }
+
+    protected function isReleased(): Attribute
+    {
+        return Attribute::get(
+            fn () => ! is_null($this->results_file_path)
+        );
+    }
+
+
     /*
     |--------------------------------------------------------------------------
     | Relationships

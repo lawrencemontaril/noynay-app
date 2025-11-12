@@ -2,22 +2,20 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\StorePaymentRequest;
-use App\Http\Requests\UpdatePaymentRequest;
-use App\Models\Payment;
-use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\{StorePaymentRequest, UpdatePaymentRequest};
+use App\Models\Payment;
 
 class PaymentController extends Controller
 {
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePaymentRequest $request, PaymentService $paymentService)
+    public function store(StorePaymentRequest $request)
     {
-        $paymentService->create($request->validated());
+        Payment::create($request->validated());
 
         return redirect()
             ->back()

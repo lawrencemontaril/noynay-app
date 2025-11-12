@@ -8,14 +8,17 @@ import AuthBase from '@/layouts/AuthLayout.vue';
 import LandingLayout from '@/layouts/LandingLayout.vue';
 import { Head, useForm as useInertiaForm } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
-import { LoaderCircle } from 'lucide-vue-next';
+import { Eye, EyeOff, LoaderCircle } from 'lucide-vue-next';
 import { useForm as useVeeForm } from 'vee-validate';
+import { ref } from 'vue';
 import * as z from 'zod';
 
 defineProps<{
     status?: string;
     canResetPassword: boolean;
 }>();
+
+const showPassword = ref(false);
 
 const inertiaForm = useInertiaForm({
     email: '',
@@ -110,13 +113,26 @@ const submit = handleSubmit((validatedValues) => {
                         </div>
 
                         <FormControl>
-                            <Input
-                                v-bind="componentField"
-                                type="password"
-                                autocomplete="current-password"
-                                :tabindex="2"
-                                placeholder="Password"
-                            />
+                            <div class="relative w-full">
+                                <Input
+                                    v-bind="componentField"
+                                    :type="showPassword ? 'text' : 'password'"
+                                    autocomplete="current-password"
+                                    :tabindex="2"
+                                    placeholder="Password"
+                                />
+
+                                <Button
+                                    @click="showPassword = !showPassword"
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    class="absolute top-1/2 right-1 -translate-y-1/2"
+                                >
+                                    <EyeOff v-if="showPassword" />
+                                    <Eye v-else />
+                                </Button>
+                            </div>
                         </FormControl>
 
                         <FormMessage />

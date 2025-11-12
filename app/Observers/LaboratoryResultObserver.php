@@ -2,10 +2,9 @@
 
 namespace App\Observers;
 
-use App\Models\LaboratoryResult;
-use App\Models\User;
-use App\Notifications\LaboratoryResultCreated;
-use App\Notifications\PendingInvoice;
+use App\Enums\LaboratoryResultStatus;
+use App\Models\{LaboratoryResult, User};
+use App\Notifications\{LaboratoryResultCreated, PendingInvoice};
 use App\Services\AppointmentService;
 
 class LaboratoryResultObserver
@@ -15,65 +14,23 @@ class LaboratoryResultObserver
      */
     public function saving(LaboratoryResult $laboratoryResult): void
     {
-        $user = $laboratoryResult->appointment?->patient?->user;
+        $user = $laboratoryResult->appointment->patient->user;
 
-        if (! is_null($laboratoryResult->results_file_path)) {
-            $laboratoryResult->status = 'released';
+        if ($laboratoryResult->is_released) {
+            $laboratoryResult->status = LaboratoryResultStatus::RELEASED;
 
-            $user->notify(new LaboratoryResultCreated($laboratoryResult));
-
-            $appointmentService = app(AppointmentService::class);
+            $user?->notify(new LaboratoryResultCreated($laboratoryResult));
 
             // Send a pending invoice notification to cashier
-            if (! $appointmentService->hasBeenServiced($laboratoryResult->appointment)) {
+            if (! app(AppointmentService::class)->hasBeenServiced($laboratoryResult->appointment)) {
                 $cashiers = User::role('cashier')->get();
 
                 foreach ($cashiers as $cashier) {
-                    $cashier->notify(new PendingInvoice($laboratoryResult->appointment));
+                    $cashier?->notify(new PendingInvoice($laboratoryResult->appointment));
                 }
             }
         } else {
-            $laboratoryResult->status = 'pending';
+            $laboratoryResult->status = LaboratoryResultStatus::PENDING;
         }
-    }
-
-    /**
-     * Handle the LaboratoryResult "created" event.
-     */
-    public function created(LaboratoryResult $laboratoryResult): void
-    {
-
-    }
-
-    /**
-     * Handle the LaboratoryResult "updated" event.
-     */
-    public function updated(LaboratoryResult $laboratoryResult): void
-    {
-        //
-    }
-
-    /**
-     * Handle the LaboratoryResult "deleted" event.
-     */
-    public function deleted(LaboratoryResult $laboratoryResult): void
-    {
-        //
-    }
-
-    /**
-     * Handle the LaboratoryResult "restored" event.
-     */
-    public function restored(LaboratoryResult $laboratoryResult): void
-    {
-        //
-    }
-
-    /**
-     * Handle the LaboratoryResult "force deleted" event.
-     */
-    public function forceDeleted(LaboratoryResult $laboratoryResult): void
-    {
-        //
     }
 }

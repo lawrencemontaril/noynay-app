@@ -91,16 +91,6 @@ class Appointment extends Model
         );
     }
 
-    protected function hasBeenServiced(): Attribute
-    {
-        return Attribute::get(
-            fn () => (
-                $this->consultations()->exists() ||
-                $this->laboratoryResults()->exists()
-            )
-        );
-    }
-
     /*
     |--------------------------------------------------------------------------
     | Relationships

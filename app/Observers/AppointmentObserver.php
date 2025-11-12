@@ -15,7 +15,7 @@ class AppointmentObserver
             return;
         }
 
-        // Otherwise, if the authenticated user is a patient, assign it automatically
+        // Associate the appointment to the patient's user model
         if (auth()->check() && auth()->user()->hasRole('patient')) {
             $appointment->patient_id = auth()->user()->patient->id;
         }

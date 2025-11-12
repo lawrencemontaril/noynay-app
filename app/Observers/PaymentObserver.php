@@ -3,16 +3,18 @@
 namespace App\Observers;
 
 use App\Enums\InvoiceStatus;
-use App\Models\Invoice;
+use App\Models\Payment;
 use App\Notifications\InvoicePaid;
 
-class InvoiceObserver
+class PaymentObserver
 {
     /**
-     * Handle the Invoice "saving" event.
+     * Handle the Payment "saving" event.
      */
-    public function saving(Invoice $invoice): void
+    public function saving(Payment $payment): void
     {
+        $invoice = $payment->invoice;
+
         if (! $invoice->invoiceItems()->exists()) {
             $invoice->status = InvoiceStatus::UNPAID;
         } elseif ($invoice->balance <= 0) {
