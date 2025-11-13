@@ -107,3 +107,14 @@ export const USER_ROLES = [
         value: 'patient',
     },
 ];
+
+export const PATIENT_GENDERS = [
+    {
+        label: 'Male',
+        value: 'male',
+    },
+    {
+        label: 'Female',
+        value: 'female',
+    },
+];

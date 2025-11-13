@@ -19,16 +19,14 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(['update:open']);
 
-const { hasPermissionTo, hasAnyRole } = usePermissions();
+const { hasRole, hasAnyRole, hasPermissionTo } = usePermissions();
 const { getFullName } = useFormatters();
 
 function closeDialog() {
     emit('update:open', false);
 }
 
-const inertiaForm = useInertiaForm({
-    status: props.appointment?.status,
-});
+const inertiaForm = useInertiaForm({});
 
 const formSchema = toTypedSchema(
     z.object({
@@ -36,17 +34,22 @@ const formSchema = toTypedSchema(
     }),
 );
 
-const { handleSubmit, setErrors, setFieldValue, resetForm } = useVeeForm({
+const { handleSubmit, setFieldValue, resetForm, values } = useVeeForm({
     validationSchema: formSchema,
 });
 
-const updateAppointment = handleSubmit((validatedValues) => {
-    inertiaForm.status = validatedValues.status;
-
-    inertiaForm.patch(route('admin.appointments.update', props.appointment?.id), {
-        onError: (serverErrors) => {
-            setErrors(serverErrors);
+const approveAppointment = handleSubmit(() => {
+    inertiaForm.patch(route('admin.appointments.approve', props.appointment?.id), {
+        onSuccess: () => {
+            inertiaForm.reset();
+            resetForm();
+            closeDialog();
         },
+    });
+});
+
+const rejectAppointment = handleSubmit(() => {
+    inertiaForm.patch(route('admin.appointments.reject', props.appointment?.id), {
         onSuccess: () => {
             inertiaForm.reset();
             resetForm();
@@ -66,82 +69,94 @@ const updateAppointment = handleSubmit((validatedValues) => {
                 <DialogTitle>Appointment #{{ appointment?.id }} </DialogTitle>
             </DialogHeader>
 
-            <!-- Patient Info -->
-            <DataCard
-                title="Patient Information"
-                :columns="2"
-            >
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Name</label>
-                    <p class="text-sm font-semibold">
-                        {{ getFullName(patient?.last_name!, patient?.first_name!, patient?.middle_name!) }}
+            <div class="space-y-2">
+                <!-- Patient Info -->
+                <DataCard
+                    title="Patient Information"
+                    :columns="2"
+                >
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">Name</label>
+                        <p class="text-sm font-semibold">
+                            {{ getFullName(patient?.last_name!, patient?.first_name!, patient?.middle_name!) }}
+                        </p>
+                    </div>
+                    <div v-if="!hasAnyRole(['doctor', 'laboratory_staff'])">
+                        <label class="text-xs font-medium text-muted-foreground">Status</label>
+                        <p
+                            class="text-sm font-semibold capitalize"
+                            :class="{
+                                'text-primary':
+                                    appointment?.status === 'approved' || appointment?.status === 'completed',
+                                'text-destructive':
+                                    appointment?.status === 'rejected' || appointment?.status === 'cancelled',
+                                'text-warning': appointment?.status === 'pending',
+                            }"
+                        >
+                            {{ appointment?.status }}
+                        </p>
+                    </div>
+                </DataCard>
+
+                <DataCard title="Service Type">
+                    <p class="text-sm">
+                        {{ ALL_SERVICES.find((service) => service.value === appointment?.type)?.label }}
                     </p>
-                </div>
-                <div v-if="!hasAnyRole(['doctor', 'laboratory_staff'])">
-                    <label class="text-xs font-medium text-muted-foreground">Status</label>
-                    <p
-                        class="text-sm font-semibold capitalize"
-                        :class="{
-                            'text-primary': appointment?.status === 'approved' || appointment?.status === 'completed',
-                            'text-destructive':
-                                appointment?.status === 'rejected' || appointment?.status === 'cancelled',
-                            'text-warning': appointment?.status === 'pending',
-                        }"
+                </DataCard>
+
+                <DataCard title="Scheduled Date">
+                    <p class="text-sm">
+                        {{ appointment?.scheduled_at.formatted_date }}
+                    </p>
+                </DataCard>
+
+                <DataCard title="Complaints / Notes">
+                    <p class="text-sm">
+                        {{ appointment?.complaints ?? 'N/A' }}
+                    </p>
+                </DataCard>
+            </div>
+
+            <DialogFooter>
+                <template v-if="hasRole('admin') && appointment?.status === 'pending'">
+                    <Button
+                        v-if="hasPermissionTo('appointments:approve')"
+                        @click="
+                            () => {
+                                setFieldValue('status', 'approved');
+                                approveAppointment();
+                            }
+                        "
+                        :disabled="inertiaForm.processing"
+                        class="flex items-center gap-2"
                     >
-                        {{ appointment?.status }}
-                    </p>
-                </div>
-            </DataCard>
+                        <LoaderCircle
+                            v-if="inertiaForm.processing && values.status === 'approved'"
+                            class="h-4 w-4 animate-spin"
+                        />
+                        Approve
+                    </Button>
 
-            <DataCard title="Service Type">
-                <p class="text-sm">
-                    {{ ALL_SERVICES.find((service) => service.value === appointment?.type)?.label }}
-                </p>
-            </DataCard>
-
-            <DataCard title="Scheduled Date">
-                <p class="text-sm">
-                    {{ appointment?.scheduled_at.formatted_date }}
-                </p>
-            </DataCard>
-
-            <DataCard title="Complaints / Notes">
-                <p class="text-sm">
-                    {{ appointment?.complaints ?? 'N/A' }}
-                </p>
-            </DataCard>
-
-            <form @submit.prevent="updateAppointment">
-                <DialogFooter>
-                    <template v-if="appointment?.status === 'pending' && hasPermissionTo('appointments:update')">
-                        <Button
-                            type="submit"
-                            @click="setFieldValue('status', 'approved')"
-                            :disabled="inertiaForm.processing"
-                            class="flex items-center gap-2"
-                        >
-                            <LoaderCircle
-                                v-if="inertiaForm.processing && inertiaForm.status === 'approved'"
-                                class="h-4 w-4 animate-spin"
-                            />
-                            Approve
-                        </Button>
-
-                        <Button
-                            variant="destructive"
-                            @click="setFieldValue('status', 'rejected')"
-                            :disabled="inertiaForm.processing"
-                            class="flex items-center gap-2"
-                        >
-                            <LoaderCircle
-                                v-if="inertiaForm.processing && inertiaForm.status === 'rejected'"
-                                class="h-4 w-4 animate-spin"
-                            />
-                            Reject
-                        </Button>
-                    </template>
-                </DialogFooter>
-            </form>
+                    <Button
+                        v-if="hasPermissionTo('appointments:reject')"
+                        @click="
+                            () => {
+                                setFieldValue('status', 'rejected');
+                                rejectAppointment();
+                            }
+                        "
+                        variant="destructive"
+                        :disabled="inertiaForm.processing"
+                        class="flex items-center gap-2"
+                    >
+                        <LoaderCircle
+                            v-if="inertiaForm.processing && values.status === 'rejected'"
+                            class="h-4 w-4 animate-spin"
+                        />
+                        Reject
+                    </Button>
+                </template>
+            </DialogFooter>
         </DialogScrollContent>
     </Dialog>
 </template>

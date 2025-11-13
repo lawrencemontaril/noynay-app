@@ -94,7 +94,7 @@ class AppointmentController extends Controller
      */
     public function cancel(Appointment $appointment, AppointmentService $appointmentService)
     {
-        Gate::authorize('update', $appointment);
+        Gate::authorize('cancel', $appointment);
 
         $appointmentService->cancel($appointment);
 

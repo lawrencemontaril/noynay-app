@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Appointment;
 use App\Models\Setting;
+use App\Notifications\AppointmentCompleted;
 use Illuminate\Support\{Arr, Collection};
 use App\Enums\InvoiceStatus;
 use App\Notifications\{InvoiceCreated, InvoicePaid};
@@ -37,12 +39,7 @@ class InvoiceService
             $invoice->invoiceItems()->createMany($data['items']);
         }
 
-        // Mark appointment as completed
-        if ($invoice->appointment()->exists()) {
-            $appointment = $invoice->appointment;
-            $appointment->status = 'completed';
-            $appointment->save();
-        }
+        $this->notifyPatientOfAppointmentCompletion($invoice->appointment);
 
         $this->notifyInvoiceCreation($invoice);
 
@@ -160,5 +157,10 @@ class InvoiceService
         if ($user) {
             $user->notify(new InvoiceCreated($invoice));
         }
+    }
+
+    protected function notifyPatientOfAppointmentCompletion(Appointment $appointment)
+    {
+        $appointment->patient->user?->notify(new AppointmentCompleted($appointment));
     }
 }

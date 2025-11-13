@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import Container from '@/components/Container.vue';
+import DataCard from '@/components/DataCard.vue';
+import DataText from '@/components/DataText.vue';
 import DeleteAppointmentDialog from '@/components/DeleteAppointmentDialog.vue';
 import EditAppointmentDialog from '@/components/EditAppointmentDialog.vue';
 import Pagination from '@/components/Pagination.vue';
@@ -128,18 +130,14 @@ const openDeleteDialog = (appointment: Appointment) => {
                     </div>
 
                     <!-- Body -->
-                    <div class="px-4 py-3 text-sm text-muted-foreground">
-                        <p v-if="appointment.complaints">
-                            <span class="font-medium text-foreground">Complaints:</span>
-                            {{ appointment.complaints }}
-                        </p>
+                    <div class="grid grid-cols-1 gap-4 p-2 pb-0 md:grid-cols-2">
+                        <DataCard title="complaints">
+                            <DataText>{{ appointment.complaints ?? 'N/A' }}</DataText>
+                        </DataCard>
 
-                        <p class="mt-1 text-xs text-muted-foreground">
-                            Scheduled for:
-                            <span class="font-medium text-foreground">{{
-                                appointment.scheduled_at.formatted_date
-                            }}</span>
-                        </p>
+                        <DataCard title="Scheduled for">
+                            <DataText>{{ appointment.scheduled_at.formatted_date }}</DataText>
+                        </DataCard>
                     </div>
                 </div>
 

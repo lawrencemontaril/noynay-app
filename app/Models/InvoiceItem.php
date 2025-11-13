@@ -32,7 +32,7 @@ class InvoiceItem extends Model
             ->logOnly(['description', 'quantity', 'unit_price'])
             ->logOnlyDirty()
             ->useLogName('invoice')
-            ->setDescriptionForEvent(fn (string $eventName) => ucfirst($eventName)." the invoice item.");
+            ->setDescriptionForEvent(fn (string $eventName) => ucfirst($eventName)." the invoice item");
     }
 
     public function tapActivity(Activity $activity, string $eventName): void

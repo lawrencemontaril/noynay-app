@@ -158,7 +158,7 @@ watch(() => [inertiaForm.status, inertiaForm.type], filterAppointments);
 
                             <TableCell class="flex items-center gap-2">
                                 <Button
-                                    v-if="hasPermissionTo('appointments:update') && appointment.is_reschedulable"
+                                    v-if="hasPermissionTo('appointments:reschedule') && appointment.is_reschedulable"
                                     @click="openRescheduleAppointmentDialog(appointment)"
                                     variant="warning"
                                     size="icon"
@@ -176,7 +176,7 @@ watch(() => [inertiaForm.status, inertiaForm.type], filterAppointments);
                                 </Button>
 
                                 <Button
-                                    v-if="hasPermissionTo('appointments:update') && appointment.is_cancellable"
+                                    v-if="hasPermissionTo('appointments:cancel') && appointment.is_cancellable"
                                     @click="openCancelAppointmentDialog(appointment)"
                                     variant="destructive"
                                     size="icon"

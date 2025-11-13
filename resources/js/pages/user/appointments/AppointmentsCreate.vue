@@ -5,7 +5,14 @@ import Button from '@/components/ui/button/Button.vue';
 import Calendar from '@/components/ui/calendar/Calendar.vue';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Stepper, StepperDescription, StepperItem, StepperSeparator, StepperTitle, StepperTrigger } from '@/components/ui/stepper';
+import {
+    Stepper,
+    StepperDescription,
+    StepperItem,
+    StepperSeparator,
+    StepperTitle,
+    StepperTrigger,
+} from '@/components/ui/stepper';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { useFormatters } from '@/composables/useFormatters';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -130,36 +137,24 @@ const steps = [
     },
 ];
 
-const availableTimes = [
-    {
-        label: '9:00 AM',
-        value: '09:00:00',
-    },
-    {
-        label: '11:00 AM',
-        value: '11:00:00',
-    },
-    {
-        label: '12:00 PM',
-        value: '12:00:00',
-    },
-    {
-        label: '1:00 PM',
-        value: '13:00:00',
-    },
-    {
-        label: '2:00 PM',
-        value: '14:00:00',
-    },
-    {
-        label: '3:00 PM',
-        value: '15:00:00',
-    },
-    {
-        label: '4:00 PM',
-        value: '16:00:00',
-    },
-];
+function generateAvailableTimes(): { label: string; value: string }[] {
+    const times: { label: string; value: string }[] = [];
+
+    for (let hour = 0; hour < 24; hour++) {
+        const ampm = hour < 12 ? 'AM' : 'PM';
+        const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+        const label = `${displayHour}:00 ${ampm}`;
+        const value = `${hour.toString().padStart(2, '0')}:00:00`;
+
+        times.push({ label, value });
+    }
+
+    return times;
+}
+
+const availableTimes = generateAvailableTimes();
+const availableTimesAM = availableTimes.filter((t) => t.label.includes('AM'));
+const availableTimesPM = availableTimes.filter((t) => t.label.includes('PM'));
 
 const formSchema = [
     z.object({
@@ -240,7 +235,9 @@ const scheduled_date = computed({
                                     :variant="state === 'completed' || state === 'active' ? 'default' : 'outline'"
                                     size="icon"
                                     class="shrink-0 rounded-full"
-                                    :class="[state === 'active' && 'ring-2 ring-ring ring-offset-2 ring-offset-background']"
+                                    :class="[
+                                        state === 'active' && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
+                                    ]"
                                     :disabled="state !== 'completed' && !meta.valid"
                                 >
                                     <Check
@@ -363,11 +360,37 @@ const scheduled_date = computed({
                                     <FormItem>
                                         <FormLabel required>Time</FormLabel>
                                         <FormControl>
+                                            <div class="border-b text-sm">Morning</div>
+                                            <div class="mb-3 flex flex-wrap gap-4">
+                                                <Button
+                                                    v-for="time in availableTimesAM"
+                                                    :class="[
+                                                        'w-fit',
+                                                        {
+                                                            'bg-primary text-primary-foreground! hover:bg-primary/90':
+                                                                values.scheduled_time === time.value,
+                                                        },
+                                                    ]"
+                                                    variant="outline"
+                                                    @click="setFieldValue('scheduled_time', time.value)"
+                                                    :key="time.value"
+                                                >
+                                                    {{ time.label }}
+                                                </Button>
+                                            </div>
+
+                                            <div class="border-b text-sm">Afternoon</div>
                                             <div class="flex flex-wrap gap-4">
                                                 <Button
-                                                    v-for="time in availableTimes"
-                                                    class="w-fit"
-                                                    :variant="values.scheduled_time === time.value ? 'default' : 'outline'"
+                                                    v-for="time in availableTimesPM"
+                                                    :class="[
+                                                        'w-fit',
+                                                        {
+                                                            'bg-primary text-primary-foreground! hover:bg-primary/90':
+                                                                values.scheduled_time === time.value,
+                                                        },
+                                                    ]"
+                                                    variant="outline"
                                                     @click="setFieldValue('scheduled_time', time.value)"
                                                     :key="time.value"
                                                 >
@@ -402,21 +425,28 @@ const scheduled_date = computed({
                                         v-if="selectedService"
                                         class="text-sm"
                                     >
-                                        {{ services[selectedService]?.children.find((s) => s.value === values.type)?.label }}
+                                        {{
+                                            services[selectedService]?.children.find((s) => s.value === values.type)
+                                                ?.label
+                                        }}
                                     </p>
                                 </div>
 
                                 <div class="grid grid-cols-1 gap-2">
                                     <label class="border-b pb-1 text-xs font-semibold uppercase">Date</label>
                                     <p class="text-sm">
-                                        {{ dateFormatter.format(toJsDate(values.scheduled_date, values.scheduled_time)) }}
+                                        {{
+                                            dateFormatter.format(toJsDate(values.scheduled_date, values.scheduled_time))
+                                        }}
                                     </p>
                                 </div>
 
                                 <div class="grid grid-cols-1 gap-2">
                                     <label class="border-b pb-1 text-xs font-semibold uppercase">Time</label>
                                     <p class="text-sm">
-                                        {{ timeFormatter.format(toJsDate(values.scheduled_date, values.scheduled_time)) }}
+                                        {{
+                                            timeFormatter.format(toJsDate(values.scheduled_date, values.scheduled_time))
+                                        }}
                                     </p>
                                 </div>
                             </div>

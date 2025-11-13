@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import CreateLaboratoryResultDialog from '@/components/CreateLaboratoryResultDialog.vue';
+import DataCard from '@/components/DataCard.vue';
+import DataText from '@/components/DataText.vue';
 import DeleteLaboratoryResultDialog from '@/components/DeleteLaboratoryResultDialog.vue';
 import PatientProfileTabs from '@/components/PatientProfileTabs.vue';
 import RequestLaboratoryResultDialog from '@/components/RequestLaboratoryResultDialog.vue';
@@ -129,11 +131,10 @@ const openDeleteDialog = (laboratory_result: LaboratoryResult) => {
                     </div>
 
                     <!-- Body -->
-                    <div class="px-4 py-3 text-sm text-muted-foreground">
-                        <p>
-                            <span class="font-medium text-foreground">Description:</span>
-                            {{ laboratory_result.description ?? 'N/A' }}
-                        </p>
+                    <div class="p-2 pb-0">
+                        <DataCard title="Description">
+                            <DataText>{{ laboratory_result.description ?? 'N/A' }}</DataText>
+                        </DataCard>
                     </div>
                 </div>
 

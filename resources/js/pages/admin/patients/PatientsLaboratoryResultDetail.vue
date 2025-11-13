@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import ActivityTimeline from '@/components/ActivityTimeline.vue';
 import DataCard from '@/components/DataCard.vue';
+import DataCell from '@/components/DataCell.vue';
+import DataLabel from '@/components/DataLabel.vue';
+import DataText from '@/components/DataText.vue';
 import DeleteLaboratoryResultDialog from '@/components/DeleteLaboratoryResultDialog.vue';
 import EditLaboratoryResultDialog from '@/components/EditLaboratoryResultDialog.vue';
 import PatientProfileTabs from '@/components/PatientProfileTabs.vue';
@@ -11,7 +14,7 @@ import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import PatientAppointmentLayout from '@/layouts/PatientAppointmentLayout.vue';
 import { Activity, Appointment, BreadcrumbItem, LaboratoryResult, Patient } from '@/types';
-import { LAB_TYPES } from '@/types/constants';
+import { LAB_TYPES, PATIENT_GENDERS } from '@/types/constants';
 import { Link } from '@inertiajs/vue3';
 import { Archive, Pencil } from 'lucide-vue-next';
 import { ref } from 'vue';
@@ -123,34 +126,36 @@ const isDeleteDialogOpen = ref(false);
                         title="Patient Information"
                         :columns="3"
                     >
-                        <div>
-                            <label class="text-xs font-medium text-muted-foreground">Name</label>
-                            <p class="text-sm font-semibold">
+                        <DataCell>
+                            <DataLabel>Name</DataLabel>
+                            <DataText>
                                 {{ getFullName(patient.last_name, patient.first_name, patient.middle_name) }}
-                            </p>
-                        </div>
-                        <div>
-                            <label class="text-xs font-medium text-muted-foreground">Gender</label>
-                            <p class="text-sm capitalize">
-                                {{ patient?.gender }}
-                            </p>
-                        </div>
-                        <div>
-                            <label class="text-xs font-medium text-muted-foreground">Age</label>
-                            <p class="text-sm">
+                            </DataText>
+                        </DataCell>
+                        <DataCell>
+                            <DataLabel>Gender</DataLabel>
+                            <DataText>
+                                {{ PATIENT_GENDERS.find((gender) => gender.value === patient?.gender)?.label }}
+                            </DataText>
+                        </DataCell>
+                        <DataCell>
+                            <DataLabel>Age</DataLabel>
+                            <DataText>
                                 {{ patient?.age?.formatted_long }}
-                            </p>
-                        </div>
+                            </DataText>
+                        </DataCell>
                     </DataCard>
 
                     <DataCard title="Test Type">
-                        <p class="text-sm">
+                        <DataText>
                             {{ LAB_TYPES.find((type) => type.value === laboratory_result?.type)?.label }}
-                        </p>
+                        </DataText>
                     </DataCard>
 
                     <DataCard title="Description">
-                        <p class="text-sm">{{ laboratory_result?.description ?? 'N/A' }}</p>
+                        <DataText>
+                            {{ laboratory_result?.description ?? 'N/A' }}
+                        </DataText>
                     </DataCard>
 
                     <iframe

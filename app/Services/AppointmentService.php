@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Setting;
+use App\Notifications\AppointmentCancelled;
+use App\Notifications\AppointmentRejected;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 use App\Enums\{AppointmentStatus, AppointmentType, LaboratoryResultStatus, LaboratoryResultType};
@@ -81,19 +83,6 @@ class AppointmentService
             'status' => $data['status'] ?? $appointment->status,
         ]);
 
-        if ($appointment->status === AppointmentStatus::APPROVED && $appointment->type->isLab()) {
-            $appointment->laboratoryResults()->create([
-                'description' => null,
-                'type' => LaboratoryResultType::from($appointment->type->value),
-                'status' => LaboratoryResultStatus::PENDING,
-                'results_file_path' => null,
-            ]);
-        }
-
-        $this->notifyStaffsOfAppointmentApprovals($appointment);
-        $this->notifyPatientOfAppointmentCompletion($appointment);
-        $this->notifyPatientOfAppointmentApprovals($appointment);
-
         return $appointment;
     }
 
@@ -121,12 +110,38 @@ class AppointmentService
         return $appointment;
     }
 
+    public function approve(Appointment $appointment)
+    {
+        $appointment->update(['status' => AppointmentStatus::APPROVED]);
+
+        if ($appointment->type->isLab()) {
+            $appointment->laboratoryResults()->create([
+                'description' => null,
+                'type' => LaboratoryResultType::from($appointment->type->value),
+                'status' => LaboratoryResultStatus::PENDING,
+                'results_file_path' => null,
+            ]);
+        }
+
+        $this->notifyStaffsOfAppointmentApprovals($appointment);
+        $this->notifyPatientOfAppointmentApprovals($appointment);
+    }
+
+    public function reject(Appointment $appointment)
+    {
+        $appointment->update(['status' => AppointmentStatus::REJECTED]);
+
+        $this->notifyPatientOfAppointmentRejection($appointment);
+    }
+
     /**
      * Cancel an appointment (triggered by user)
      */
-    public function cancel(Appointment $appointment): bool
+    public function cancel(Appointment $appointment)
     {
-        return $appointment->update(['status' => 'cancelled']);
+        $appointment->update(['status' => AppointmentStatus::CANCELLED]);
+
+        $this->notifyAdminsOfAppointmentCancellations($appointment);
     }
 
     /*
@@ -198,34 +213,28 @@ class AppointmentService
     }
 
     /**
+     * Notify admins of appointment cancellations.
+     */
+    protected function notifyAdminsOfAppointmentCancellations(Appointment $appointment)
+    {
+        $admins = User::role('admin')->get();
+
+        Notification::send($admins, new AppointmentCancelled($appointment));
+    }
+
+    /**
      * Notify cashiers of appointment approvals.
      */
     protected function notifyStaffsOfAppointmentApprovals(Appointment $appointment)
     {
-        if ($appointment->wasChanged('status') && $appointment->status === AppointmentStatus::APPROVED) {
-            if ($appointment->type->isLab()) {
-                // Send to laboratory staff
-                $labStaff = User::role('laboratory_staff')->get();
-                foreach ($labStaff as $user) {
-                    $user?->notify(new LaboratoryResultRequest($appointment));
-                }
-            } else {
-                // Send to doctors
-                $doctors = User::role('doctor')->get();
-                foreach ($doctors as $user) {
-                    $user?->notify(new ConsultationRequest($appointment));
-                }
-            }
-        }
-    }
+        if ($appointment->type->isLab()) {
+            $labStaffs = User::role('laboratory_staff')->get();
 
-    /**
-     * Notify patient of appointment completion.
-     */
-    protected function notifyPatientOfAppointmentCompletion(Appointment $appointment)
-    {
-        if ($appointment->wasChanged('status') && $appointment->status === AppointmentStatus::COMPLETED) {
-            $appointment->patient->user?->notify(new AppointmentCompleted($appointment));
+            Notification::send($labStaffs, new AppointmentRescheduled($appointment));
+        } else {
+            $doctors = User::role('doctor')->get();
+
+            Notification::send($doctors, new AppointmentRescheduled($appointment));
         }
     }
 
@@ -234,8 +243,14 @@ class AppointmentService
      */
     protected function notifyPatientOfAppointmentApprovals(Appointment $appointment)
     {
-        if ($appointment->wasChanged('status') && $appointment->status === AppointmentStatus::APPROVED) {
-            $appointment->patient->user?->notify(new AppointmentApproved($appointment));
-        }
+        $appointment->patient->user?->notify(new AppointmentApproved($appointment));
+    }
+
+    /**
+     * Notify patient of appointment rejections.
+     */
+    protected function notifyPatientOfAppointmentRejection(Appointment $appointment)
+    {
+        $appointment->patient->user?->notify(new AppointmentRejected($appointment));
     }
 }

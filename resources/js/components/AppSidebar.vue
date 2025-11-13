@@ -1,12 +1,34 @@
 <script setup lang="ts">
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
+} from '@/components/ui/sidebar';
 import { usePermissions } from '@/composables/usePermissions';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/vue3';
-import { ClipboardList, FlaskConical, FolderHeart, LayoutGrid, MessagesSquare, ReceiptText, ScrollText, Table2, User } from 'lucide-vue-next';
+import { Link, usePage } from '@inertiajs/vue3';
+import {
+    ClipboardList,
+    FlaskConical,
+    FolderHeart,
+    LayoutGrid,
+    MessagesSquare,
+    ReceiptText,
+    ScrollText,
+    Table2,
+    User,
+} from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 
 const { hasPermissionTo, hasRole, hasAnyRole } = usePermissions();
 
@@ -18,11 +40,14 @@ const adminAnalyticsNavItems: NavItem[] = [
         isActive: route().current('admin.dashboard'),
         access: true,
     },
+];
+
+const adminReportsNavItems: NavItem[] = [
     {
-        title: 'Reports',
-        href: route('admin.reports'),
-        icon: Table2,
-        isActive: route().current('admin.reports'),
+        title: 'Invoice',
+        href: route('admin.reports.invoice'),
+        icon: ReceiptText,
+        isActive: route().current('admin.reports.invoice'),
         access: hasAnyRole(['cashier', 'admin']),
     },
 ];
@@ -112,6 +137,8 @@ const userMainNavItems: NavItem[] = [
         access: hasRole('patient'),
     },
 ];
+
+const page = usePage();
 </script>
 
 <template>
@@ -127,7 +154,7 @@ const userMainNavItems: NavItem[] = [
                         as-child
                     >
                         <Link
-                            :href="route('dashboard')"
+                            :href="route('home')"
                             prefetch
                         >
                             <AppLogo />
@@ -142,6 +169,45 @@ const userMainNavItems: NavItem[] = [
                 group-label="Analytics"
                 :items="adminAnalyticsNavItems"
             />
+
+            <SidebarMenu class="px-2 py-0">
+                <Collapsible
+                    :defaultOpen="route().current('admin.reports*')"
+                    class="group/collapsible"
+                >
+                    <SidebarMenuItem>
+                        <CollapsibleTrigger as-child>
+                            <SidebarMenuButton>
+                                <Table2 />
+                                <span>Reports</span>
+                            </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                            <SidebarMenuSub>
+                                <SidebarMenuSubItem
+                                    v-for="reportsNavItem in adminReportsNavItems"
+                                    :key="reportsNavItem.href"
+                                >
+                                    <SidebarMenuSubButton
+                                        :is-active="reportsNavItem.href === page.url || reportsNavItem?.isActive"
+                                        :tooltip="reportsNavItem.title"
+                                        as-child
+                                    >
+                                        <Link
+                                            :href="reportsNavItem.href"
+                                            prefetch
+                                        >
+                                            <component :is="reportsNavItem.icon" />
+                                            <span>{{ reportsNavItem.title }}</span>
+                                        </Link>
+                                    </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                            </SidebarMenuSub>
+                        </CollapsibleContent>
+                    </SidebarMenuItem>
+                </Collapsible>
+            </SidebarMenu>
+
             <NavMain
                 group-label="Data"
                 :items="adminMainNavItems"

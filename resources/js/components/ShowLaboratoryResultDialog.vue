@@ -3,8 +3,11 @@ import Button from '@/components/ui/button/Button.vue';
 import { Dialog, DialogFooter, DialogHeader, DialogScrollContent, DialogTitle } from '@/components/ui/dialog';
 import { useFormatters } from '@/composables/useFormatters';
 import { LaboratoryResult, Patient } from '@/types';
-import { LAB_TYPES } from '@/types/constants';
+import { LAB_TYPES, PATIENT_GENDERS } from '@/types/constants';
 import DataCard from './DataCard.vue';
+import DataCell from './DataCell.vue';
+import DataLabel from './DataLabel.vue';
+import DataText from './DataText.vue';
 
 defineProps<{
     open: boolean;
@@ -35,32 +38,32 @@ function closeDialog() {
                 title="Patient Information"
                 :columns="3"
             >
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Name</label>
-                    <p class="text-sm font-semibold">
+                <DataCell>
+                    <DataLabel>Name</DataLabel>
+                    <DataText>
                         {{ getFullName(patient?.last_name!, patient?.first_name!, patient?.middle_name!) }}
-                    </p>
-                </div>
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Gender</label>
-                    <p class="text-sm capitalize">
-                        {{ patient?.gender }}
-                    </p>
-                </div>
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Age</label>
-                    <p class="text-sm">
+                    </DataText>
+                </DataCell>
+                <DataCell>
+                    <DataLabel>Gender</DataLabel>
+                    <DataText>
+                        {{ PATIENT_GENDERS.find((gender) => gender.value === patient?.gender)?.label }}
+                    </DataText>
+                </DataCell>
+                <DataCell>
+                    <DataLabel>Age</DataLabel>
+                    <DataText>
                         {{ patient?.age?.formatted_long }}
-                    </p>
-                </div>
+                    </DataText>
+                </DataCell>
             </DataCard>
 
             <DataCard title="Test Type">
-                <p class="text-sm">{{ LAB_TYPES.find((type) => type.value === laboratory_result?.type)?.label }}</p>
+                <DataText>{{ LAB_TYPES.find((type) => type.value === laboratory_result?.type)?.label }}</DataText>
             </DataCard>
 
             <DataCard title="Description">
-                <p class="text-sm">{{ laboratory_result?.description ?? 'N/A' }}</p>
+                <DataText>{{ laboratory_result?.description ?? 'N/A' }}</DataText>
             </DataCard>
 
             <DialogFooter>

@@ -13,11 +13,14 @@ import { cn } from '@/lib/utils';
 import { Head, useForm as useInertiaForm } from '@inertiajs/vue3';
 import { CalendarDate, DateFormatter, getLocalTimeZone, parseDate, today } from '@internationalized/date';
 import { toTypedSchema } from '@vee-validate/zod';
-import { CalendarIcon, LoaderCircle } from 'lucide-vue-next';
+import { CalendarIcon, Eye, EyeOff, LoaderCircle } from 'lucide-vue-next';
 import { toDate } from 'reka-ui/date';
 import { useForm as useVeeForm } from 'vee-validate';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import * as z from 'zod';
+
+const showPassword = ref(false);
+const showPasswordConfirmation = ref(false);
 
 const inertiaForm = useInertiaForm({
     first_name: '',
@@ -35,7 +38,9 @@ const inertiaForm = useInertiaForm({
 
 const formSchema = toTypedSchema(
     z.object({
-        first_name: z.string({ required_error: 'First Name is required.' }).max(80, 'Exceeded maximum character of 80.'),
+        first_name: z
+            .string({ required_error: 'First Name is required.' })
+            .max(80, 'Exceeded maximum character of 80.'),
         last_name: z.string({ required_error: 'Last Name is required.' }).max(80, 'Exceeded maximum character of 80.'),
         middle_name: z.string().max(80, 'Exceeded maximum character of 80.').or(z.null()).optional(),
         email: z.string({ required_error: 'Email address is required.' }).email(),
@@ -44,7 +49,9 @@ const formSchema = toTypedSchema(
         gender: z.enum(['male', 'female']),
         civil_status: z.enum(['single', 'married', 'widowed', 'divorced', 'separated']),
         birthdate: z.string({ required_error: 'Birthdate is required.' }),
-        contact_number: z.string({ required_error: 'Contact Number is required.' }).max(24, 'Exceeded maximum character of 24.'),
+        contact_number: z
+            .string({ required_error: 'Contact Number is required.' })
+            .max(24, 'Exceeded maximum character of 24.'),
         address: z.string({ required_error: 'Address is required.' }),
     }),
 );
@@ -166,10 +173,26 @@ const birthdate = computed({
                         <FormLabel required>Password</FormLabel>
 
                         <FormControl>
-                            <Input
-                                v-bind="componentField"
-                                type="password"
-                            />
+                            <div class="relative w-full">
+                                <Input
+                                    v-bind="componentField"
+                                    :type="showPassword ? 'text' : 'password'"
+                                    autocomplete="current-password"
+                                    :tabindex="2"
+                                    placeholder="Password"
+                                />
+
+                                <Button
+                                    @click="showPassword = !showPassword"
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    class="absolute top-1/2 right-1 -translate-y-1/2"
+                                >
+                                    <EyeOff v-if="showPassword" />
+                                    <Eye v-else />
+                                </Button>
+                            </div>
                         </FormControl>
 
                         <FormMessage />
@@ -184,10 +207,26 @@ const birthdate = computed({
                         <FormLabel required>Confirm Password</FormLabel>
 
                         <FormControl>
-                            <Input
-                                v-bind="componentField"
-                                type="password"
-                            />
+                            <div class="relative w-full">
+                                <Input
+                                    v-bind="componentField"
+                                    :type="showPasswordConfirmation ? 'text' : 'password'"
+                                    autocomplete="current-password"
+                                    :tabindex="2"
+                                    placeholder="Password"
+                                />
+
+                                <Button
+                                    @click="showPasswordConfirmation = !showPasswordConfirmation"
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    class="absolute top-1/2 right-1 -translate-y-1/2"
+                                >
+                                    <EyeOff v-if="showPasswordConfirmation" />
+                                    <Eye v-else />
+                                </Button>
+                            </div>
                         </FormControl>
 
                         <FormMessage />
@@ -260,9 +299,18 @@ const birthdate = computed({
                                         <FormControl>
                                             <Button
                                                 variant="outline"
-                                                :class="cn('w-full border-input text-start font-normal', !birthdate && 'text-muted-foreground')"
+                                                :class="
+                                                    cn(
+                                                        'w-full border-input text-start font-normal',
+                                                        !birthdate && 'text-muted-foreground',
+                                                    )
+                                                "
                                             >
-                                                <span>{{ birthdate ? formatDate.format(toDate(birthdate)) : 'Select birthdate' }}</span>
+                                                <span>{{
+                                                    birthdate
+                                                        ? formatDate.format(toDate(birthdate))
+                                                        : 'Select birthdate'
+                                                }}</span>
                                                 <CalendarIcon class="ms-auto h-4 w-4 opacity-50" />
                                             </Button>
                                             <input hidden />

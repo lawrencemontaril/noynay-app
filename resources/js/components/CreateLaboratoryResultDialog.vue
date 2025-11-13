@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import Button from '@/components/ui/button/Button.vue';
-import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogScrollContent, DialogTitle } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogScrollContent,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useFormatters } from '@/composables/useFormatters';
@@ -11,6 +18,8 @@ import { LoaderCircle } from 'lucide-vue-next';
 import { useForm as useVeeForm } from 'vee-validate';
 import { watch } from 'vue';
 import * as z from 'zod';
+import DataCard from './DataCard.vue';
+import DataText from './DataText.vue';
 import InputError from './InputError.vue';
 import Input from './ui/input/Input.vue';
 import Textarea from './ui/textarea/Textarea.vue';
@@ -104,12 +113,11 @@ function closeDialog() {
             >
                 <InputError :message="inertiaForm.errors.appointment_id" />
 
-                <div class="mb-4 grid grid-cols-1 content-start gap-2">
-                    <label class="border-b pb-1 text-xs font-semibold uppercase">Patient Name</label>
-                    <p class="text-sm">
+                <DataCard title="Patient Name">
+                    <DataText>
                         {{ getFullName(patient.last_name, patient.first_name, patient.middle_name) }}
-                    </p>
-                </div>
+                    </DataText>
+                </DataCard>
 
                 <FormField
                     v-slot="{ componentField }"

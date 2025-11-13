@@ -36,7 +36,7 @@ const loadActivities = () => {
         class="gap-0"
     >
         <CardHeader class="flex items-center justify-between border-b">
-            <CardTitle class="text-lg font-semibold">Activity Log</CardTitle>
+            <CardTitle class="text-lg font-semibold">Audit Trail</CardTitle>
 
             <div class="flex items-center gap-2">
                 <Button

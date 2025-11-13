@@ -12,9 +12,9 @@ class ReportsController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request)
+    public function invoice(Request $request)
     {
-        return Inertia::render('admin/Reports', [
+        return Inertia::render('admin/reports/InvoiceReports', [
             'invoiceRevenueTable' => $this->getPaymentRevenueTable(),
         ]);
     }

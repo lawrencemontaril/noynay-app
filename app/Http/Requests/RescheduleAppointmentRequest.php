@@ -12,7 +12,7 @@ class RescheduleAppointmentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Gate::allows('update', $this->appointment);
+        return Gate::allows('reschedule', $this->appointment);
     }
 
     /**

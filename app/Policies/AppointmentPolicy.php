@@ -46,6 +46,26 @@ class AppointmentPolicy
             || $isOwner;
     }
 
+    public function approve(User $user, Appointment $appointment): bool
+    {
+        return $user->can('appointments:approve');
+    }
+
+    public function reject(User $user, Appointment $appointment): bool
+    {
+        return $user->can('appointments:reject');
+    }
+
+    public function cancel(User $user, Appointment $appointment): bool
+    {
+        return $user->can('appointments:cancel');
+    }
+
+    public function reschedule(User $user, Appointment $appointment): bool
+    {
+        return $user->can('appointments:reschedule');
+    }
+
     /**
      * Determine whether the user can delete the model.
      */

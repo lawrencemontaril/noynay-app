@@ -10,8 +10,8 @@ defineProps<{
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Reports',
-        href: route('admin.reports'),
+        title: 'Invoice Reports',
+        href: route('admin.reports.invoice'),
     },
 ];
 </script>

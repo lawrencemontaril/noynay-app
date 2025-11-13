@@ -68,7 +68,13 @@ Route::prefix('admin')
     ])
     ->group(function () {
         Route::get('dashboard', AdminDashboardController::class)->name('dashboard');
-        Route::get('reports', AdminReportsController::class)->middleware('role:cashier|admin')->name('reports');
+
+        /**
+         * Reports
+         */
+        Route::controller(AdminReportsController::class)->middleware('role:cashier|admin')->group(function () {
+            Route::get('reports/invoice', 'invoice')->name('reports.invoice');
+        });
 
         /**
          * Users
@@ -117,6 +123,8 @@ Route::prefix('admin')
             Route::delete('appointments/{appointment}', 'destroy')->name('appointments.destroy');
             Route::patch('appointments/{appointment}/restore', 'restore')->withTrashed()->name('appointments.restore');
             Route::patch('appointments/{appointment}', 'update')->name('appointments.update');
+            Route::patch('appointments/{appointment}/approve', 'approve')->name('appointments.approve');
+            Route::patch('appointments/{appointment}/reject', 'reject')->name('appointments.reject');
         });
 
         /**

@@ -44,8 +44,9 @@ class Invoice extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['status'])
+            ->logFillable()
             ->logOnlyDirty()
+            ->logExcept(['appointment_id'])
             ->useLogName('invoice')
             ->setDescriptionForEvent(fn (string $eventName) => ucfirst($eventName)." the invoice");
     }

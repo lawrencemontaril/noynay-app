@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import ActivityTimeline from '@/components/ActivityTimeline.vue';
 import DataCard from '@/components/DataCard.vue';
+import DataCell from '@/components/DataCell.vue';
+import DataLabel from '@/components/DataLabel.vue';
+import DataText from '@/components/DataText.vue';
 import EditAppointmentDialog from '@/components/EditAppointmentDialog.vue';
 import PatientProfileTabs from '@/components/PatientProfileTabs.vue';
 import { Badge } from '@/components/ui/badge';
@@ -93,36 +96,39 @@ const isEditDialogOpen = ref(false);
                 <!-- Body -->
                 <CardContent class="text-sm">
                     <DataCard title="Appointment Details">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-xs font-medium text-muted-foreground">Service Type</label>
-                                <p class="text-sm">
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <DataCell>
+                                <DataLabel>Service Type</DataLabel>
+                                <DataText>
                                     {{ ALL_SERVICES.find((service) => service.value === appointment.type)?.label }}
-                                </p>
-                            </div>
-                            <div>
-                                <label class="text-xs font-medium text-muted-foreground">Status</label>
-                                <p class="text-sm capitalize">
-                                    {{ appointment.status }}
-                                </p>
-                            </div>
-                            <div>
-                                <label class="text-xs font-medium text-muted-foreground">Schedule</label>
-                                <p class="text-sm capitalize">
+                                </DataText>
+                            </DataCell>
+                            <DataCell>
+                                <DataLabel>Status</DataLabel>
+                                <DataText>
+                                    {{
+                                        APPOINTMENT_STATUSES.find((status) => status.value === appointment.status)
+                                            ?.label
+                                    }}
+                                </DataText>
+                            </DataCell>
+                            <DataCell>
+                                <DataLabel>Schedule</DataLabel>
+                                <DataText>
                                     {{ appointment.scheduled_at.formatted_date }}
-                                </p>
-                            </div>
-                            <div>
-                                <label class="text-xs font-medium text-muted-foreground">Creation Date</label>
-                                <p class="text-sm capitalize">
+                                </DataText>
+                            </DataCell>
+                            <DataCell>
+                                <DataLabel>Creation Date</DataLabel>
+                                <DataText>
                                     {{ appointment.created_at.formatted_date }}
-                                </p>
-                            </div>
+                                </DataText>
+                            </DataCell>
                         </div>
                     </DataCard>
 
                     <DataCard title="Complaints">
-                        <p class="text-sm">{{ appointment.complaints || '—' }}</p>
+                        <DataText>{{ appointment.complaints || '—' }}</DataText>
                     </DataCard>
                 </CardContent>
             </Card>

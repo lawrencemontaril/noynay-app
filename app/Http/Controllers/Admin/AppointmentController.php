@@ -71,6 +71,30 @@ class AppointmentController extends Controller
     }
 
     /**
+     * Approve the appointment.
+     */
+    public function approve(Appointment $appointment, AppointmentService $appointmentService)
+    {
+        $appointmentService->approve($appointment);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Appointment approved.');
+    }
+
+    /**
+     * Reject the appointment.
+     */
+    public function reject(Appointment $appointment, AppointmentService $appointmentService)
+    {
+        $appointmentService->reject($appointment);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Appointment approved.');
+    }
+
+    /**
      * Soft delete (archive) the specified resource from storage.
      */
     public function destroy(Appointment $appointment)

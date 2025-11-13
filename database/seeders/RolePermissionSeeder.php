@@ -18,7 +18,7 @@ class RolePermissionSeeder extends Seeder
         $permissionsArray = [
             'users' => ['view_any', 'view', 'create', 'update'],
             'patients' => ['view_any', 'view', 'create', 'update', 'delete', 'restore', 'force_delete'],
-            'appointments' => ['view_any', 'view', 'create', 'update', 'delete', 'restore', 'force_delete'],
+            'appointments' => ['view_any', 'view', 'create', 'update', 'approve', 'reject', 'cancel', 'reschedule', 'delete', 'restore', 'force_delete'],
             'consultations' => ['view_any', 'view', 'create', 'update'],
             'laboratory_results' => ['view_any', 'view', 'create', 'update'],
             'procedures' => ['view_any', 'view', 'create'],
@@ -46,7 +46,7 @@ class RolePermissionSeeder extends Seeder
             'admin' => [
                 'users:view_any', 'users:view',
                 'patients:view_any', 'patients:view',
-                'appointments:view_any', 'appointments:view', 'appointments:update', 'appointments:restore',
+                'appointments:view_any', 'appointments:view', 'appointments:delete', 'appointments:restore', 'appointments:approve', 'appointments:reject',
                 'invoices:view',
             ],
             'system_admin' => [
@@ -72,11 +72,10 @@ class RolePermissionSeeder extends Seeder
                 'patients:view_any', 'patients:view',
                 'appointments:view_any', 'appointments:view',
                 'laboratory_results:view_any', 'laboratory_results:view', 'laboratory_results:create', 'laboratory_results:update',
-                'invoices:view',
             ],
             'patient' => [
                 'patients:view',
-                'appointments:view_any', 'appointments:view', 'appointments:create', 'appointments:update',
+                'appointments:view_any', 'appointments:view', 'appointments:create', 'appointments:reschedule', 'appointments:cancel',
                 'invoices:view',
                 'consultations:view',
                 'laboratory_results:view',
