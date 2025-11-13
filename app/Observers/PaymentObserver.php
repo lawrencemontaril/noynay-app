@@ -9,9 +9,9 @@ use App\Notifications\InvoicePaid;
 class PaymentObserver
 {
     /**
-     * Handle the Payment "saving" event.
+     * Handle the Payment "created" event.
      */
-    public function saving(Payment $payment): void
+    public function created(Payment $payment): void
     {
         $invoice = $payment->invoice;
 
@@ -25,5 +25,7 @@ class PaymentObserver
         } else {
             $invoice->status = InvoiceStatus::UNPAID;
         }
+
+        $invoice->save();
     }
 }

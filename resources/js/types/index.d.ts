@@ -98,6 +98,7 @@ export interface User {
     role: 'admin' | 'system_admin' | 'doctor' | 'laboratory_staff' | 'cashier' | 'patient';
     permissions: string[];
     notifications: Notification[];
+    notifications_unread_count: number;
 
     created_at: DateTimeResource;
     updated_at: DateTimeResource;
@@ -173,6 +174,17 @@ export interface Appointment {
     consultations?: Consultation[];
     laboratory_results?: LaboratoryResult[];
     activities?: Activity[];
+}
+
+export interface Procedure {
+    id: number;
+    appointment_id: number;
+    description: string;
+    quantity: number;
+    created_at: DateTimeResource;
+    updated_at: DateTimeResource;
+
+    appointment?: Appointment;
 }
 
 export interface Consultation {

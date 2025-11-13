@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\{ObservedBy, Scope, ScopedBy};
+use Illuminate\Database\Eloquent\Attributes\{Scope, ScopedBy};
 use Illuminate\Database\Eloquent\{Builder, Model};
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
@@ -10,10 +10,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use App\Enums\InvoiceStatus;
-use App\Observers\InvoiceObserver;
 use App\Models\Scopes\ExcludeArchivedAppointment;
 
-#[ObservedBy(InvoiceObserver::class)]
 #[ScopedBy([ExcludeArchivedAppointment::class])]
 class Invoice extends Model
 {

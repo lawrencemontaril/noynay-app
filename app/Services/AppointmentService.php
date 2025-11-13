@@ -4,7 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
-use App\Enums\{AppointmentStatus, AppointmentType};
+use App\Enums\{AppointmentStatus, AppointmentType, LaboratoryResultStatus, LaboratoryResultType};
 use App\Models\{Appointment, LaboratoryResult, User};
 use App\Notifications\{AppointmentApproved, AppointmentCompleted, AppointmentCreated, AppointmentRescheduled, ConsultationRequest, LaboratoryResultRequest};
 use Carbon\Carbon;
@@ -72,12 +72,11 @@ class AppointmentService
             'status' => $data['status'] ?? $appointment->status,
         ]);
 
-        if ($appointment->status === AppointmentStatus::APPROVED && in_array($appointment->type, [AppointmentType::PREGNANCY_TEST, AppointmentType::PAPSMEAR, AppointmentType::CBC, AppointmentType::URINALYSIS, AppointmentType::FECALYSIS])) {
-            LaboratoryResult::create([
-                'appointment_id' => $appointment->id,
+        if ($appointment->status === AppointmentStatus::APPROVED && $appointment->type->isLab()) {
+            $appointment->laboratoryResults()->create([
                 'description' => null,
-                'type' => $appointment->type->value,
-                'status' => 'pending',
+                'type' => LaboratoryResultType::from($appointment->type->value),
+                'status' => LaboratoryResultStatus::PENDING,
                 'results_file_path' => null,
             ]);
         }
@@ -194,24 +193,18 @@ class AppointmentService
      */
     protected function notifyStaffsOfAppointmentApprovals(Appointment $appointment)
     {
-        if ($appointment->wasChanged('status') && $appointment->status === 'approved') {
-            // $cashiers = User::role('cashier')->get();
-
-            // Notification::send($cashiers, new AppointmentApproved($appointment));
-
-            $labTypes = ['pregnancy_test', 'papsmear', 'cbc', 'urinalysis', 'fecalysis'];
-
-            if (in_array($appointment->type, $labTypes)) {
+        if ($appointment->wasChanged('status') && $appointment->status === AppointmentStatus::APPROVED) {
+            if ($appointment->type->isLab()) {
                 // Send to laboratory staff
                 $labStaff = User::role('laboratory_staff')->get();
                 foreach ($labStaff as $user) {
-                    $user->notify(new LaboratoryResultRequest($appointment));
+                    $user?->notify(new LaboratoryResultRequest($appointment));
                 }
             } else {
                 // Send to doctors
                 $doctors = User::role('doctor')->get();
                 foreach ($doctors as $user) {
-                    $user->notify(new ConsultationRequest($appointment));
+                    $user?->notify(new ConsultationRequest($appointment));
                 }
             }
         }
@@ -222,8 +215,8 @@ class AppointmentService
      */
     protected function notifyPatientOfAppointmentCompletion(Appointment $appointment)
     {
-        if ($appointment->wasChanged('status') && $appointment->status === 'completed') {
-            Notification::send($appointment->patient?->user, new AppointmentCompleted($appointment));
+        if ($appointment->wasChanged('status') && $appointment->status === AppointmentStatus::COMPLETED) {
+            $appointment->patient->user?->notify(new AppointmentCompleted($appointment));
         }
     }
 
@@ -232,8 +225,8 @@ class AppointmentService
      */
     protected function notifyPatientOfAppointmentApprovals(Appointment $appointment)
     {
-        if ($appointment->wasChanged('status') && $appointment->status === 'approved') {
-            Notification::send($appointment->patient?->user, new AppointmentApproved($appointment));
+        if ($appointment->wasChanged('status') && $appointment->status === AppointmentStatus::APPROVED) {
+            $appointment->patient->user?->notify(new AppointmentApproved($appointment));
         }
     }
 }

@@ -21,6 +21,7 @@ class RolePermissionSeeder extends Seeder
             'appointments' => ['view_any', 'view', 'create', 'update', 'delete', 'restore', 'force_delete'],
             'consultations' => ['view_any', 'view', 'create', 'update'],
             'laboratory_results' => ['view_any', 'view', 'create', 'update'],
+            'procedures' => ['view_any', 'view', 'create'],
             'invoices' => ['view_any', 'view', 'create', 'update', 'delete'],
             'invoice_items' => ['create', 'update', 'delete'],
             'payments' => ['create', 'update', 'delete']
@@ -45,7 +46,7 @@ class RolePermissionSeeder extends Seeder
             'admin' => [
                 'users:view_any', 'users:view',
                 'patients:view_any', 'patients:view',
-                'appointments:view_any', 'appointments:view', 'appointments:update', 'appointments:delete', 'appointments:restore',
+                'appointments:view_any', 'appointments:view', 'appointments:update', 'appointments:restore',
                 'invoices:view_any', 'invoices:view',
             ],
             'system_admin' => [
@@ -64,7 +65,7 @@ class RolePermissionSeeder extends Seeder
                 'appointments:view_any', 'appointments:view',
                 'consultations:view_any', 'consultations:view', 'consultations:create', 'consultations:update',
                 'laboratory_results:view_any', 'laboratory_results:view', 'laboratory_results:create',
-                'invoices:view', 'invoices:update',
+                'procedures:view_any', 'procedures:view', 'procedures:create',
                 'invoice_items:create', 'invoice_items:update', 'invoice_items:delete'
             ],
             'laboratory_staff' => [

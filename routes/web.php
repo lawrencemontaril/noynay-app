@@ -2,8 +2,22 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InvoicePdfController;
-use App\Http\Controllers\Admin\{AppointmentController as AdminAppointmentController, ConsultationController as AdminConsultationController, DashboardController as AdminDashboardController, InvoiceController as AdminInvoiceController, LaboratoryResultController as AdminLaboratoryResultController, PatientController as AdminPatientController, PaymentController as AdminPaymentController, ReportsController as AdminReportsController, UserController as AdminUserController};
-use App\Http\Controllers\User\{AppointmentController as UserAppointmentController, ConsultationController as UserConsultationController, DashboardController as UserDashboardController, InvoiceController as UserInvoiceController, LaboratoryResultController as UserLaboratoryResultController, PatientController as UserPatientController};
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ReportsController as AdminReportsController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\PatientController as AdminPatientController;
+use App\Http\Controllers\Admin\AppointmentController as AdminAppointmentController;
+use App\Http\Controllers\Admin\ProcedureController as AdminProcedureController;
+use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\Admin\ConsultationController as AdminConsultationController;
+use App\Http\Controllers\Admin\LaboratoryResultController as AdminLaboratoryResultController;
+use App\Http\Controllers\User\DashboardController as UserDashboardController;
+use App\Http\Controllers\User\AppointmentController as UserAppointmentController;
+use App\Http\Controllers\User\ConsultationController as UserConsultationController;
+use App\Http\Controllers\User\PatientController as UserPatientController;
+use App\Http\Controllers\User\InvoiceController as UserInvoiceController;
+use App\Http\Controllers\User\LaboratoryResultController as UserLaboratoryResultController;
 
 /*
 | -----------------------------------------------------------------------------
@@ -79,6 +93,7 @@ Route::prefix('admin')
             Route::get('/patients/{patient}/appointments', 'appointments')->name('patients.appointments');
             Route::scopeBindings()->group(function () {
                 Route::get('/patients/{patient}/appointments/{appointment}', 'appointmentDetail')->name('patients.appointments.show');
+                Route::get('/patients/{patient}/appointments/{appointment}/procedures', 'procedures')->name('patients.appointments.procedures');
                 Route::get('/patients/{patient}/appointments/{appointment}/invoice', 'invoice')->name('patients.appointments.invoice');
                 Route::get('/patients/{patient}/appointments/{appointment}/consultations', 'consultations')->name('patients.appointments.consultations');
                 Route::get('/patients/{patient}/appointments/{appointment}/consultations/{consultation}', 'consultationDetail')->name('patients.appointments.consultations.show');
@@ -115,16 +130,6 @@ Route::prefix('admin')
         });
 
         /**
-         * Invoices
-         */
-        Route::controller(AdminInvoiceController::class)->group(function () {
-            Route::get('invoices', 'index')->name('invoices.index');
-            Route::post('invoices', 'store')->name('invoices.store');
-            Route::patch('invoices/{invoice}', 'update')->name('invoices.update');
-            Route::delete('invoices/{invoice}', 'destroy')->name('invoices.destroy');
-        });
-
-        /**
          * Laboratory Results
          */
         Route::controller(AdminLaboratoryResultController::class)->group(function () {
@@ -132,6 +137,23 @@ Route::prefix('admin')
             Route::post('laboratory_results', 'store')->name('laboratory_results.store');
             Route::post('laboratory_results/{laboratoryResult}', 'update')->name('laboratory_results.update');
             Route::delete('laboratory_results/{laboratoryResult}', 'destroy')->name('laboratory_results.destroy');
+        });
+
+        /**
+         * Procedures
+         */
+        Route::controller(AdminProcedureController::class)->group(function () {
+            Route::post('procedures', 'store')->name('procedures.store');
+        });
+
+        /**
+         * Invoices
+         */
+        Route::controller(AdminInvoiceController::class)->group(function () {
+            Route::get('invoices', 'index')->name('invoices.index');
+            Route::post('invoices', 'store')->name('invoices.store');
+            Route::patch('invoices/{invoice}', 'update')->name('invoices.update');
+            Route::delete('invoices/{invoice}', 'destroy')->name('invoices.destroy');
         });
 
         /**

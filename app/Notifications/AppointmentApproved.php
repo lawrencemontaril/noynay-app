@@ -38,12 +38,9 @@ class AppointmentApproved extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $patient = $this->appointment->patient;
-        $user = $patient->user;
-
         return [
-            'message' => "Appointment for {$user->first_name} {$user->last_name} has been approved.",
-            'link' => "/admin/appointments?id={$this->appointment->id}",
+            'message' => "Your {$this->appointment->type->label()} appointment has been approved.",
+            'link' => "/appointments?id={$this->appointment->id}",
         ];
     }
 }

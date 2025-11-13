@@ -33,6 +33,15 @@ const sidebarNavItems: NavItem[] = [
         access: hasPermissionTo('invoices:view'),
     },
     {
+        title: 'Procedures',
+        href: route('admin.patients.appointments.procedures', {
+            patient: props.patientId,
+            appointment: props.appointmentId,
+        }),
+        isActive: isActive('admin.patients.appointments.procedures'),
+        access: hasPermissionTo('procedures:view_any'),
+    },
+    {
         title: 'Consultations',
         href: route('admin.patients.appointments.consultations', {
             patient: props.patientId,

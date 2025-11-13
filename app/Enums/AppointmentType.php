@@ -73,4 +73,20 @@ enum AppointmentType: string
             ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
             ->toArray();
     }
+
+    public function isLab(): bool
+    {
+        return in_array($this, [
+            self::PREGNANCY_TEST,
+            self::PAPSMEAR,
+            self::CBC,
+            self::URINALYSIS,
+            self::FECALYSIS,
+        ]);
+    }
+
+    public function isConsultation(): bool
+    {
+        return ! $this->isLab();
+    }
 }

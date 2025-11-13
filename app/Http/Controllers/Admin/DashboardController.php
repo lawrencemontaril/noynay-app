@@ -156,7 +156,7 @@ class DashboardController extends Controller
                 ->get()
                 ->toResourceCollection(),
 
-            'unpaidInvoices' => Invoice::with(['appointment.patient', 'invoiceItems', 'payments'])
+            'unpaidInvoices' => Invoice::with(['appointment.patient', 'appointment.procedures', 'invoiceItems', 'payments'])
                 ->whereIn('status', ['unpaid', 'partially_paid'])
                 ->latest()
                 ->limit(10)

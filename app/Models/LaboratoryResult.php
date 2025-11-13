@@ -35,7 +35,8 @@ class LaboratoryResult extends Model
     {
         return [
             'type' => LaboratoryResultType::class,
-            'status' => LaboratoryResultStatus::class
+            'status' => LaboratoryResultStatus::class,
+            'is_released' => 'boolean'
         ];
     }
 

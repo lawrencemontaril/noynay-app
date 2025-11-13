@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Procedure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Activitylog\Models\Activity;
@@ -170,6 +171,21 @@ class PatientController extends Controller
             'activities' => Inertia::optional(
                 fn () => ActivityResource::collection($laboratoryResult->activities()->with('causer')->latest()->get())
             )
+        ]);
+    }
+
+    /**
+     * Display the patient's procedures
+     */
+    public function procedures(Patient $patient, Appointment $appointment)
+    {
+        Gate::authorize('viewAny', Procedure::class);
+
+        return Inertia::render('admin/patients/PatientsProcedures', [
+            'patient' => $patient->toResource(),
+            'appointment' => $appointment->toResource(),
+            'invoice' => $appointment->invoice?->toResource(),
+            'procedures' => $appointment->procedures->toResourceCollection(),
         ]);
     }
 

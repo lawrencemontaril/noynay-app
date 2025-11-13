@@ -140,23 +140,6 @@ const updateAppointment = handleSubmit((validatedValues) => {
                             Reject
                         </Button>
                     </template>
-
-                    <template v-else>
-                        <Button
-                            v-if="appointment?.status === 'approved' || appointment?.status === 'completed'"
-                            disabled
-                        >
-                            {{ appointment?.status === 'approved' ? 'Approved' : 'Completed' }}
-                        </Button>
-
-                        <Button
-                            v-if="appointment?.status === 'rejected'"
-                            variant="destructive"
-                            disabled
-                        >
-                            Rejected
-                        </Button>
-                    </template>
                 </DialogFooter>
             </form>
         </DialogScrollContent>

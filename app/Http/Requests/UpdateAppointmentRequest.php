@@ -32,7 +32,7 @@ class UpdateAppointmentRequest extends FormRequest
                 'sometimes',
                 'date',
             ],
-            'service' => [
+            'type' => [
                 'sometimes',
                 'string',
                 Rule::enum(AppointmentType::class),

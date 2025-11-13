@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use Illuminate\Support\{Arr, Collection};
+use App\Enums\InvoiceStatus;
+use App\Notifications\{InvoiceCreated, InvoicePaid};
 use App\Models\Invoice;
-use App\Notifications\InvoiceCreated;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 
 class InvoiceService
 {
@@ -43,6 +43,8 @@ class InvoiceService
             $this->syncInvoiceItems($invoice, collect($data['items']));
         }
 
+        $this->updateInvoiceStatus($invoice);
+
         return $invoice->load('invoiceItems');
     }
 
@@ -69,6 +71,22 @@ class InvoiceService
         if ($toCreate->isNotEmpty()) {
             $invoice->invoiceItems()->createMany($toCreate->all());
         }
+    }
+
+    protected function updateInvoiceStatus(Invoice $invoice)
+    {
+        if (! $invoice->invoiceItems()->exists()) {
+            $invoice->status = InvoiceStatus::UNPAID;
+        } elseif ($invoice->balance <= 0) {
+            $invoice->status = InvoiceStatus::PAID;
+            $invoice->appointment->patient->user?->notify(new InvoicePaid($invoice));
+        } elseif ($invoice->total_paid > 0) {
+            $invoice->status = InvoiceStatus::PARTIALLY_PAID;
+        } else {
+            $invoice->status = InvoiceStatus::UNPAID;
+        }
+
+        $invoice->save();
     }
 
     /*

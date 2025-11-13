@@ -116,6 +116,11 @@ class Appointment extends Model
         return $this->hasMany(LaboratoryResult::class);
     }
 
+    public function procedures(): HasMany
+    {
+        return $this->hasMany(Procedure::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Scopes
