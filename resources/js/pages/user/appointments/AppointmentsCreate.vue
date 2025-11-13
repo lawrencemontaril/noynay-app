@@ -364,16 +364,12 @@ const scheduled_date = computed({
                                             <div class="mb-3 flex flex-wrap gap-4">
                                                 <Button
                                                     v-for="time in availableTimesAM"
-                                                    :class="[
-                                                        'w-fit',
-                                                        {
-                                                            'bg-primary text-primary-foreground! hover:bg-primary/90':
-                                                                values.scheduled_time === time.value,
-                                                        },
-                                                    ]"
-                                                    variant="outline"
                                                     @click="setFieldValue('scheduled_time', time.value)"
+                                                    :variant="
+                                                        values.scheduled_time === time.value ? 'default' : 'outline'
+                                                    "
                                                     :key="time.value"
+                                                    class="w-fit"
                                                 >
                                                     {{ time.label }}
                                                 </Button>
@@ -383,16 +379,12 @@ const scheduled_date = computed({
                                             <div class="flex flex-wrap gap-4">
                                                 <Button
                                                     v-for="time in availableTimesPM"
-                                                    :class="[
-                                                        'w-fit',
-                                                        {
-                                                            'bg-primary text-primary-foreground! hover:bg-primary/90':
-                                                                values.scheduled_time === time.value,
-                                                        },
-                                                    ]"
-                                                    variant="outline"
                                                     @click="setFieldValue('scheduled_time', time.value)"
+                                                    :variant="
+                                                        values.scheduled_time === time.value ? 'default' : 'outline'
+                                                    "
                                                     :key="time.value"
+                                                    class="w-fit"
                                                 >
                                                     {{ time.label }}
                                                 </Button>
