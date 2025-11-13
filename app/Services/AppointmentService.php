@@ -86,30 +86,6 @@ class AppointmentService
         return $appointment;
     }
 
-    /**
-     * Reschedule an appointment (triggered by user).
-     */
-    public function reschedule(Appointment $appointment, array $data): Appointment
-    {
-        $scheduledAt = Carbon::parse($data['scheduled_at']);
-
-        // Ensure new datetime isn’t already full (excluding this one)
-        if ($this->isFull($scheduledAt, $appointment->id)) {
-            throw ValidationException::withMessages([
-                'scheduled_at' => 'The selected date and time has reached the maximum number of appointments ('.$this->maxAppointmentsPerSlot.').',
-            ]);
-        }
-
-        $appointment->update([
-            'complaints' => $data['complaints'] ?? $appointment->complaints,
-            'scheduled_at' => $scheduledAt
-        ]);
-
-        $this->notifyAdminsOfAppointmentReschedules($appointment);
-
-        return $appointment;
-    }
-
     public function approve(Appointment $appointment)
     {
         $appointment->update(['status' => AppointmentStatus::APPROVED]);
@@ -135,7 +111,31 @@ class AppointmentService
     }
 
     /**
-     * Cancel an appointment (triggered by user)
+     * Reschedule an appointment (triggered by user).
+     */
+    public function reschedule(Appointment $appointment, array $data): Appointment
+    {
+        $scheduledAt = Carbon::parse($data['scheduled_at']);
+
+        // Ensure new datetime isn’t already full (excluding this one)
+        if ($this->isFull($scheduledAt, $appointment->id)) {
+            throw ValidationException::withMessages([
+                'scheduled_at' => 'The selected date and time has reached the maximum number of appointments ('.$this->maxAppointmentsPerSlot.').',
+            ]);
+        }
+
+        $appointment->update([
+            'complaints' => $data['complaints'] ?? $appointment->complaints,
+            'scheduled_at' => $scheduledAt
+        ]);
+
+        $this->notifyAdminsOfAppointmentReschedules($appointment);
+
+        return $appointment;
+    }
+
+    /**
+     * Cancel an appointment (triggered by user).
      */
     public function cancel(Appointment $appointment)
     {
@@ -230,11 +230,11 @@ class AppointmentService
         if ($appointment->type->isLab()) {
             $labStaffs = User::role('laboratory_staff')->get();
 
-            Notification::send($labStaffs, new AppointmentRescheduled($appointment));
+            Notification::send($labStaffs, new AppointmentApproved($appointment));
         } else {
             $doctors = User::role('doctor')->get();
 
-            Notification::send($doctors, new AppointmentRescheduled($appointment));
+            Notification::send($doctors, new AppointmentApproved($appointment));
         }
     }
 

@@ -243,21 +243,15 @@ const downloadInvoice = async () => {
                             <p class="text-sm text-muted-foreground">Subtotal:</p>
                             <p class="text-base font-medium">{{ formatCurrency(invoice.subtotal) }}</p>
 
-                            <p
-                                v-if="invoice.discount_amount > 0"
-                                class="text-sm text-muted-foreground"
-                            >
-                                Discount:
-                            </p>
-                            <p
-                                v-if="invoice.discount_amount > 0"
-                                class="text-base font-medium text-green-600"
-                            >
+                            <p class="text-sm text-muted-foreground">Discount:</p>
+                            <p class="text-base font-medium text-green-600">
                                 -{{ formatCurrency(invoice.discount_amount) }}
                             </p>
 
                             <p class="text-sm text-muted-foreground">Subtotal after discount:</p>
-                            <p class="text-base font-medium">{{ formatCurrency(invoice.subtotal_after_discount) }}</p>
+                            <p class="text-base font-medium">
+                                {{ formatCurrency(invoice.subtotal_after_discount) }}
+                            </p>
 
                             <p class="text-sm text-muted-foreground">VAT:</p>
                             <p class="text-base font-medium">{{ formatCurrency(invoice.vat_amount) }}</p>

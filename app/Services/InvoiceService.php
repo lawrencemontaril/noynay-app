@@ -39,9 +39,8 @@ class InvoiceService
             $invoice->invoiceItems()->createMany($data['items']);
         }
 
-        $this->notifyPatientOfAppointmentCompletion($invoice->appointment);
-
         $this->notifyInvoiceCreation($invoice);
+        $this->notifyPatientOfAppointmentCompletion($invoice->appointment);
 
         return $invoice;
     }

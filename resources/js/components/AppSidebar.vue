@@ -44,6 +44,20 @@ const adminAnalyticsNavItems: NavItem[] = [
 
 const adminReportsNavItems: NavItem[] = [
     {
+        title: 'Patient',
+        href: route('admin.reports.patient'),
+        icon: FolderHeart,
+        isActive: route().current('admin.reports.patient'),
+        access: hasAnyRole(['cashier', 'admin']),
+    },
+    {
+        title: 'Appointment',
+        href: route('admin.reports.appointment'),
+        icon: ClipboardList,
+        isActive: route().current('admin.reports.appointment'),
+        access: hasAnyRole(['cashier', 'admin']),
+    },
+    {
         title: 'Invoice',
         href: route('admin.reports.invoice'),
         icon: ReceiptText,

@@ -73,7 +73,18 @@ Route::prefix('admin')
          * Reports
          */
         Route::controller(AdminReportsController::class)->middleware('role:cashier|admin')->group(function () {
+            // Invoice reports
             Route::get('reports/invoice', 'invoice')->name('reports.invoice');
+            Route::get('reports/invoice-revenue/pdf', 'downloadInvoiceRevenuePdf')->name('reports.invoice-revenue.pdf');
+
+            // Appointment reports
+            Route::get('reports/appointment', 'appointment')->name('reports.appointment');
+            Route::get('reports/appointment-type-ranking/pdf', 'downloadAppointmentTypeRankingPdf')->name('reports.appointment-type-ranking.pdf');
+            Route::get('reports/appointment-volume/pdf', 'downloadMonthlyAppointmentVolumePdf')->name('reports.appointment-volume.pdf');
+
+            // Patient reports
+            Route::get('reports/patient', 'patient')->name('reports.patient');
+            Route::get('reports/patient-loyalty/pdf', 'downloadMostLoyalPatientsPdf')->name('reports.patient-loyalty.pdf');
         });
 
         /**

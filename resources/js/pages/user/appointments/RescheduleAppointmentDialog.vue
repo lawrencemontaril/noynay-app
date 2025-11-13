@@ -75,6 +75,23 @@ const rescheduleAppointment = handleSubmit((validatedValues) => {
     });
 });
 
+function generateAvailableTimes(): { label: string; value: string }[] {
+    const times: { label: string; value: string }[] = [];
+
+    for (let hour = 0; hour < 24; hour++) {
+        const ampm = hour < 12 ? 'AM' : 'PM';
+        const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+        const label = `${displayHour}:00 ${ampm}`;
+        const value = `${hour.toString().padStart(2, '0')}:00:00`;
+
+        times.push({ label, value });
+    }
+
+    return times;
+}
+
+const availableTimes = generateAvailableTimes();
+
 const formatDate = new DateFormatter('en-US', {
     dateStyle: 'long',
 });
@@ -169,13 +186,13 @@ const scheduled_date = computed({
 
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectItem value="09:00:00">9:00 AM</SelectItem>
-                                        <SelectItem value="11:00:00">11:00 AM</SelectItem>
-                                        <SelectItem value="12:00:00">12:00 PM</SelectItem>
-                                        <SelectItem value="13:00:00">1:00 PM</SelectItem>
-                                        <SelectItem value="14:00:00">2:00 PM</SelectItem>
-                                        <SelectItem value="15:00:00">3:00 PM</SelectItem>
-                                        <SelectItem value="16:00:00">4:00 PM</SelectItem>
+                                        <SelectItem
+                                            v-for="time in availableTimes"
+                                            :value="time.value"
+                                            :key="time.value"
+                                        >
+                                            {{ time.label }}
+                                        </SelectItem>
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
