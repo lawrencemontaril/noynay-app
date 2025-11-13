@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Setting;
 use Illuminate\Support\{Arr, Collection};
 use App\Enums\InvoiceStatus;
 use App\Notifications\{InvoiceCreated, InvoicePaid};
@@ -9,12 +10,28 @@ use App\Models\Invoice;
 
 class InvoiceService
 {
+    protected int $vatPercent;
+    protected int $specialDiscountPercent;
+
+    public function __construct()
+    {
+        $setting = Setting::select(['vat_percent', 'special_discount_percent'])->first();
+
+        $this->vatPercent = $setting->vat_percent;
+        $this->specialDiscountPercent = $setting->special_discount_percent;
+    }
+
     /**
      * Create a new invoice
      */
     public function create(array $data): Invoice
     {
-        $invoice = Invoice::create(Arr::except($data, ['items']));
+        $totals = $this->calculateTotals($data['items'], $data['with_discount'] ?? false);
+
+        $invoice = Invoice::create(array_merge(
+            Arr::except($data, ['items']),
+            $totals
+        ));
 
         if ($data['items']) {
             $invoice->invoiceItems()->createMany($data['items']);
@@ -37,17 +54,24 @@ class InvoiceService
      */
     public function update(Invoice $invoice, array $data): Invoice
     {
-        $invoice->update(Arr::except($data, ['items']));
-
         if (isset($data['items'])) {
             $this->syncInvoiceItems($invoice, collect($data['items']));
+            $totals = $this->calculateTotals($data['items'], $invoice->with_discount ?? false);
+            $invoice->update($totals);
         }
+
+        $invoice->update(Arr::except($data, ['items', 'with_discount']));
 
         $this->updateInvoiceStatus($invoice);
 
         return $invoice->load('invoiceItems');
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Helpers
+    |--------------------------------------------------------------------------
+    */
     protected function syncInvoiceItems(Invoice $invoice, Collection $items): void
     {
         $existingIds = $invoice->invoiceItems()->pluck('id')->all();
@@ -87,6 +111,37 @@ class InvoiceService
         }
 
         $invoice->save();
+    }
+
+    protected function calculateTotals(array $items, bool $withDiscount = false): array
+    {
+        $subtotal = 0;
+
+        foreach ($items as $item) {
+            $lineTotal = $item['quantity'] * $item['unit_price'];
+            $subtotal += $lineTotal;
+        }
+
+        // Apply special discount first
+        $discountAmount = 0;
+        if ($withDiscount) {
+            $discountAmount = $subtotal * ($this->specialDiscountPercent / 100);
+        }
+
+        $subtotalAfterDiscount = $subtotal - $discountAmount;
+
+        // Apply VAT
+        $vatAmount = $withDiscount ? 0 : $subtotalAfterDiscount * ($this->vatPercent / 100);
+
+        $total = $subtotalAfterDiscount + $vatAmount;
+
+        return [
+            'subtotal' => round($subtotal, 2),
+            'discount_amount' => round($discountAmount, 2),
+            'subtotal_after_discount' => round($subtotalAfterDiscount, 2),
+            'vat_amount' => round($vatAmount, 2),
+            'total' => round($total, 2),
+        ];
     }
 
     /*

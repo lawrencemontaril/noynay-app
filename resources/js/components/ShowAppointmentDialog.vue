@@ -19,7 +19,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(['update:open']);
 
-const { hasPermissionTo } = usePermissions();
+const { hasPermissionTo, hasAnyRole } = usePermissions();
 const { getFullName } = useFormatters();
 
 function closeDialog() {
@@ -77,7 +77,7 @@ const updateAppointment = handleSubmit((validatedValues) => {
                         {{ getFullName(patient?.last_name!, patient?.first_name!, patient?.middle_name!) }}
                     </p>
                 </div>
-                <div>
+                <div v-if="!hasAnyRole(['doctor', 'laboratory_staff'])">
                     <label class="text-xs font-medium text-muted-foreground">Status</label>
                     <p
                         class="text-sm font-semibold capitalize"

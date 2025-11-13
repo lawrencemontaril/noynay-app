@@ -47,7 +47,7 @@ class RolePermissionSeeder extends Seeder
                 'users:view_any', 'users:view',
                 'patients:view_any', 'patients:view',
                 'appointments:view_any', 'appointments:view', 'appointments:update', 'appointments:restore',
-                'invoices:view_any', 'invoices:view',
+                'invoices:view',
             ],
             'system_admin' => [
                 'users:view_any', 'users:view', 'users:create', 'users:update',

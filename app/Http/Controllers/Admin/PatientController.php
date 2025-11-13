@@ -196,6 +196,8 @@ class PatientController extends Controller
     {
         Gate::authorize('viewInvoice', $patient);
 
+        $appointment->load(['invoice.invoiceItems']);
+
         return Inertia::render('admin/patients/PatientsInvoice', [
             'patient' => $patient->toResource(),
             'appointment' => $appointment->toResource(),

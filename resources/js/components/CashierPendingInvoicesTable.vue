@@ -81,7 +81,11 @@ function refreshAppointments() {
                     }}</TableCell>
 
                     <TableCell class="max-w-48 truncate capitalize">
-                        {{ ALL_SERVICES.find((type) => type.value === approvedAppointment.type)?.label || approvedAppointment.type || 'N/A' }}
+                        {{
+                            ALL_SERVICES.find((type) => type.value === approvedAppointment.type)?.label ||
+                            approvedAppointment.type ||
+                            'N/A'
+                        }}
                     </TableCell>
 
                     <TableCell>{{ approvedAppointment.scheduled_at.formatted_date }}</TableCell>
@@ -112,6 +116,7 @@ function refreshAppointments() {
             v-model:open="isCreateInvoiceDialogOpen"
             :appointment="selectedAppointment"
             :patient="selectedAppointment?.patient!"
+            :procedures="selectedAppointment?.procedures!"
         />
     </div>
 </template>

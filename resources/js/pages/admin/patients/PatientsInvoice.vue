@@ -238,12 +238,36 @@ const downloadInvoice = async () => {
                 </CardContent>
 
                 <CardFooter class="flex flex-col items-end gap-2">
-                    <div class="flex w-full justify-end border-t pt-4">
+                    <div class="flex w-full flex-col justify-end gap-1 border-t pt-4">
                         <div class="text-right">
-                            <p class="text-sm text-muted-foreground">Total:</p>
+                            <p class="text-sm text-muted-foreground">Subtotal:</p>
+                            <p class="text-base font-medium">{{ formatCurrency(invoice.subtotal) }}</p>
+
+                            <p
+                                v-if="invoice.discount_amount > 0"
+                                class="text-sm text-muted-foreground"
+                            >
+                                Discount:
+                            </p>
+                            <p
+                                v-if="invoice.discount_amount > 0"
+                                class="text-base font-medium text-green-600"
+                            >
+                                -{{ formatCurrency(invoice.discount_amount) }}
+                            </p>
+
+                            <p class="text-sm text-muted-foreground">Subtotal after discount:</p>
+                            <p class="text-base font-medium">{{ formatCurrency(invoice.subtotal_after_discount) }}</p>
+
+                            <p class="text-sm text-muted-foreground">VAT:</p>
+                            <p class="text-base font-medium">{{ formatCurrency(invoice.vat_amount) }}</p>
+
+                            <p class="mt-2 text-sm text-muted-foreground">Total:</p>
                             <p class="text-xl font-semibold">{{ formatCurrency(invoice.total) }}</p>
+
                             <p class="text-sm text-muted-foreground">Total Paid:</p>
                             <p class="text-xl font-semibold text-primary">{{ formatCurrency(invoice.total_paid) }}</p>
+
                             <p
                                 v-if="invoice.balance > 0"
                                 class="text-sm font-medium text-destructive"

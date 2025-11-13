@@ -142,7 +142,7 @@ class DashboardController extends Controller
     private function cashierProps(): array
     {
         return [
-            'approvedAppointments' => Appointment::with(['patient', 'invoice.invoiceItems'])
+            'approvedAppointments' => Appointment::with(['patient', 'procedures', 'invoice.invoiceItems'])
                 ->where('status', 'approved')
                 ->whereDoesntHave('invoice')
                 ->where(function ($q) {

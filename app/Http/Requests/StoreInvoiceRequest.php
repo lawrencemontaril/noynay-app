@@ -31,6 +31,10 @@ class StoreInvoiceRequest extends FormRequest
                 Rule::exists('appointments', 'id'),
                 Rule::unique('invoices', 'appointment_id'),
             ],
+            'with_discount' => [
+                'required',
+                'boolean'
+            ],
             'items' => [
                 'required',
                 'array',

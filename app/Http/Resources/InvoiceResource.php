@@ -18,10 +18,14 @@ class InvoiceResource extends PaginatedJsonResource
         return [
             'id' => $this->id,
             'appointment_id' => $this->appointment_id,
-            'total' => $this->total,
             'total_paid' => $this->total_paid,
             'balance' => $this->balance,
             'status' => $this->status,
+            'subtotal' => $this->subtotal,
+            'discount_amount' => $this->discount_amount,
+            'subtotal_after_discount' => $this->subtotal_after_discount,
+            'vat_amount' => $this->vat_amount,
+            'total' => $this->total,
             'created_at' => DateTimeResource::make($this->created_at),
             'updated_at' => DateTimeResource::make($this->updated_at),
 

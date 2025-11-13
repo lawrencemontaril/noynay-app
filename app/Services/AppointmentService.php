@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Setting;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 use App\Enums\{AppointmentStatus, AppointmentType, LaboratoryResultStatus, LaboratoryResultType};
@@ -11,7 +12,15 @@ use Carbon\Carbon;
 
 class AppointmentService
 {
-    const MAX_APPOINTMENTS_PER_SLOT = 5;
+    protected const DEFAULT_MAX_APPOINTMENTS_PER_SLOT = 1;
+    protected int $maxAppointmentsPerSlot;
+
+    public function __construct()
+    {
+        $setting = Setting::select('max_appointments_per_slot')->first();
+
+        $this->maxAppointmentsPerSlot = $setting->max_appointments_per_slot ?? self::DEFAULT_MAX_APPOINTMENTS_PER_SLOT;
+    }
 
     /**
      * Create a new appointment with multiple services.
@@ -30,7 +39,7 @@ class AppointmentService
         // Check if slot is already full
         if ($this->isFull($scheduledAt)) {
             throw ValidationException::withMessages([
-                'scheduled_at' => 'The selected date and time has reached the maximum number of appointments ('.static::MAX_APPOINTMENTS_PER_SLOT.').',
+                'scheduled_at' => 'The selected date and time has reached the maximum number of appointments ('.$this->maxAppointmentsPerSlot.').',
             ]);
         }
 
@@ -59,7 +68,7 @@ class AppointmentService
             // Ensure new datetime isn’t already full (excluding this one)
             if ($this->isFull($scheduledAt, $appointment->id)) {
                 throw ValidationException::withMessages([
-                    'scheduled_at' => 'The selected date and time has reached the maximum number of appointments ('.static::MAX_APPOINTMENTS_PER_SLOT.').',
+                    'scheduled_at' => 'The selected date and time has reached the maximum number of appointments ('.$this->maxAppointmentsPerSlot.').',
                 ]);
             }
 
@@ -98,7 +107,7 @@ class AppointmentService
         // Ensure new datetime isn’t already full (excluding this one)
         if ($this->isFull($scheduledAt, $appointment->id)) {
             throw ValidationException::withMessages([
-                'scheduled_at' => 'The selected date and time has reached the maximum number of appointments ('.static::MAX_APPOINTMENTS_PER_SLOT.').',
+                'scheduled_at' => 'The selected date and time has reached the maximum number of appointments ('.$this->maxAppointmentsPerSlot.').',
             ]);
         }
 
@@ -136,7 +145,7 @@ class AppointmentService
             ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
             ->count();
 
-        return $count >= self::MAX_APPOINTMENTS_PER_SLOT;
+        return $count >= $this->maxAppointmentsPerSlot;
     }
 
     /**

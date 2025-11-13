@@ -171,6 +171,7 @@ export interface Appointment {
 
     patient?: Patient;
     invoice?: Invoice;
+    procedures?: Procedure[];
     consultations?: Consultation[];
     laboratory_results?: LaboratoryResult[];
     activities?: Activity[];
@@ -256,6 +257,11 @@ export interface Invoice {
     total_paid: number;
     balance: number;
     status: 'unpaid' | 'partially_paid' | 'paid' | 'cancelled';
+    subtotal: number;
+    discount_amount: number;
+    subtotal_after_discount: number;
+    vat_amount: number;
+    total: number;
     created_at: DateTimeResource;
     updated_at: DateTimeResource;
 

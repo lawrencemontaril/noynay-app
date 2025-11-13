@@ -11,7 +11,7 @@ import {
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import Input from '@/components/ui/input/Input.vue';
 import { useFormatters } from '@/composables/useFormatters';
-import { Appointment, Patient } from '@/types';
+import { Appointment, Patient, Procedure } from '@/types';
 import { ALL_SERVICES } from '@/types/constants';
 import { useForm as useInertiaForm } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -21,11 +21,13 @@ import { watch } from 'vue';
 import * as z from 'zod';
 import DataCard from './DataCard.vue';
 import InputError from './InputError.vue';
+import Switch from './ui/switch/Switch.vue';
 
 const props = defineProps<{
     open: boolean;
     appointment: Appointment | null;
     patient: Patient;
+    procedures: Procedure[];
 }>();
 const emit = defineEmits(['update:open']);
 
@@ -38,12 +40,14 @@ function closeDialog() {
 const inertiaForm = useInertiaForm({
     appointment_id: props.appointment?.id,
     items: [{ description: '', quantity: 1, unit_price: 0 }],
+    with_discount: false,
 });
 
 const itemSchema = z.object({
     description: z.string().min(1, 'Description is required'),
     quantity: z.coerce.number().int().min(1, 'Quantity must be at least 1'),
     unit_price: z.coerce.number().min(0, 'Price must be positive'),
+    locked: z.boolean().optional(),
 });
 
 const formSchema = toTypedSchema(
@@ -53,6 +57,7 @@ const formSchema = toTypedSchema(
             .array(itemSchema)
             .min(1, 'Add at least one item')
             .default([{ description: '', quantity: 1, unit_price: 0 }]),
+        with_discount: z.boolean({ required_error: 'This field is required.' }),
     }),
 );
 
@@ -78,10 +83,21 @@ watch(
     () => {
         inertiaForm.reset();
         inertiaForm.clearErrors();
-        resetForm();
+        resetForm({
+            values: {
+                appointment_id: props.appointment?.id,
+                items: [],
+            },
+        });
 
         if (props.appointment?.id) {
             setFieldValue('appointment_id', props.appointment.id);
+        }
+
+        if (props.appointment?.procedures) {
+            props.appointment.procedures.forEach((procedure) => {
+                push({ description: procedure.description, quantity: procedure.quantity, unit_price: 0, locked: true });
+            });
         }
     },
 );
@@ -129,9 +145,44 @@ const addItem = () => {
                     </div>
                 </DataCard>
 
+                <FormField
+                    v-slot="{ value, handleChange }"
+                    name="with_discount"
+                >
+                    <FormItem
+                        class="flex flex-row items-center justify-between gap-4 rounded-lg border border-destructive/50 bg-destructive/15 p-4 shadow-xs"
+                    >
+                        <div class="space-y-0.5">
+                            <FormLabel
+                                class="text-sm capitalize"
+                                required
+                            >
+                                Special Discount
+                            </FormLabel>
+                            <FormDescription class="text-sm">For PWDs, Senior Citizens, etc.</FormDescription>
+                        </div>
+
+                        <FormControl>
+                            <Switch
+                                :model-value="value"
+                                @update:model-value="handleChange"
+                            />
+                        </FormControl>
+
+                        <FormMessage />
+                    </FormItem>
+                </FormField>
+
                 <FormField name="items">
                     <FormItem>
                         <FormLabel required>Invoice Items</FormLabel>
+
+                        <p
+                            v-if="procedures.length < 1"
+                            class="text-xs text-destructive"
+                        >
+                            Doctor has not added any procedures yet.
+                        </p>
 
                         <div
                             v-for="(field, index) in itemFields"
@@ -152,6 +203,7 @@ const addItem = () => {
                                             type="text"
                                             class="w-full rounded border p-2"
                                             placeholder="Item description"
+                                            :disabled="field.value.locked"
                                         />
                                     </FormControl>
 
@@ -173,6 +225,7 @@ const addItem = () => {
                                             type="number"
                                             min="1"
                                             class="w-full rounded border p-2"
+                                            :disabled="field.value.locked"
                                         />
                                     </FormControl>
 
@@ -209,7 +262,7 @@ const addItem = () => {
                                 size="icon"
                                 class="absolute -top-2 right-2"
                                 @click="remove(index)"
-                                v-if="itemFields.length > 1"
+                                v-if="itemFields.length > 1 && !field.value.locked"
                             >
                                 <Trash />
                             </Button>

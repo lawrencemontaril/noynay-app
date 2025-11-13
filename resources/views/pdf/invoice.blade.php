@@ -10,15 +10,14 @@
             font-size: 12px;
             color: #333;
             line-height: 1.5;
+            margin: 0;
+            padding: 0;
         }
 
         /* Header */
         .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 10px;
+            padding: 15px 0;
             margin-bottom: 25px;
         }
 
@@ -29,26 +28,27 @@
         }
 
         .logo {
-            width: 70px;
+            width: 80px;
             height: auto;
         }
 
         .clinic-name {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             color: #111827;
         }
 
         .invoice-info {
-            text-align: right;
+            text-align: left;
         }
 
-        .title {
-            font-size: 18px;
+        .invoice-title {
+            font-size: 20px;
             font-weight: bold;
+            margin-bottom: 3px;
         }
 
-        .subtitle {
+        .invoice-subtitle {
             font-size: 12px;
             color: #555;
         }
@@ -59,55 +59,7 @@
         }
 
         .info p {
-            margin: 2px 0;
-        }
-
-        /* Table */
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        .table th {
-            background: #f3f4f6;
-            text-align: left;
-            font-weight: bold;
-            padding: 8px;
-            border-bottom: 1px solid #ccc;
-        }
-
-        .table td {
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-            vertical-align: top;
-        }
-
-        .right {
-            text-align: right;
-        }
-
-        .total-row {
-            background: #f9fafb;
-            font-weight: bold;
-        }
-
-        /* Section title */
-        .section-title {
-            font-weight: bold;
-            font-size: 14px;
-            margin-top: 25px;
-            margin-bottom: 8px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 3px;
-        }
-
-        /* Footer */
-        .footer {
-            margin-top: 40px;
-            text-align: center;
-            font-size: 11px;
-            color: #666;
+            margin: 4px 0;
         }
 
         /* Badges */
@@ -118,20 +70,15 @@
             font-size: 11px;
             font-weight: bold;
             color: white;
+            text-transform: capitalize;
         }
 
-        .badge.pending {
-            background-color: #f59e0b;
-        }
-
+        .badge.pending,
         .badge.partially_paid {
             background-color: #f59e0b;
         }
 
-        .badge.approved {
-            background-color: #3b82f6;
-        }
-
+        .badge.approved,
         .badge.completed {
             background-color: #16a34a;
         }
@@ -142,6 +89,64 @@
 
         .badge.paid {
             background-color: #10b981;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background-color: #f3f4f6;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        td.right {
+            text-align: right;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 3px;
+        }
+
+        .totals-table td {
+            border: none;
+            padding: 4px 0;
+        }
+
+        .totals-table tr.total {
+            font-weight: bold;
+            border-top: 2px solid #ccc;
+        }
+
+        .totals-table tr.discount td {
+            color: #16a34a;
+        }
+
+        .totals-table tr.balance td {
+            color: #ef4444;
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 11px;
+            color: #666;
         }
     </style>
 </head>
@@ -154,8 +159,9 @@
             <div class="clinic-name">Noynay Medical Center</div>
         </div>
         <div class="invoice-info">
-            <div class="title">Invoice #{{ $invoice->id }}</div>
-            <div class="subtitle">Issued on {{ $invoice->created_at->format('F d, Y') }}</div>
+            <div class="invoice-title">Invoice #{{ $invoice->id }}</div>
+            <div class="invoice-subtitle">Issued on {{ $invoice->created_at->format('F d, Y') }}</div>
+            <div class="invoice-subtitle">Generated on {{ now()->timezone('Asia/Manila')->format('F d, Y h:i A') }}</div>
         </div>
     </div>
 
@@ -176,12 +182,12 @@
 
     <!-- Invoice Items -->
     <div class="section-title">Invoice Items</div>
-    <table class="table">
+    <table>
         <thead>
             <tr>
                 <th>#</th>
                 <th>Description</th>
-                <th class="right">Quantity</th>
+                <th class="right">Qty</th>
                 <th class="right">Unit Price</th>
                 <th class="right">Line Total</th>
             </tr>
@@ -196,24 +202,12 @@
                     <td class="right">{{ number_format($item->line_total, 2) }}</td>
                 </tr>
             @endforeach
-            <tr class="total-row">
-                <td class="right" colspan="4">Total</td>
-                <td class="right">{{ number_format($invoice->total, 2) }}</td>
-            </tr>
-            <tr>
-                <td class="right" colspan="4">Total Paid</td>
-                <td class="right">{{ number_format($invoice->total_paid, 2) }}</td>
-            </tr>
-            <tr class="total-row">
-                <td class="right" colspan="4">Outstanding Balance</td>
-                <td class="right">{{ number_format($invoice->balance, 2) }}</td>
-            </tr>
         </tbody>
     </table>
 
     <!-- Payments -->
-    <div class="section-title">Payments</div>
-    <table class="table">
+    <div class="section-title" style="clear: both;">Payments</div>
+    <table>
         <thead>
             <tr>
                 <th>Date</th>
@@ -234,10 +228,39 @@
         </tbody>
     </table>
 
-    <!-- Footer -->
-    <div class="footer">
-        <p>Generated on {{ now()->timezone('Asia/Manila')->format('F d, Y h:i A') }}</p>
-    </div>
+        <!-- Totals -->
+    <table class="totals-table" style="margin-top: 20px; width: 50%; float: right;">
+        <tr>
+            <td>Subtotal:</td>
+            <td class="right">{{ number_format($invoice->subtotal, 2) }}</td>
+        </tr>
+        @if ($invoice->discount_amount > 0)
+            <tr class="discount">
+                <td>Discount:</td>
+                <td class="right">-{{ number_format($invoice->discount_amount, 2) }}</td>
+            </tr>
+        @endif
+        <tr>
+            <td>Subtotal after Discount:</td>
+            <td class="right">{{ number_format($invoice->subtotal_after_discount, 2) }}</td>
+        </tr>
+        <tr>
+            <td>VAT:</td>
+            <td class="right">{{ number_format($invoice->vat_amount, 2) }}</td>
+        </tr>
+        <tr class="total">
+            <td>Total:</td>
+            <td class="right">{{ number_format($invoice->total, 2) }}</td>
+        </tr>
+        <tr>
+            <td>Total Paid:</td>
+            <td class="right">{{ number_format($invoice->total_paid, 2) }}</td>
+        </tr>
+        <tr class="balance">
+            <td>Outstanding Balance:</td>
+            <td class="right">{{ number_format($invoice->balance, 2) }}</td>
+        </tr>
+    </table>
 </body>
 
 </html>

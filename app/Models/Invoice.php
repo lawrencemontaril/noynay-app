@@ -25,12 +25,19 @@ class Invoice extends Model
     protected $fillable = [
         'appointment_id',
         'status',
+        'with_discount',
+        'subtotal',
+        'discount_amount',
+        'subtotal_after_discount',
+        'vat_amount',
+        'total'
     ];
 
     protected function casts(): array
     {
         return [
-            'status' => InvoiceStatus::class
+            'status' => InvoiceStatus::class,
+            'with_discount' => 'boolean'
         ];
     }
 
@@ -78,14 +85,6 @@ class Invoice extends Model
     | Accessors/Mutators
     |--------------------------------------------------------------------------
     */
-    protected function total(): Attribute
-    {
-        return Attribute::get(
-            fn () => $this->invoiceItems
-                ->sum(fn ($item) => $item->lineTotal)
-        );
-    }
-
     protected function totalPaid(): Attribute
     {
         return Attribute::get(
@@ -96,7 +95,7 @@ class Invoice extends Model
     protected function balance(): Attribute
     {
         return Attribute::get(
-            fn () => max(0, $this->total - $this->total_paid)
+            fn () => round(max(0, $this->total - $this->total_paid), 2)
         );
     }
 
