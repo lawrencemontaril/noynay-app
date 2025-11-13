@@ -12,7 +12,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import Input from '@/components/ui/input/Input.vue';
 import { useFormatters } from '@/composables/useFormatters';
 import { Appointment, Patient, Procedure } from '@/types';
-import { ALL_SERVICES } from '@/types/constants';
+import { ALL_SERVICES, LAB_TYPES } from '@/types/constants';
 import { useForm as useInertiaForm } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
 import { LoaderCircle, Plus, Trash } from 'lucide-vue-next';
@@ -86,6 +86,7 @@ watch(
         resetForm({
             values: {
                 appointment_id: props.appointment?.id,
+                with_discount: false,
                 items: [],
             },
         });
@@ -178,7 +179,7 @@ const addItem = () => {
                         <FormLabel required>Invoice Items</FormLabel>
 
                         <p
-                            v-if="procedures.length < 1"
+                            v-if="procedures.length < 1 && !LAB_TYPES.some((type) => type.value === appointment?.type)"
                             class="text-xs text-destructive"
                         >
                             Doctor has not added any procedures yet.

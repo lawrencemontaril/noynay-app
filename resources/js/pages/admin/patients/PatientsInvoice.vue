@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import ActivityTimeline from '@/components/ActivityTimeline.vue';
-import CreateInvoiceItemDialog from '@/components/CreateInvoiceItemDialog.vue';
 import CreatePaymentDialog from '@/components/CreatePaymentDialog.vue';
 import EditInvoiceDialog from '@/components/EditInvoiceDialog.vue';
 import PatientProfileTabs from '@/components/PatientProfileTabs.vue';
@@ -51,7 +50,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const isEditInvoiceDialogOpen = ref(false);
-const isCreateInvoiceItemDialogOpen = ref(false);
+// const isCreateInvoiceItemDialogOpen = ref(false);
 const isCreatePaymentDialogOpen = ref(false);
 
 const isDownloading = ref(false);
@@ -174,7 +173,7 @@ const downloadInvoice = async () => {
                         </TableBody>
                     </Table>
 
-                    <Button
+                    <!-- <Button
                         v-if="
                             hasRole('cashier') && hasPermissionTo('invoice_items:create') && appointment.is_operatable
                         "
@@ -182,7 +181,7 @@ const downloadInvoice = async () => {
                         class="mt-4 w-full"
                     >
                         Add invoice items
-                    </Button>
+                    </Button> -->
 
                     <Button
                         v-if="hasRole('doctor') && hasPermissionTo('invoices:update') && appointment.is_operatable"
@@ -286,13 +285,13 @@ const downloadInvoice = async () => {
                 :activities="activities"
             />
 
-            <CreateInvoiceItemDialog
+            <!-- <CreateInvoiceItemDialog
                 v-if="hasRole('cashier')"
                 v-model:open="isCreateInvoiceItemDialogOpen"
                 :patient="patient"
                 :appointment="appointment"
                 :invoice="invoice"
-            />
+            /> -->
 
             <EditInvoiceDialog
                 v-if="hasRole('doctor')"

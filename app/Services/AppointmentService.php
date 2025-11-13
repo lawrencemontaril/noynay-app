@@ -15,6 +15,7 @@ use Carbon\Carbon;
 class AppointmentService
 {
     protected const DEFAULT_MAX_APPOINTMENTS_PER_SLOT = 1;
+
     protected int $maxAppointmentsPerSlot;
 
     public function __construct()
@@ -156,7 +157,11 @@ class AppointmentService
     protected function isFull(Carbon $scheduledAt, ?int $ignoreId = null): bool
     {
         $count = Appointment::where('scheduled_at', $scheduledAt)
-            ->whereIn('status', ['approved', 'completed', 'pending'])
+            ->whereIn('status', [
+                AppointmentStatus::APPROVED,
+                AppointmentStatus::COMPLETED,
+                AppointmentStatus::PENDING,
+            ])
             ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
             ->count();
 
@@ -173,7 +178,11 @@ class AppointmentService
         }
 
         return Appointment::where('patient_id', $patientId)
-            ->whereNotIn('status', ['rejected', 'completed', 'cancelled'])
+            ->whereNotIn('status', [
+                AppointmentStatus::REJECTED,
+                AppointmentStatus::COMPLETED,
+                AppointmentStatus::CANCELLED,
+            ])
             ->exists();
     }
 
@@ -223,18 +232,18 @@ class AppointmentService
     }
 
     /**
-     * Notify cashiers of appointment approvals.
+     * Notify laboratory staff and doctor of appointment approvals.
      */
     protected function notifyStaffsOfAppointmentApprovals(Appointment $appointment)
     {
         if ($appointment->type->isLab()) {
             $labStaffs = User::role('laboratory_staff')->get();
 
-            Notification::send($labStaffs, new AppointmentApproved($appointment));
+            Notification::send($labStaffs, new LaboratoryResultRequest($appointment));
         } else {
             $doctors = User::role('doctor')->get();
 
-            Notification::send($doctors, new AppointmentApproved($appointment));
+            Notification::send($doctors, new ConsultationRequest($appointment));
         }
     }
 

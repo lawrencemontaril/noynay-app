@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\AppointmentStatus;
 use App\Models\Appointment;
 use App\Models\Setting;
 use App\Notifications\AppointmentCompleted;
@@ -160,6 +161,8 @@ class InvoiceService
 
     protected function notifyPatientOfAppointmentCompletion(Appointment $appointment)
     {
+        $appointment->update(['status' => AppointmentStatus::COMPLETED]);
+
         $appointment->patient->user?->notify(new AppointmentCompleted($appointment));
     }
 }

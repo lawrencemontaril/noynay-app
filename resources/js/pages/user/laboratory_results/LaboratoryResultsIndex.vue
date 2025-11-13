@@ -90,8 +90,6 @@ const statuses: {
                                 </Select>
                             </TableHead>
 
-                            <TableHead>Scheduled At</TableHead>
-
                             <TableHead>
                                 <Select v-model="inertiaForm.status">
                                     <SelectTrigger>
@@ -126,10 +124,6 @@ const statuses: {
 
                             <TableCell>
                                 {{ LAB_TYPES.find((type) => type.value === laboratory_result.type)?.label }}
-                            </TableCell>
-
-                            <TableCell class="capitalize">
-                                {{ laboratory_result.scheduled_at?.formatted_date ?? 'N/A' }}
                             </TableCell>
 
                             <TableCell class="capitalize">

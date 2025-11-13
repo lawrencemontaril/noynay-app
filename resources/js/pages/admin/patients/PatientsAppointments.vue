@@ -59,108 +59,104 @@ const openDeleteDialog = (appointment: Appointment) => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <PatientProfileTabs :patient="patient" />
 
-        <Container>
-            <div class="space-y-4">
-                <div
-                    v-for="appointment in appointments.data"
-                    :key="appointment.id"
-                    class="rounded-xl border bg-card shadow-xs"
-                >
-                    <!-- Header -->
-                    <div class="flex flex-col gap-2 border-b px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:gap-2">
-                            <h3 class="text-base leading-tight font-semibold text-foreground">
-                                {{ ALL_SERVICES.find((service) => service.value === appointment.type)?.label }}
-                                Appointment
-                            </h3>
+        <Container class="space-y-4">
+            <div
+                v-for="appointment in appointments.data"
+                :key="appointment.id"
+                class="rounded-xl border bg-card shadow-xs"
+            >
+                <!-- Header -->
+                <div class="flex flex-col gap-2 border-b px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+                        <h3 class="text-base leading-tight font-semibold text-foreground">
+                            {{ ALL_SERVICES.find((service) => service.value === appointment.type)?.label }}
+                            Appointment
+                        </h3>
 
-                            <Badge
-                                as="span"
-                                :variant="
-                                    APPOINTMENT_STATUSES.find((status) => status.value === appointment.status)?.badge
+                        <Badge
+                            as="span"
+                            :variant="APPOINTMENT_STATUSES.find((status) => status.value === appointment.status)?.badge"
+                            class="mt-1 w-fit capitalize sm:mt-0"
+                        >
+                            {{ appointment.status }}
+                        </Badge>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="flex flex-wrap gap-1 sm:gap-2">
+                        <Button
+                            v-if="hasPermissionTo('appointments:view')"
+                            variant="outline"
+                            size="sm"
+                            class="flex items-center gap-1 text-xs"
+                            as-child
+                        >
+                            <Link
+                                :href="
+                                    route('admin.patients.appointments.show', {
+                                        patient: patient.id,
+                                        appointment: appointment.id,
+                                    })
                                 "
-                                class="mt-1 w-fit capitalize sm:mt-0"
+                                prefetch
                             >
-                                {{ appointment.status }}
-                            </Badge>
-                        </div>
+                                <Ellipsis class="h-4 w-4" /> Details
+                            </Link>
+                        </Button>
 
-                        <!-- Action buttons -->
-                        <div class="flex flex-wrap gap-1 sm:gap-2">
-                            <Button
-                                v-if="hasPermissionTo('appointments:view')"
-                                variant="outline"
-                                size="sm"
-                                class="flex items-center gap-1 text-xs"
-                                as-child
-                            >
-                                <Link
-                                    :href="
-                                        route('admin.patients.appointments.show', {
-                                            patient: patient.id,
-                                            appointment: appointment.id,
-                                        })
-                                    "
-                                    prefetch
-                                >
-                                    <Ellipsis class="h-4 w-4" /> Details
-                                </Link>
-                            </Button>
+                        <Button
+                            v-if="hasPermissionTo('appointments:update')"
+                            @click="openEditDialog(appointment)"
+                            variant="warning"
+                            size="icon"
+                            class="h-8 w-8"
+                        >
+                            <Pencil class="h-4 w-4" />
+                        </Button>
 
-                            <Button
-                                v-if="hasPermissionTo('appointments:update')"
-                                @click="openEditDialog(appointment)"
-                                variant="warning"
-                                size="icon"
-                                class="h-8 w-8"
-                            >
-                                <Pencil class="h-4 w-4" />
-                            </Button>
-
-                            <Button
-                                v-if="hasPermissionTo('appointments:delete')"
-                                @click="openDeleteDialog(appointment)"
-                                variant="secondary"
-                                size="icon"
-                                class="h-8 w-8"
-                            >
-                                <Archive class="h-4 w-4" />
-                            </Button>
-                        </div>
-                    </div>
-
-                    <!-- Body -->
-                    <div class="grid grid-cols-1 gap-4 p-2 pb-0 md:grid-cols-2">
-                        <DataCard title="complaints">
-                            <DataText>{{ appointment.complaints ?? 'N/A' }}</DataText>
-                        </DataCard>
-
-                        <DataCard title="Scheduled for">
-                            <DataText>{{ appointment.scheduled_at.formatted_date }}</DataText>
-                        </DataCard>
+                        <Button
+                            v-if="hasPermissionTo('appointments:delete')"
+                            @click="openDeleteDialog(appointment)"
+                            variant="secondary"
+                            size="icon"
+                            class="h-8 w-8"
+                        >
+                            <Archive class="h-4 w-4" />
+                        </Button>
                     </div>
                 </div>
 
-                <!-- Empty state -->
-                <div
-                    v-if="!appointments.data.length"
-                    class="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-muted/20 p-8 text-center"
-                >
-                    <p class="text-sm text-muted-foreground">No appointments yet.</p>
+                <!-- Body -->
+                <div class="grid grid-cols-1 gap-4 p-2 pb-0 md:grid-cols-2">
+                    <DataCard title="complaints">
+                        <DataText>{{ appointment.complaints ?? 'N/A' }}</DataText>
+                    </DataCard>
+
+                    <DataCard title="Scheduled for">
+                        <DataText>{{ appointment.scheduled_at.formatted_date }}</DataText>
+                    </DataCard>
                 </div>
-
-                <Pagination :meta="appointments.meta" />
-
-                <EditAppointmentDialog
-                    v-model:open="isEditDialogOpen"
-                    :patient="patient"
-                    :appointment="selectedAppointment"
-                />
-                <DeleteAppointmentDialog
-                    v-model:open="isDeleteDialogOpen"
-                    :appointment="selectedAppointment"
-                />
             </div>
+
+            <!-- Empty state -->
+            <div
+                v-if="!appointments.data.length"
+                class="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-muted/20 p-8 text-center"
+            >
+                <p class="text-sm text-muted-foreground">No appointments yet.</p>
+            </div>
+
+            <Pagination :meta="appointments.meta" />
+
+            <EditAppointmentDialog
+                v-model:open="isEditDialogOpen"
+                :patient="patient"
+                :appointment="selectedAppointment"
+            />
+            <DeleteAppointmentDialog
+                v-model:open="isDeleteDialogOpen"
+                :appointment="selectedAppointment"
+            />
         </Container>
     </AppLayout>
 </template>

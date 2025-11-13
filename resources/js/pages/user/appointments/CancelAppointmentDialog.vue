@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import DataCard from '@/components/DataCard.vue';
+import DataText from '@/components/DataText.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { Dialog, DialogFooter, DialogHeader, DialogScrollContent, DialogTitle } from '@/components/ui/dialog';
 import { Appointment } from '@/types';
@@ -39,11 +40,11 @@ const cancelAppointment = () => {
 
             <form @submit.prevent="cancelAppointment">
                 <DataCard title="Appointment Date">
-                    <p class="text-sm">{{ appointment.scheduled_at.formatted_date }}</p>
+                    <DataText>{{ appointment.scheduled_at.formatted_date }}</DataText>
                 </DataCard>
 
                 <DataCard title="Reason for visit / Complaints">
-                    <p class="text-sm">{{ appointment.complaints ?? 'N/A' }}</p>
+                    <DataText>{{ appointment.complaints ?? 'N/A' }}</DataText>
                 </DataCard>
 
                 <DialogFooter>

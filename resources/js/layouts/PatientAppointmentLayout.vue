@@ -39,7 +39,7 @@ const sidebarNavItems: NavItem[] = [
             appointment: props.appointmentId,
         }),
         isActive: isActive('admin.patients.appointments.procedures'),
-        access: hasPermissionTo('procedures:view_any'),
+        access: hasPermissionTo('procedures:view'),
     },
     {
         title: 'Consultations',
@@ -71,7 +71,7 @@ const sidebarNavItems: NavItem[] = [
 <template>
     <div class="px-4 py-6">
         <div class="flex flex-col space-y-8 md:space-y-0 lg:flex-row lg:space-y-0 lg:space-x-12">
-            <aside class="w-full max-w-xl lg:w-48">
+            <aside class="w-full lg:w-48">
                 <nav class="flex flex-col space-y-1 space-x-0">
                     <template
                         v-for="item in sidebarNavItems"
@@ -103,7 +103,7 @@ const sidebarNavItems: NavItem[] = [
             <Separator class="my-6 md:hidden" />
 
             <div class="flex-1">
-                <section class="space-y-4">
+                <section class="mx-auto max-w-4xl space-y-4">
                     <slot />
                 </section>
             </div>

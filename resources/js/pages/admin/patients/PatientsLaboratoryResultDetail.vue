@@ -89,7 +89,7 @@ const isDeleteDialogOpen = ref(false);
                 </Link>
             </Button>
 
-            <Card class="mx-auto max-w-4xl shadow-xs">
+            <Card>
                 <!-- Header -->
                 <CardHeader class="flex items-center justify-between border-b">
                     <div>

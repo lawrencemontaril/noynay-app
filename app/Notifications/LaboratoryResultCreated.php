@@ -38,10 +38,10 @@ class LaboratoryResultCreated extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $appointment = $this->laboratoryResult->appointment;
+        $laboratoryResult = $this->laboratoryResult;
 
         return [
-            'message' => "Your laboratory result for {$appointment->type->label()} is now available.",
+            'message' => "Your laboratory result for {$laboratoryResult->type->label()} is now available.",
             'link' => "/laboratory_results?id={$this->laboratoryResult->id}",
         ];
     }

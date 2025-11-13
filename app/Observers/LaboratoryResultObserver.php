@@ -6,6 +6,7 @@ use App\Enums\LaboratoryResultStatus;
 use App\Models\{LaboratoryResult, User};
 use App\Notifications\{LaboratoryResultCreated, PendingInvoice};
 use App\Services\AppointmentService;
+use Illuminate\Support\Facades\Notification;
 
 class LaboratoryResultObserver
 {
@@ -25,9 +26,7 @@ class LaboratoryResultObserver
             if (! app(AppointmentService::class)->hasBeenServiced($laboratoryResult->appointment)) {
                 $cashiers = User::role('cashier')->get();
 
-                foreach ($cashiers as $cashier) {
-                    $cashier?->notify(new PendingInvoice($laboratoryResult->appointment));
-                }
+                Notification::send($cashiers, new PendingInvoice($laboratoryResult->appointment));
             }
         } else {
             $laboratoryResult->status = LaboratoryResultStatus::PENDING;

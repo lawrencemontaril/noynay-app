@@ -60,7 +60,7 @@ const isEditDialogOpen = ref(false);
             :patient-id="patient.id"
             :appointment-id="appointment.id"
         >
-            <Card class="mx-auto max-w-4xl shadow-xs">
+            <Card>
                 <!-- Header -->
                 <CardHeader class="flex items-center justify-between border-b">
                     <div>

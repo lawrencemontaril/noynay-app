@@ -91,7 +91,7 @@ class AppointmentController extends Controller
 
         return redirect()
             ->back()
-            ->with('success', 'Appointment approved.');
+            ->with('success', 'Appointment rejected.');
     }
 
     /**

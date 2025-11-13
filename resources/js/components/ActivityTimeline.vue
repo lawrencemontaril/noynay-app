@@ -146,7 +146,9 @@ const loadActivities = () => {
                                         :key="key"
                                     >
                                         <strong>{{ key }}:</strong>
-                                        <span class="ml-1 wrap-break-word text-muted-foreground">{{ value }}</span>
+                                        <span class="ml-1 wrap-break-word break-all text-muted-foreground">{{
+                                            value
+                                        }}</span>
                                     </li>
                                 </ul>
                             </div>
@@ -162,7 +164,9 @@ const loadActivities = () => {
                                         :key="key"
                                     >
                                         <strong>{{ key }}:</strong>
-                                        <span class="ml-1 wrap-break-word text-muted-foreground">{{ value }}</span>
+                                        <span class="ml-1 wrap-break-word break-all text-muted-foreground">{{
+                                            value
+                                        }}</span>
                                     </li>
                                 </ul>
                             </div>
