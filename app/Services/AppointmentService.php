@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Setting;
 use App\Notifications\AppointmentCancelled;
+use App\Notifications\AppointmentNoShow;
 use App\Notifications\AppointmentRejected;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
@@ -111,6 +112,17 @@ class AppointmentService
         $this->notifyPatientOfAppointmentRejection($appointment);
     }
 
+    public function noShow(Appointment $appointment)
+    {
+        $appointment->update(['status' => AppointmentStatus::NO_SHOW]);
+
+        if ($appointment->laboratoryResults()->exists()) {
+            $appointment->laboratoryResults()->delete();
+        }
+
+        $this->notifyAdminsOfAppointmentNoShows($appointment);
+    }
+
     /**
      * Reschedule an appointment (triggered by user).
      */
@@ -182,6 +194,7 @@ class AppointmentService
                 AppointmentStatus::REJECTED,
                 AppointmentStatus::COMPLETED,
                 AppointmentStatus::CANCELLED,
+                AppointmentStatus::NO_SHOW,
             ])
             ->exists();
     }
@@ -212,6 +225,22 @@ class AppointmentService
     }
 
     /**
+     * Notify laboratory staff and doctor of appointment approvals.
+     */
+    protected function notifyStaffsOfAppointmentApprovals(Appointment $appointment)
+    {
+        if ($appointment->type->isLab()) {
+            $labStaffs = User::role('laboratory_staff')->get();
+
+            Notification::send($labStaffs, new LaboratoryResultRequest($appointment));
+        } else {
+            $doctors = User::role('doctor')->get();
+
+            Notification::send($doctors, new ConsultationRequest($appointment));
+        }
+    }
+
+    /**
      * Notify admins of appointment reschedules.
      */
     protected function notifyAdminsOfAppointmentReschedules(Appointment $appointment)
@@ -232,19 +261,11 @@ class AppointmentService
     }
 
     /**
-     * Notify laboratory staff and doctor of appointment approvals.
+     * Notify admins of appointment no shows.
      */
-    protected function notifyStaffsOfAppointmentApprovals(Appointment $appointment)
+    protected function notifyAdminsOfAppointmentNoShows(Appointment $appointment)
     {
-        if ($appointment->type->isLab()) {
-            $labStaffs = User::role('laboratory_staff')->get();
-
-            Notification::send($labStaffs, new LaboratoryResultRequest($appointment));
-        } else {
-            $doctors = User::role('doctor')->get();
-
-            Notification::send($doctors, new ConsultationRequest($appointment));
-        }
+        $appointment->patient->user?->notify(new AppointmentNoShow($appointment));
     }
 
     /**

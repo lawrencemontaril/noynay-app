@@ -107,7 +107,8 @@
                 <th style="width:6%;">Services</th>
                 <th style="width:10%;">Spend (₱)</th>
                 <th style="width:8%;">Avg Days</th>
-                <th style="width:6%;">Score</th>
+                <th style="width:7%;">Status Score</th>
+                <th style="width:7%;">Loyalty Score</th>
             </tr>
         </thead>
         <tbody>
@@ -122,6 +123,7 @@
                     <td class="right">{{ $p['distinct_services'] }}</td>
                     <td class="right">{{ number_format($p['total_spend'] ?? 0, 2) }}</td>
                     <td class="right">{{ $p['avg_days_between_visits'] ?? '—' }}</td>
+                    <td class="right">{{ $p['status_score'] }}</td>
                     <td class="right">{{ $p['loyalty_score'] }}</td>
                 </tr>
             @empty

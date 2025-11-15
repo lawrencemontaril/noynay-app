@@ -4,7 +4,7 @@ import DeleteAppointmentDialog from '@/components/DeleteAppointmentDialog.vue';
 import EditAppointmentDialog from '@/components/EditAppointmentDialog.vue';
 import Pagination from '@/components/Pagination.vue';
 import RestoreAppointmentDialog from '@/components/RestoreAppointmentDialog.vue';
-import { Badge, type BadgeVariants } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Input from '@/components/ui/input/Input.vue';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -13,7 +13,7 @@ import { useFormatters } from '@/composables/useFormatters';
 import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Appointment, BreadcrumbItem, PaginatedData } from '@/types';
-import { ALL_SERVICES, LAB_TYPES } from '@/types/constants';
+import { ALL_SERVICES, APPOINTMENT_STATUSES, LAB_TYPES } from '@/types/constants';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 import { Archive, ArchiveRestore, Eye, Pencil, Search, X } from 'lucide-vue-next';
@@ -86,18 +86,6 @@ function clearSearch() {
 }
 
 watch([q, status, type, archived], () => filterAppointments());
-
-const statuses: {
-    label: string;
-    value: Appointment['status'];
-    badge: BadgeVariants['variant'];
-}[] = [
-    { label: 'Pending', value: 'pending', badge: 'warning' },
-    { label: 'Approved', value: 'approved', badge: 'default' },
-    { label: 'Completed', value: 'completed', badge: 'default' },
-    { label: 'Rejected', value: 'rejected', badge: 'destructive' },
-    { label: 'Cancelled', value: 'cancelled', badge: 'destructive' },
-];
 </script>
 
 <template>
@@ -162,7 +150,7 @@ const statuses: {
                                         <SelectGroup>
                                             <SelectItem value="all">All</SelectItem>
                                             <SelectItem
-                                                v-for="status in statuses"
+                                                v-for="status in APPOINTMENT_STATUSES"
                                                 :key="status.value"
                                                 :value="status.value"
                                             >
@@ -228,8 +216,16 @@ const statuses: {
                             </TableCell>
 
                             <TableCell>
-                                <Badge :variant="statuses.find((status) => status.value === appointment.status)?.badge">
-                                    {{ statuses.find((status) => status.value === appointment.status)?.label }}
+                                <Badge
+                                    :variant="
+                                        APPOINTMENT_STATUSES.find((status) => status.value === appointment.status)
+                                            ?.badge
+                                    "
+                                >
+                                    {{
+                                        APPOINTMENT_STATUSES.find((status) => status.value === appointment.status)
+                                            ?.label
+                                    }}
                                 </Badge>
                             </TableCell>
 

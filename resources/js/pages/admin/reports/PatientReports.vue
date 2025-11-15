@@ -19,6 +19,7 @@ defineProps<{
         distinct_services: number;
         total_spend: number;
         avg_days_between_visits: number | null;
+        status_score: number;
         loyalty_score: number;
     }>;
 }>();
@@ -36,17 +37,17 @@ const breadcrumbs: BreadcrumbItem[] = [
         <Container class="space-y-8">
             <!-- Most Loyal Patients -->
             <Card>
-                <CardHeader class="flex items-center justify-between">
+                <CardHeader class="flex items-center justify-between gap-4">
                     <CardTitle>Most Loyal Patients</CardTitle>
-                    <div class="flex items-center gap-2">
-                        <Button
-                            as="a"
-                            variant="destructive"
-                            :href="route('admin.reports.patient-loyalty.pdf')"
-                            target="_blank"
-                            >Download PDF</Button
-                        >
-                    </div>
+
+                    <Button
+                        as="a"
+                        variant="destructive"
+                        :href="route('admin.reports.patient-loyalty.pdf')"
+                        target="_blank"
+                    >
+                        Download PDF
+                    </Button>
                 </CardHeader>
 
                 <CardContent>
@@ -57,12 +58,12 @@ const breadcrumbs: BreadcrumbItem[] = [
                                 <TableHead>Patient</TableHead>
                                 <TableHead class="text-right">Visits</TableHead>
                                 <TableHead class="text-right">Visits/yr</TableHead>
-                                <TableHead class="text-right">Last Visit</TableHead>
                                 <TableHead class="text-right">Tenure (yrs)</TableHead>
                                 <TableHead class="text-right">Services</TableHead>
                                 <TableHead class="text-right">Spend</TableHead>
                                 <TableHead class="text-right">Avg Days</TableHead>
-                                <TableHead class="text-right">Score</TableHead>
+                                <TableHead class="text-right">Status Score</TableHead>
+                                <TableHead class="text-right">Loyalty Score</TableHead>
                             </TableRow>
                         </TableHeader>
 
@@ -75,9 +76,6 @@ const breadcrumbs: BreadcrumbItem[] = [
                                 <TableCell>{{ p.name }}</TableCell>
                                 <TableCell class="text-right font-semibold">{{ p.total_appointments }}</TableCell>
                                 <TableCell class="text-right">{{ p.visits_per_year }}</TableCell>
-                                <TableCell class="text-right">{{
-                                    p.last_visit ? new Date(p.last_visit).toLocaleString() : '—'
-                                }}</TableCell>
                                 <TableCell class="text-right">{{ p.tenure_years }}</TableCell>
                                 <TableCell class="text-right">{{ p.distinct_services }}</TableCell>
                                 <TableCell class="text-right">{{
@@ -86,6 +84,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                                     )
                                 }}</TableCell>
                                 <TableCell class="text-right">{{ p.avg_days_between_visits ?? '—' }}</TableCell>
+                                <TableCell class="text-right font-semibold">{{ p.status_score }}</TableCell>
                                 <TableCell class="text-right font-semibold">{{ p.loyalty_score }}</TableCell>
                             </TableRow>
 

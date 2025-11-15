@@ -78,7 +78,7 @@ const openDeleteDialog = (appointment: Appointment) => {
                             :variant="APPOINTMENT_STATUSES.find((status) => status.value === appointment.status)?.badge"
                             class="mt-1 w-fit capitalize sm:mt-0"
                         >
-                            {{ appointment.status }}
+                            {{ APPOINTMENT_STATUSES.find((status) => status.value === appointment.status)?.label }}
                         </Badge>
                     </div>
 

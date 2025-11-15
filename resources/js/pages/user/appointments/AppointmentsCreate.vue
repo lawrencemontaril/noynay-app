@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import Container from '@/components/Container.vue';
+import DataCard from '@/components/DataCard.vue';
+import DataCell from '@/components/DataCell.vue';
+import DataLabel from '@/components/DataLabel.vue';
+import DataText from '@/components/DataText.vue';
 import InputError from '@/components/InputError.vue';
 import Button from '@/components/ui/button/Button.vue';
 import Calendar from '@/components/ui/calendar/Calendar.vue';
+import { Card, CardContent } from '@/components/ui/card';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
@@ -216,7 +221,10 @@ const scheduled_date = computed({
                 v-model="stepIndex"
                 class="block w-full"
             >
-                <form @submit.prevent="createAppointment">
+                <form
+                    @submit.prevent="createAppointment"
+                    class="space-y-4"
+                >
                     <div class="flex-start flex w-full gap-2">
                         <StepperItem
                             v-for="step in steps"
@@ -266,191 +274,188 @@ const scheduled_date = computed({
                         </StepperItem>
                     </div>
 
-                    <div class="mt-4 flex flex-col rounded-md border p-3 shadow-xs">
-                        <template v-if="stepIndex === 1">
-                            <FormField name="type">
-                                <FormItem>
-                                    <FormLabel required>Service</FormLabel>
-
-                                    <Select v-model="selectedService">
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select a service" />
-                                        </SelectTrigger>
-
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                <SelectItem
-                                                    v-for="(service, key) in services"
-                                                    :value="key"
-                                                    :key="key"
-                                                >
-                                                    {{ service.label }}
-                                                </SelectItem>
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
-
-                                    <FormControl>
-                                        <template v-if="selectedService">
-                                            <div class="grid grid-cols-2 gap-2 md:grid-cols-4">
-                                                <Button
-                                                    v-for="child in services[selectedService]?.children"
-                                                    :key="child.value"
-                                                    :variant="values.type === child.value ? 'default' : 'outline'"
-                                                    @click="setFieldValue('type', child.value)"
-                                                    class="flex h-full w-full flex-col justify-start gap-0 p-1"
-                                                >
-                                                    <img
-                                                        :src="`/images/services/${child.value}.jpg`"
-                                                        class="block w-auto"
-                                                    />
-                                                    <p class="p-2 text-wrap">{{ child.label }}</p>
-                                                </Button>
-                                            </div>
-                                        </template>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            </FormField>
-
-                            <FormField
-                                v-slot="{ componentField }"
-                                name="complaints"
-                            >
-                                <FormItem>
-                                    <FormLabel>Complaints / Notes</FormLabel>
-
-                                    <FormControl>
-                                        <Textarea v-bind="componentField" />
-                                    </FormControl>
-
-                                    <FormMessage />
-                                </FormItem>
-                            </FormField>
-                        </template>
-
-                        <template v-if="stepIndex === 2">
-                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <FormField name="scheduled_date">
+                    <Card>
+                        <CardContent>
+                            <template v-if="stepIndex === 1">
+                                <FormField name="type">
                                     <FormItem>
-                                        <FormLabel required>Date</FormLabel>
-                                        <FormControl class="flex flex-col items-center justify-center">
-                                            <Calendar
-                                                button-size="icon12"
-                                                class="p-0"
-                                                :model-value="scheduled_date"
-                                                calendar-label="Appointment date"
-                                                initial-focus
-                                                :min-value="today(getLocalTimeZone())"
-                                                :max-value="today(getLocalTimeZone()).add({ years: 1 })"
-                                                @update:model-value="
-                                                    (v) => {
-                                                        if (v) {
-                                                            setFieldValue('scheduled_date', v.toString());
-                                                        }
-                                                    }
-                                                "
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                </FormField>
+                                        <FormLabel required>Service</FormLabel>
 
-                                <FormField name="scheduled_time">
-                                    <FormItem>
-                                        <FormLabel required>Time</FormLabel>
+                                        <Select v-model="selectedService">
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select a service" />
+                                            </SelectTrigger>
+
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectItem
+                                                        v-for="(service, key) in services"
+                                                        :value="key"
+                                                        :key="key"
+                                                    >
+                                                        {{ service.label }}
+                                                    </SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+
                                         <FormControl>
-                                            <div class="border-b text-sm">Morning</div>
-                                            <div class="mb-3 flex flex-wrap gap-4">
-                                                <Button
-                                                    v-for="time in availableTimesAM"
-                                                    @click="setFieldValue('scheduled_time', time.value)"
-                                                    :variant="
-                                                        values.scheduled_time === time.value ? 'default' : 'outline'
-                                                    "
-                                                    :key="time.value"
-                                                    class="w-fit"
-                                                >
-                                                    {{ time.label }}
-                                                </Button>
-                                            </div>
+                                            <template v-if="selectedService">
+                                                <div class="grid grid-cols-2 gap-2 md:grid-cols-4">
+                                                    <Button
+                                                        v-for="child in services[selectedService]?.children"
+                                                        :key="child.value"
+                                                        :variant="values.type === child.value ? 'default' : 'outline'"
+                                                        @click="setFieldValue('type', child.value)"
+                                                        class="flex h-full w-full flex-col justify-start gap-0 p-1"
+                                                    >
+                                                        <img
+                                                            :src="`/images/services/${child.value}.jpg`"
+                                                            class="block w-auto"
+                                                        />
+                                                        <p class="p-2 text-wrap">{{ child.label }}</p>
+                                                    </Button>
+                                                </div>
+                                            </template>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                </FormField>
 
-                                            <div class="border-b text-sm">Afternoon</div>
-                                            <div class="flex flex-wrap gap-4">
-                                                <Button
-                                                    v-for="time in availableTimesPM"
-                                                    @click="setFieldValue('scheduled_time', time.value)"
-                                                    :variant="
-                                                        values.scheduled_time === time.value ? 'default' : 'outline'
-                                                    "
-                                                    :key="time.value"
-                                                    class="w-fit"
-                                                >
-                                                    {{ time.label }}
-                                                </Button>
-                                            </div>
+                                <FormField
+                                    v-slot="{ componentField }"
+                                    name="complaints"
+                                >
+                                    <FormItem>
+                                        <FormLabel>Complaints / Notes</FormLabel>
+
+                                        <FormControl>
+                                            <Textarea v-bind="componentField" />
                                         </FormControl>
 
                                         <FormMessage />
                                     </FormItem>
                                 </FormField>
-                            </div>
-                        </template>
+                            </template>
 
-                        <template v-if="stepIndex === 3">
-                            <h1 class="mt-2 mb-6 text-center text-xl font-semibold">Confirm appointment details</h1>
+                            <template v-if="stepIndex === 2">
+                                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <FormField name="scheduled_date">
+                                        <FormItem>
+                                            <FormLabel required>Date</FormLabel>
+                                            <FormControl class="flex flex-col items-center justify-center">
+                                                <Calendar
+                                                    button-size="icon12"
+                                                    class="p-0"
+                                                    :model-value="scheduled_date"
+                                                    calendar-label="Appointment date"
+                                                    initial-focus
+                                                    :min-value="today(getLocalTimeZone())"
+                                                    :max-value="today(getLocalTimeZone()).add({ years: 1 })"
+                                                    @update:model-value="
+                                                        (v) => {
+                                                            if (v) {
+                                                                setFieldValue('scheduled_date', v.toString());
+                                                            }
+                                                        }
+                                                    "
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    </FormField>
 
-                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <div class="grid grid-cols-1 gap-2">
-                                    <label class="border-b pb-1 text-xs font-semibold uppercase">Service</label>
-                                    <p
-                                        v-if="selectedService"
-                                        class="text-sm"
-                                    >
-                                        {{ services[selectedService]?.label }}
-                                    </p>
+                                    <FormField name="scheduled_time">
+                                        <FormItem>
+                                            <FormLabel required>Time</FormLabel>
+                                            <FormControl>
+                                                <div class="border-b text-sm">Morning</div>
+                                                <div class="mb-3 flex flex-wrap gap-4">
+                                                    <Button
+                                                        v-for="time in availableTimesAM"
+                                                        @click="setFieldValue('scheduled_time', time.value)"
+                                                        :variant="
+                                                            values.scheduled_time === time.value ? 'default' : 'outline'
+                                                        "
+                                                        :key="time.value"
+                                                        class="w-fit"
+                                                    >
+                                                        {{ time.label }}
+                                                    </Button>
+                                                </div>
+
+                                                <div class="border-b text-sm">Afternoon</div>
+                                                <div class="flex flex-wrap gap-4">
+                                                    <Button
+                                                        v-for="time in availableTimesPM"
+                                                        @click="setFieldValue('scheduled_time', time.value)"
+                                                        :variant="
+                                                            values.scheduled_time === time.value ? 'default' : 'outline'
+                                                        "
+                                                        :key="time.value"
+                                                        class="w-fit"
+                                                    >
+                                                        {{ time.label }}
+                                                    </Button>
+                                                </div>
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    </FormField>
                                 </div>
+                            </template>
 
-                                <div class="grid grid-cols-1 gap-2">
-                                    <label class="border-b pb-1 text-xs font-semibold uppercase">Service Type</label>
-                                    <p
-                                        v-if="selectedService"
-                                        class="text-sm"
-                                    >
-                                        {{
+                            <template v-if="stepIndex === 3">
+                                <h1 class="mt-2 mb-6 text-center text-xl font-semibold">Confirm appointment details</h1>
+
+                                <DataCard
+                                    v-if="selectedService"
+                                    title="Service"
+                                    :columns="2"
+                                >
+                                    <DataCell>
+                                        <DataLabel>Category</DataLabel>
+                                        <DataText>{{ services[selectedService]?.label }}</DataText>
+                                    </DataCell>
+
+                                    <DataCell>
+                                        <DataLabel>Selected Service</DataLabel>
+                                        <DataText>{{
                                             services[selectedService]?.children.find((s) => s.value === values.type)
                                                 ?.label
-                                        }}
-                                    </p>
-                                </div>
+                                        }}</DataText>
+                                    </DataCell>
+                                </DataCard>
 
-                                <div class="grid grid-cols-1 gap-2">
-                                    <label class="border-b pb-1 text-xs font-semibold uppercase">Date</label>
-                                    <p class="text-sm">
-                                        {{
+                                <DataCard
+                                    title="Schedule"
+                                    :columns="2"
+                                >
+                                    <DataCell>
+                                        <DataLabel>Date</DataLabel>
+                                        <DataText>{{
                                             dateFormatter.format(toJsDate(values.scheduled_date, values.scheduled_time))
-                                        }}
-                                    </p>
-                                </div>
+                                        }}</DataText>
+                                    </DataCell>
 
-                                <div class="grid grid-cols-1 gap-2">
-                                    <label class="border-b pb-1 text-xs font-semibold uppercase">Time</label>
-                                    <p class="text-sm">
-                                        {{
+                                    <DataCell>
+                                        <DataLabel>Time</DataLabel>
+                                        <DataText>{{
                                             timeFormatter.format(toJsDate(values.scheduled_date, values.scheduled_time))
-                                        }}
-                                    </p>
-                                </div>
-                            </div>
+                                        }}</DataText>
+                                    </DataCell>
+                                </DataCard>
 
-                            <InputError
-                                class="mt-4"
-                                :message="inertiaForm.errors.scheduled_at"
-                            />
-                        </template>
-                    </div>
+                                <InputError
+                                    class="mt-4"
+                                    :message="inertiaForm.errors.scheduled_at"
+                                />
+                            </template>
+                        </CardContent>
+                    </Card>
 
-                    <div class="mt-4 flex items-center justify-between">
+                    <div class="flex items-center justify-between">
                         <Button
                             :disabled="isPrevDisabled"
                             variant="outline"
@@ -458,6 +463,7 @@ const scheduled_date = computed({
                         >
                             Back
                         </Button>
+
                         <div class="flex items-center gap-3">
                             <Button
                                 v-if="stepIndex !== 3"

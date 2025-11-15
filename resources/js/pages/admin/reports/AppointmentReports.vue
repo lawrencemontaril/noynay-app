@@ -3,6 +3,7 @@ import Container from '@/components/Container.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useFormatters } from '@/composables/useFormatters';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 
@@ -11,12 +12,15 @@ defineProps<{
         rank: number;
         label: string;
         total: number;
+        revenue: number;
     }[];
     monthlyAppointmentVolume: {
         month: string;
         total: number;
     }[];
 }>();
+
+const { formatCurrency } = useFormatters();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -31,19 +35,17 @@ const breadcrumbs: BreadcrumbItem[] = [
         <Container class="space-y-8">
             <!-- Appointment Type Ranking Table -->
             <Card>
-                <CardHeader>
-                    <div class="flex items-center justify-between gap-4">
-                        <CardTitle>Appointment Type Ranking by Frequency</CardTitle>
+                <CardHeader class="flex items-center justify-between gap-4">
+                    <CardTitle>Appointment Type Ranking</CardTitle>
 
-                        <Button
-                            as="a"
-                            variant="destructive"
-                            :href="route('admin.reports.appointment-type-ranking.pdf')"
-                            target="_blank"
-                        >
-                            Download PDF
-                        </Button>
-                    </div>
+                    <Button
+                        as="a"
+                        variant="destructive"
+                        :href="route('admin.reports.appointment-type-ranking.pdf')"
+                        target="_blank"
+                    >
+                        Download PDF
+                    </Button>
                 </CardHeader>
 
                 <CardContent>
@@ -52,7 +54,8 @@ const breadcrumbs: BreadcrumbItem[] = [
                             <TableRow>
                                 <TableHead class="w-20">Rank</TableHead>
                                 <TableHead>Label</TableHead>
-                                <TableHead class="text-right">Total</TableHead>
+                                <TableHead>Total Appointments</TableHead>
+                                <TableHead class="text-right">Revenue Generated</TableHead>
                             </TableRow>
                         </TableHeader>
 
@@ -63,7 +66,10 @@ const breadcrumbs: BreadcrumbItem[] = [
                             >
                                 <TableCell>{{ item.rank }}</TableCell>
                                 <TableCell>{{ item.label }}</TableCell>
-                                <TableCell class="text-right font-semibold">{{ item.total }}</TableCell>
+                                <TableCell>{{ item.total }}</TableCell>
+                                <TableCell class="text-right font-semibold">{{
+                                    formatCurrency(item.revenue)
+                                }}</TableCell>
                             </TableRow>
 
                             <TableEmpty
@@ -79,19 +85,17 @@ const breadcrumbs: BreadcrumbItem[] = [
 
             <!-- Appointment Monthly Volume -->
             <Card>
-                <CardHeader>
-                    <div class="flex items-center justify-between gap-4">
-                        <CardTitle>Monthly Appointment Volume</CardTitle>
+                <CardHeader class="flex items-center justify-between gap-4">
+                    <CardTitle>Monthly Appointment Volume</CardTitle>
 
-                        <Button
-                            as="a"
-                            variant="destructive"
-                            :href="route('admin.reports.appointment-volume.pdf')"
-                            target="_blank"
-                        >
-                            Download PDF
-                        </Button>
-                    </div>
+                    <Button
+                        as="a"
+                        variant="destructive"
+                        :href="route('admin.reports.appointment-volume.pdf')"
+                        target="_blank"
+                    >
+                        Download PDF
+                    </Button>
                 </CardHeader>
 
                 <CardContent>

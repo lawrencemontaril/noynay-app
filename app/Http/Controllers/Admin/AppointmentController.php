@@ -95,6 +95,18 @@ class AppointmentController extends Controller
     }
 
     /**
+     * Mark the appointment as no show
+     */
+    public function noShow(Appointment $appointment, AppointmentService $appointmentService)
+    {
+        $appointmentService->noShow($appointment);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Appointment updated successfully.');
+    }
+
+    /**
      * Soft delete (archive) the specified resource from storage.
      */
     public function destroy(Appointment $appointment)

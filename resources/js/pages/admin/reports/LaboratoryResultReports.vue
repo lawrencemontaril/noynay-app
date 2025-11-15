@@ -31,19 +31,17 @@ const breadcrumbs: BreadcrumbItem[] = [
         <Container class="space-y-8">
             <!-- Laboratory Type Ranking -->
             <Card>
-                <CardHeader>
-                    <div class="flex items-center justify-between gap-4">
-                        <CardTitle>Laboratory Type Ranking by Frequency</CardTitle>
+                <CardHeader class="flex items-center justify-between gap-4">
+                    <CardTitle>Laboratory Type Ranking by Frequency</CardTitle>
 
-                        <Button
-                            as="a"
-                            variant="destructive"
-                            :href="route('admin.reports.laboratory-result-type-ranking.pdf')"
-                            target="_blank"
-                        >
-                            Download PDF
-                        </Button>
-                    </div>
+                    <Button
+                        as="a"
+                        variant="destructive"
+                        :href="route('admin.reports.laboratory-result-type-ranking.pdf')"
+                        target="_blank"
+                    >
+                        Download PDF
+                    </Button>
                 </CardHeader>
 
                 <CardContent>
@@ -79,19 +77,17 @@ const breadcrumbs: BreadcrumbItem[] = [
 
             <!-- Monthly Laboratory Volume -->
             <Card>
-                <CardHeader>
-                    <div class="flex items-center justify-between gap-4">
-                        <CardTitle>Monthly Laboratory Volume</CardTitle>
+                <CardHeader class="flex items-center justify-between gap-4">
+                    <CardTitle>Monthly Laboratory Volume</CardTitle>
 
-                        <Button
-                            as="a"
-                            variant="destructive"
-                            :href="route('admin.reports.laboratory-result-volume.pdf')"
-                            target="_blank"
-                        >
-                            Download PDF
-                        </Button>
-                    </div>
+                    <Button
+                        as="a"
+                        variant="destructive"
+                        :href="route('admin.reports.laboratory-result-volume.pdf')"
+                        target="_blank"
+                    >
+                        Download PDF
+                    </Button>
                 </CardHeader>
 
                 <CardContent>

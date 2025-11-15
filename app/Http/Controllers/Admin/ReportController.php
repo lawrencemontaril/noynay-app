@@ -21,57 +21,121 @@ use Inertia\Inertia;
 class ReportController extends Controller
 {
     /*
-    |--------------------------------------------------------------------------
-    | Invoice Reports
-    |--------------------------------------------------------------------------
-    */
-    public function invoice(Request $request)
+|--------------------------------------------------------------------------
+| Patient Reports
+|--------------------------------------------------------------------------
+*/
+    public function patient(Request $request)
     {
-        return Inertia::render('admin/reports/InvoiceReports', [
-            'invoiceRevenueTable' => $this->getPaymentRevenueTable(),
+        return Inertia::render('admin/reports/PatientReports', [
+            'mostLoyalPatients' => $this->getMostLoyalPatients(),
         ]);
     }
 
-    protected function getPaymentRevenueTable()
+    protected function getMostLoyalPatients($limit = 20)
     {
-        $reference = now()->startOfMonth();
-
-        $startDate = $reference->copy()->subMonths(11);
-        $endDate = $reference->copy()->endOfMonth();
-
-        $revenue = Payment::query()
-            ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, SUM(amount) as total_revenue')
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->groupByRaw('DATE_FORMAT(created_at, "%Y-%m")')
-            ->orderByRaw('DATE_FORMAT(created_at, "%Y-%m")')
+        $patients = Patient::query()
+            ->select([
+                'patients.id',
+                DB::raw("CONCAT(patients.first_name, ' ', patients.last_name) AS name"),
+                DB::raw("(SELECT COUNT(*) FROM appointments WHERE appointments.patient_id = patients.id) AS total_appointments"),
+                DB::raw("(SELECT MAX(scheduled_at) FROM appointments WHERE appointments.patient_id = patients.id) AS last_visit"),
+                DB::raw("(SELECT MIN(scheduled_at) FROM appointments WHERE appointments.patient_id = patients.id) AS first_visit"),
+                DB::raw("(SELECT COUNT(DISTINCT type) FROM appointments WHERE appointments.patient_id = patients.id) AS distinct_services"),
+                DB::raw("(SELECT COALESCE(SUM(payments.amount), 0)
+                      FROM payments
+                      JOIN invoices ON invoices.id = payments.invoice_id
+                      JOIN appointments ON appointments.id = invoices.appointment_id
+                      WHERE appointments.patient_id = patients.id) AS total_spend"),
+            ])
+            ->groupBy('patients.id', 'patients.last_name', 'patients.first_name')
             ->get();
 
-        $months = collect(range(0, 11))
-            ->map(fn ($i) => $startDate->copy()->addMonths($i)->format('Y-m'));
+        $results = $patients->map(function ($p) {
 
-        return $months->map(function ($month) use ($revenue) {
-            $found = $revenue->firstWhere('month', $month);
+            $appointments = Appointment::where('patient_id', $p->id)
+                ->orderBy('scheduled_at')
+                ->get();
 
-            [$year, $monthNum] = explode('-', $month);
-            $label = Carbon::createFromDate($year, $monthNum, 1)->locale('en')->monthName." $year";
+            // Compute status-weighted appointment score
+            $statusWeights = [
+                'pending' => 0.5,
+                'approved' => 1,
+                'completed' => 2,
+                'rejected' => -1,
+                'cancelled' => -0.5,
+                'no_show' => -2,
+            ];
+            $statusScore = $appointments->sum(fn ($a) => $statusWeights[$a->status->value] ?? 0);
+
+            // Compute average interval between visits
+            $dates = $appointments->pluck('scheduled_at')->map(fn ($d) => Carbon::parse($d))->values();
+            $avgInterval = null;
+            if ($dates->count() > 1) {
+                $diffs = [];
+                for ($i = 1; $i < $dates->count(); $i++) {
+                    $diffs[] = $dates[$i - 1]->diffInDays($dates[$i]);
+                }
+                $avgInterval = array_sum($diffs) / count($diffs);
+            }
+
+            $lastVisit = $p->last_visit ? Carbon::parse($p->last_visit) : null;
+            $firstVisit = $p->first_visit ? Carbon::parse($p->first_visit) : null;
+
+            $recencyDays = $lastVisit ? now()->diffInDays($lastVisit) : 999;
+            $tenureYears = $firstVisit ? max(now()->diffInYears($firstVisit), 1) : 1;
+
+            $visitsPerYear = $p->total_appointments > 0
+                ? round($p->total_appointments / $tenureYears, 2)
+                : 0;
+
+            // Raw loyalty score including status weighting
+            $rawScore =
+                ($p->total_appointments * 2) +
+                ($visitsPerYear * 3) +
+                ((365 - min($recencyDays, 365)) / 30 * 2) +
+                ($tenureYears * 1.5) +
+                ($p->distinct_services * 1.2) +
+                ($p->total_spend / 500) -
+                (($avgInterval ?? 60) / 50) +
+                ($statusScore * 10);
 
             return [
-                'month' => $label,
-                'total_revenue' => (float) ($found?->total_revenue ?? 0),
+                'id' => $p->id,
+                'name' => $p->name,
+                'total_appointments' => (int) $p->total_appointments,
+                'visits_per_year' => $visitsPerYear,
+                'last_visit' => $lastVisit?->diffForHumans(),
+                'tenure_years' => $tenureYears,
+                'distinct_services' => (int) $p->distinct_services,
+                'total_spend' => (float) $p->total_spend,
+                'avg_days_between_visits' => $avgInterval ? round($avgInterval, 2) : null,
+                'status_score' => $statusScore,
+                'raw_loyalty_score' => $rawScore,
             ];
-        })->reverse()->values();
+        });
+
+        // Normalize to 0-100 while keeping status score
+        $maxScore = $results->max('raw_loyalty_score') ?: 1;
+        $normalized = $results->map(fn ($p) => [
+            ...$p,
+            'loyalty_score' => round(($p['raw_loyalty_score'] / $maxScore) * 100, 2),
+        ]);
+
+        return $normalized
+            ->sortByDesc('loyalty_score')
+            ->take($limit)
+            ->values();
     }
 
-    public function downloadInvoiceRevenuePdf()
+    public function downloadMostLoyalPatientsPdf()
     {
-        $invoiceRevenueTable = $this->getPaymentRevenueTable();
-
-        $pdf = Pdf::loadView('pdf.reports.invoice_revenue_pdf', [
-            'invoiceRevenueTable' => $invoiceRevenueTable,
+        $pdf = Pdf::loadView('pdf.reports.patient_loyalty_pdf', [
+            'mostLoyalPatients' => $this->getMostLoyalPatients(),
             'generated_at' => now()->timezone('Asia/Manila')->format('F d, Y h:i A'),
         ])->setPaper('a4', 'portrait');
 
-        return $pdf->download('Invoice_Revenue_Report.pdf');
+        return $pdf->download('Most_Loyal_Patients_Report.pdf');
     }
 
     /*
@@ -89,21 +153,36 @@ class ReportController extends Controller
 
     protected function getAppointmentTypeRanking()
     {
-        $ranking = Appointment::query()
-            ->select('type', DB::raw('COUNT(*) as total'))
-            ->groupBy('type')
-            ->pluck('total', 'type');
+        // Fetch raw appointment counts + revenue grouped by type
+        $raw = Appointment::query()
+            ->leftJoin('invoices', 'invoices.appointment_id', '=', 'appointments.id')
+            ->leftJoin('payments', 'payments.invoice_id', '=', 'invoices.id')
+            ->select(
+                'appointments.type',
+                DB::raw('COUNT(appointments.id) as total_appointments'),
+                DB::raw('COALESCE(SUM(payments.amount), 0) as total_revenue')
+            )
+            ->groupBy('appointments.type')
+            ->get()
+            ->keyBy('type');
 
+        // Get your appointment type options
         $options = AppointmentType::options();
 
-        $complete = collect($options)->map(function ($label, $typeValue) use ($ranking) {
+        // Return all types (even those with 0)
+        $complete = collect($options)->map(function ($label, $typeValue) use ($raw) {
+
+            $row = $raw[$typeValue] ?? null;
+
             return [
                 'label' => $label,
-                'total' => $ranking[$typeValue] ?? 0,
+                'total' => $row->total_appointments ?? 0,
+                'revenue' => $row->total_revenue ?? 0,
             ];
         });
 
-        $sorted = $complete->sortByDesc('total')->values();
+        // Sort by total appointments (or switch to revenue if needed)
+        $sorted = $complete->sortByDesc(['revenue', 'total'])->values();
 
         return $sorted->map(function ($row, $index) {
             return [
@@ -165,129 +244,56 @@ class ReportController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | Patient Reports
+    | Invoice Reports
     |--------------------------------------------------------------------------
     */
-    public function patient(Request $request)
+    public function invoice(Request $request)
     {
-        return Inertia::render('admin/reports/PatientReports', [
-            'mostLoyalPatients' => $this->getMostLoyalPatients(),
+        return Inertia::render('admin/reports/InvoiceReports', [
+            'invoiceRevenueTable' => $this->getPaymentRevenueTable(),
         ]);
     }
 
-    protected function getMostLoyalPatients($limit = 20)
+    protected function getPaymentRevenueTable()
     {
-        // Base patient appointment aggregates
-        $patients = Patient::query()
-            ->select([
-                'patients.id',
-                DB::raw("CONCAT(patients.first_name, ' ', patients.last_name) AS name"),
+        $reference = now()->startOfMonth();
 
-                // Total visits
-                DB::raw("(SELECT COUNT(*)
-                      FROM appointments
-                      WHERE appointments.patient_id = patients.id
-                    ) AS total_appointments"),
+        $startDate = $reference->copy()->subMonths(11);
+        $endDate = $reference->copy()->endOfMonth();
 
-                // Last visit
-                DB::raw("(SELECT MAX(scheduled_at)
-                      FROM appointments
-                      WHERE appointments.patient_id = patients.id
-                    ) AS last_visit"),
-
-                // First visit
-                DB::raw("(SELECT MIN(scheduled_at)
-                      FROM appointments
-                      WHERE appointments.patient_id = patients.id
-                    ) AS first_visit"),
-
-                // Distinct service types
-                DB::raw("(SELECT COUNT(DISTINCT type)
-                      FROM appointments
-                      WHERE appointments.patient_id = patients.id
-                    ) AS distinct_services"),
-
-                // Total spend from payments -> invoice -> appointment
-                DB::raw("(SELECT COALESCE(SUM(payments.amount), 0)
-                      FROM payments
-                      JOIN invoices ON invoices.id = payments.invoice_id
-                      JOIN appointments ON appointments.id = invoices.appointment_id
-                      WHERE appointments.patient_id = patients.id
-                    ) AS total_spend"),
-            ])
-            ->groupBy('patients.id', 'patients.last_name', 'patients.first_name')
+        $revenue = Payment::query()
+            ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, SUM(amount) as total_revenue')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupByRaw('DATE_FORMAT(created_at, "%Y-%m")')
+            ->orderByRaw('DATE_FORMAT(created_at, "%Y-%m")')
             ->get();
 
-        // Compute average interval between visits
-        $results = $patients->map(function ($p) {
+        $months = collect(range(0, 11))
+            ->map(fn ($i) => $startDate->copy()->addMonths($i)->format('Y-m'));
 
-            // Collect appointment dates for interval calculation
-            $dates = Appointment::where('patient_id', $p->id)
-                ->orderBy('scheduled_at')
-                ->pluck('scheduled_at')
-                ->map(fn ($d) => Carbon::parse($d))
-                ->values();
+        return $months->map(function ($month) use ($revenue) {
+            $found = $revenue->firstWhere('month', $month);
 
-            $avgInterval = null;
-            if ($dates->count() > 1) {
-                $diffs = [];
-                for ($i = 1; $i < $dates->count(); $i++) {
-                    $diffs[] = $dates[$i - 1]->diffInDays($dates[$i]);
-                }
-                $avgInterval = array_sum($diffs) / count($diffs);
-            }
-
-            $lastVisit = $p->last_visit ? Carbon::parse($p->last_visit) : null;
-            $firstVisit = $p->first_visit ? Carbon::parse($p->first_visit) : null;
-
-            $recencyDays = $lastVisit ? now()->diffInDays($lastVisit) : 999;
-            $tenureYears = $firstVisit ? max(now()->diffInYears($firstVisit), 1) : 1;
-
-            // Visits per year
-            $visitsPerYear = $p->total_appointments > 0
-                ? round($p->total_appointments / $tenureYears, 2)
-                : 0;
-
-            // Loyalty Score
-            $score =
-                ($p->total_appointments * 2) +
-                ($visitsPerYear * 3) +
-                ((365 - min($recencyDays, 365)) / 30) * 2 +
-                ($tenureYears * 1.5) +
-                ($p->distinct_services * 1.2) +
-                ($p->total_spend / 500) -
-                (($avgInterval ?? 60) / 50);
+            [$year, $monthNum] = explode('-', $month);
+            $label = Carbon::createFromDate($year, $monthNum, 1)->locale('en')->monthName." $year";
 
             return [
-                'id' => $p->id,
-                'name' => $p->name,
-                'total_appointments' => (int) $p->total_appointments,
-                'visits_per_year' => $visitsPerYear,
-                'last_visit' => $p->last_visit,
-                'tenure_years' => $tenureYears,
-                'distinct_services' => (int) $p->distinct_services,
-                'total_spend' => (float) $p->total_spend,
-                'avg_days_between_visits' => $avgInterval ? round($avgInterval, 2) : null,
-                'loyalty_score' => round($score, 2),
+                'month' => $label,
+                'total_revenue' => (float) ($found?->total_revenue ?? 0),
             ];
-        });
-
-        return $results
-            ->sortByDesc('loyalty_score')
-            ->take($limit)
-            ->values();
+        })->reverse()->values();
     }
 
-
-
-    public function downloadMostLoyalPatientsPdf()
+    public function downloadInvoiceRevenuePdf()
     {
-        $pdf = Pdf::loadView('pdf.reports.patient_loyalty_pdf', [
-            'mostLoyalPatients' => $this->getMostLoyalPatients(),
+        $invoiceRevenueTable = $this->getPaymentRevenueTable();
+
+        $pdf = Pdf::loadView('pdf.reports.invoice_revenue_pdf', [
+            'invoiceRevenueTable' => $invoiceRevenueTable,
             'generated_at' => now()->timezone('Asia/Manila')->format('F d, Y h:i A'),
         ])->setPaper('a4', 'portrait');
 
-        return $pdf->download('Most_Loyal_Patients_Report.pdf');
+        return $pdf->download('Invoice_Revenue_Report.pdf');
     }
 
     /*

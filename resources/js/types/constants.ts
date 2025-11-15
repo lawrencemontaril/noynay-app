@@ -11,6 +11,7 @@ export const APPOINTMENT_STATUSES: {
     { label: 'Completed', value: 'completed', badge: 'default' },
     { label: 'Rejected', value: 'rejected', badge: 'destructive' },
     { label: 'Cancelled', value: 'cancelled', badge: 'destructive' },
+    { label: 'No Show', value: 'no_show', badge: 'destructive' },
 ];
 
 export const INVOICE_STATUSES: {

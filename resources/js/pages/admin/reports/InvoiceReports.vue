@@ -27,6 +27,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <Container class="space-y-8">
+            <!-- Invoice Revenue Report -->
             <Card>
                 <CardHeader class="flex items-center justify-between">
                     <CardTitle>Invoice Revenue Report (Last 12 Months)</CardTitle>

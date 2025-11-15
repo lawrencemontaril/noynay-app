@@ -210,7 +210,7 @@ const page = usePage();
                 >
                     <SidebarMenuItem>
                         <CollapsibleTrigger as-child>
-                            <SidebarMenuButton>
+                            <SidebarMenuButton :is-active="route().current('admin.reports*')">
                                 <Table2 />
                                 <span>Reports</span>
                             </SidebarMenuButton>

@@ -30,7 +30,7 @@ const inertiaForm = useInertiaForm({});
 
 const formSchema = toTypedSchema(
     z.object({
-        status: z.enum(['pending', 'approved', 'rejected', 'cancelled', 'completed']),
+        status: z.enum(['pending', 'approved', 'rejected', 'cancelled', 'no_show', 'completed']),
     }),
 );
 
@@ -50,6 +50,16 @@ const approveAppointment = handleSubmit(() => {
 
 const rejectAppointment = handleSubmit(() => {
     inertiaForm.patch(route('admin.appointments.reject', props.appointment?.id), {
+        onSuccess: () => {
+            inertiaForm.reset();
+            resetForm();
+            closeDialog();
+        },
+    });
+});
+
+const noShowAppointment = handleSubmit(() => {
+    inertiaForm.patch(route('admin.appointments.noShow', props.appointment?.id), {
         onSuccess: () => {
             inertiaForm.reset();
             resetForm();
@@ -118,6 +128,26 @@ const rejectAppointment = handleSubmit(() => {
             </div>
 
             <DialogFooter>
+                <template v-if="hasAnyRole(['doctor', 'laboratory_staff']) && appointment?.status === 'approved'">
+                    <Button
+                        @click="
+                            () => {
+                                setFieldValue('status', 'no_show');
+                                noShowAppointment();
+                            }
+                        "
+                        variant="destructive"
+                        :disabled="inertiaForm.processing"
+                        class="flex items-center gap-2"
+                    >
+                        <LoaderCircle
+                            v-if="inertiaForm.processing && values.status === 'no_show'"
+                            class="h-4 w-4 animate-spin"
+                        />
+                        Did not show
+                    </Button>
+                </template>
+
                 <template v-if="hasRole('admin') && appointment?.status === 'pending'">
                     <Button
                         v-if="hasPermissionTo('appointments:approve')"

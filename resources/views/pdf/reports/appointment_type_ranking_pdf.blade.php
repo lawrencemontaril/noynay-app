@@ -102,7 +102,8 @@
             <tr>
                 <th style="width: 10%;">Rank</th>
                 <th>Label</th>
-                <th class="right" style="width: 15%;">Total</th>
+                <th>Total Appointments</th>
+                <th class="right" style="width: 15%;">Revenue Generated</th>
             </tr>
         </thead>
         <tbody>
@@ -110,7 +111,8 @@
                 <tr>
                     <td>{{ $item['rank'] }}</td>
                     <td>{{ $item['label'] }}</td>
-                    <td class="right">{{ $item['total'] }}</td>
+                    <td>{{ $item['total'] }}</td>
+                    <td class="right">{{ $item['revenue'] }}</td>
                 </tr>
             @empty
                 <tr>

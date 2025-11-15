@@ -160,7 +160,7 @@ export interface Appointment {
         | 'minor_surgical_procedures'
         | 'issuance_of_medical_certificate'
         | 'pedia_adult_vaccination_services';
-    status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'completed';
+    status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'no_show' | 'completed';
     is_reschedulable: boolean;
     is_cancellable: boolean;
     is_operatable: boolean;

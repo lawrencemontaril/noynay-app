@@ -147,6 +147,7 @@ Route::prefix('admin')
             Route::patch('appointments/{appointment}', 'update')->name('appointments.update');
             Route::patch('appointments/{appointment}/approve', 'approve')->name('appointments.approve');
             Route::patch('appointments/{appointment}/reject', 'reject')->name('appointments.reject');
+            Route::patch('appointments/{appointment}/no-show', 'noShow')->name('appointments.noShow');
         });
 
         /**
