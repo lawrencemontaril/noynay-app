@@ -253,10 +253,11 @@ export interface LaboratoryResult {
 export interface Invoice {
     id: number;
     appointment_id: number;
+    status: 'unpaid' | 'partially_paid' | 'paid' | 'cancelled';
+    with_discount: boolean;
     total: number;
     total_paid: number;
     balance: number;
-    status: 'unpaid' | 'partially_paid' | 'paid' | 'cancelled';
     subtotal: number;
     discount_amount: number;
     subtotal_after_discount: number;

@@ -2,16 +2,25 @@
 import Container from '@/components/Container.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 
 defineProps<{
-    mostLoyalPatients: {
-        rank: number;
+    mostLoyalPatients: Array<{
+        id: number;
+        rank?: number;
         name: string;
-        total_appointments: string;
-    }[];
+        total_appointments: number;
+        visits_per_year: number;
+        last_visit: string | null;
+        tenure_years: number;
+        total_no_shows: number;
+        distinct_services: number;
+        total_spend: number;
+        avg_days_between_visits: number | null;
+        loyalty_score: number;
+    }>;
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -27,18 +36,16 @@ const breadcrumbs: BreadcrumbItem[] = [
         <Container class="space-y-8">
             <!-- Most Loyal Patients -->
             <Card>
-                <CardHeader>
-                    <div class="flex items-center justify-between gap-4">
-                        <CardTitle>Most Loyal Patients</CardTitle>
-
+                <CardHeader class="flex items-center justify-between">
+                    <CardTitle>Most Loyal Patients</CardTitle>
+                    <div class="flex items-center gap-2">
                         <Button
                             as="a"
                             variant="destructive"
                             :href="route('admin.reports.patient-loyalty.pdf')"
                             target="_blank"
+                            >Download PDF</Button
                         >
-                            Download PDF
-                        </Button>
                     </div>
                 </CardHeader>
 
@@ -46,26 +53,49 @@ const breadcrumbs: BreadcrumbItem[] = [
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Rank</TableHead>
-                                <TableHead>Patient Name</TableHead>
-                                <TableHead class="text-right">Total Appointments</TableHead>
+                                <TableHead class="w-[60px]">Rank</TableHead>
+                                <TableHead>Patient</TableHead>
+                                <TableHead class="text-right">Visits</TableHead>
+                                <TableHead class="text-right">Visits/yr</TableHead>
+                                <TableHead class="text-right">Last Visit</TableHead>
+                                <TableHead class="text-right">Tenure (yrs)</TableHead>
+                                <TableHead class="text-right">Services</TableHead>
+                                <TableHead class="text-right">Spend</TableHead>
+                                <TableHead class="text-right">Avg Days</TableHead>
+                                <TableHead class="text-right">Score</TableHead>
                             </TableRow>
                         </TableHeader>
+
                         <TableBody>
                             <TableRow
-                                v-for="patient in mostLoyalPatients"
-                                :key="patient.rank"
+                                v-for="(p, idx) in mostLoyalPatients"
+                                :key="p.id"
                             >
-                                <TableCell>{{ patient.rank }}</TableCell>
-                                <TableCell>{{ patient.name }}</TableCell>
-                                <TableCell class="text-right font-semibold">{{ patient.total_appointments }}</TableCell>
+                                <TableCell>{{ idx + 1 }}</TableCell>
+                                <TableCell>{{ p.name }}</TableCell>
+                                <TableCell class="text-right font-semibold">{{ p.total_appointments }}</TableCell>
+                                <TableCell class="text-right">{{ p.visits_per_year }}</TableCell>
+                                <TableCell class="text-right">{{
+                                    p.last_visit ? new Date(p.last_visit).toLocaleString() : '—'
+                                }}</TableCell>
+                                <TableCell class="text-right">{{ p.tenure_years }}</TableCell>
+                                <TableCell class="text-right">{{ p.distinct_services }}</TableCell>
+                                <TableCell class="text-right">{{
+                                    new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(
+                                        p.total_spend,
+                                    )
+                                }}</TableCell>
+                                <TableCell class="text-right">{{ p.avg_days_between_visits ?? '—' }}</TableCell>
+                                <TableCell class="text-right font-semibold">{{ p.loyalty_score }}</TableCell>
                             </TableRow>
-                            <TableEmpty
-                                v-if="!mostLoyalPatients.length"
-                                :colspan="3"
-                            >
-                                No patient data available
-                            </TableEmpty>
+
+                            <TableRow v-if="!mostLoyalPatients.length">
+                                <TableCell
+                                    colspan="11"
+                                    class="py-4 text-center text-muted-foreground"
+                                    >No patient data available.</TableCell
+                                >
+                            </TableRow>
                         </TableBody>
                     </Table>
                 </CardContent>

@@ -94,27 +94,39 @@
     </div>
 
     <!-- Table Section -->
-    <div class="section-title">Top Patients by Number of Appointments</div>
+    <div class="section-title">Top Patients by Loyalty Score</div>
     <table>
         <thead>
             <tr>
-                <th style="width:10%;">Rank</th>
-                <th style="width:70%;">Patient Name</th>
-                <th class="right" style="width:20%;">Total Appointments</th>
+                <th style="width:6%;">#</th>
+                <th style="width:22%;">Patient</th>
+                <th style="width:8%;">Visits</th>
+                <th style="width:8%;">Visits/yr</th>
+                <th style="width:12%;">Last Visit</th>
+                <th style="width:6%;">Tenure</th>
+                <th style="width:6%;">Services</th>
+                <th style="width:10%;">Spend (₱)</th>
+                <th style="width:8%;">Avg Days</th>
+                <th style="width:6%;">Score</th>
             </tr>
         </thead>
         <tbody>
-            @forelse ($mostLoyalPatients as $patient)
+            @forelse ($mostLoyalPatients as $idx => $p)
                 <tr>
-                    <td>{{ $patient['rank'] }}</td>
-                    <td>{{ $patient['name'] }}</td>
-                    <td class="right">{{ $patient['total_appointments'] }}</td>
+                    <td>{{ $idx + 1 }}</td>
+                    <td>{{ $p['name'] }}</td>
+                    <td class="right">{{ $p['total_appointments'] }}</td>
+                    <td class="right">{{ $p['visits_per_year'] }}</td>
+                    <td class="right">{{ $p['last_visit'] ? \Carbon\Carbon::parse($p['last_visit'])->format('F d, Y') : '—' }}</td>
+                    <td class="right">{{ $p['tenure_years'] }}</td>
+                    <td class="right">{{ $p['distinct_services'] }}</td>
+                    <td class="right">{{ number_format($p['total_spend'] ?? 0, 2) }}</td>
+                    <td class="right">{{ $p['avg_days_between_visits'] ?? '—' }}</td>
+                    <td class="right">{{ $p['loyalty_score'] }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="3" style="text-align:center; color:#999; padding:20px;">
-                        No patient data available.
-                    </td>
+                    <td colspan="11" style="text-align:center; color:#999; padding:20px;">No patient data available.</td>
                 </tr>
             @endforelse
         </tbody>

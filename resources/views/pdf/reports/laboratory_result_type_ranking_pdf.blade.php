@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Monthly Appointment Volume Report</title>
+    <title>Laboratory Type Ranking Report</title>
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
@@ -90,30 +90,32 @@
             <div class="clinic-name">Noynay Medical Center</div>
         </div>
         <div class="report-info">
-            <div><strong>Report:</strong> Monthly Appointment Volume (Last 12 Months)</div>
+            <div><strong>Report:</strong>Laboratory Result Type Ranking</div>
             <div><strong>Generated on:</strong> {{ $generated_at }}</div>
         </div>
     </div>
 
     <!-- Table Section -->
-    <div class="section-title">Monthly Appointment Summary</div>
+    <div class="section-title">Ranking Summary</div>
     <table>
         <thead>
             <tr>
-                <th style="width:70%;">Month</th>
-                <th class="right" style="width:30%;">Total Appointments</th>
+                <th style="width: 10%;">Rank</th>
+                <th>Label</th>
+                <th class="right" style="width: 15%;">Total</th>
             </tr>
         </thead>
         <tbody>
-            @forelse ($monthlyAppointmentVolume as $row)
+            @forelse ($ranking as $item)
                 <tr>
-                    <td>{{ $row['month'] }}</td>
-                    <td class="right">{{ $row['total'] }}</td>
+                    <td>{{ $item['rank'] }}</td>
+                    <td>{{ $item['label'] }}</td>
+                    <td class="right">{{ $item['total'] }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="2" style="text-align:center; color:#999; padding:20px;">
-                        No appointment data available.
+                    <td colspan="4" style="text-align:center; color:#999; padding:20px;">
+                        No laboratory data available.
                     </td>
                 </tr>
             @endforelse
@@ -122,7 +124,7 @@
 
     <!-- Footer -->
     <div class="footer">
-        Noynay Medical Center &middot; Automatically generated report
+        Noynay Medical Center &middot; Generated automatically by the system
     </div>
 </body>
 

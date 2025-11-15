@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\InvoicePdfController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\ReportsController as AdminReportsController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\PatientController as AdminPatientController;
 use App\Http\Controllers\Admin\AppointmentController as AdminAppointmentController;
@@ -32,21 +33,10 @@ Route::inertia('/', 'Welcome')->name('home');
 | -----------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
-    Route::get('/notifications', function (Request $request) {
-        return $request->user()?->unreadNotifications->map(fn ($notification) => [
-            'id' => $notification->id,
-            'message' => $notification->data['message'] ?? '',
-            'link' => $notification->data['link'] ?? '#',
-            'created_at' => $notification->created_at->diffForHumans(),
-        ]);
-    })->name('notifications.index');
-
-    Route::post('/notifications/{notification}/read', function ($notificationId) {
-        $notification = auth()->user()->notifications()->findOrFail($notificationId);
-        $notification->markAsRead();
-
-        return redirect($notification->data['link'] ?? '/');
-    })->name('notifications.read');
+    Route::controller(NotificationController::class)->group(function () {
+        Route::get('/notifications', 'index')->name('notifications.index');
+        Route::post('/notifications/{notificationId}/read', 'read')->name('notifications.read');
+    });
 
     Route::get('/invoices/{invoice}/pdf', [InvoicePdfController::class, 'download'])
         ->name('invoices.download');
@@ -72,20 +62,41 @@ Route::prefix('admin')
         /**
          * Reports
          */
-        Route::controller(AdminReportsController::class)->middleware('role:cashier|admin')->group(function () {
-            // Invoice reports
-            Route::get('reports/invoice', 'invoice')->name('reports.invoice');
-            Route::get('reports/invoice-revenue/pdf', 'downloadInvoiceRevenuePdf')->name('reports.invoice-revenue.pdf');
+        Route::controller(AdminReportController::class)
+            ->group(function () {
+                // Patient reports
+                Route::middleware('permission:patients:view_any')->group(function () {
+                    Route::get('reports/patient', 'patient')->middleware('permission:patients:view_any')->name('reports.patient');
+                    Route::get('reports/patient-loyalty/pdf', 'downloadMostLoyalPatientsPdf')->name('reports.patient-loyalty.pdf');
+                });
 
-            // Appointment reports
-            Route::get('reports/appointment', 'appointment')->name('reports.appointment');
-            Route::get('reports/appointment-type-ranking/pdf', 'downloadAppointmentTypeRankingPdf')->name('reports.appointment-type-ranking.pdf');
-            Route::get('reports/appointment-volume/pdf', 'downloadMonthlyAppointmentVolumePdf')->name('reports.appointment-volume.pdf');
+                // Appointment reports
+                Route::middleware('permission:appointments:view_any')->group(function () {
+                    Route::get('reports/appointment', 'appointment')->name('reports.appointment');
+                    Route::get('reports/appointment-type-ranking/pdf', 'downloadAppointmentTypeRankingPdf')->name('reports.appointment-type-ranking.pdf');
+                    Route::get('reports/appointment-volume/pdf', 'downloadMonthlyAppointmentVolumePdf')->name('reports.appointment-volume.pdf');
+                });
 
-            // Patient reports
-            Route::get('reports/patient', 'patient')->name('reports.patient');
-            Route::get('reports/patient-loyalty/pdf', 'downloadMostLoyalPatientsPdf')->name('reports.patient-loyalty.pdf');
-        });
+                // Invoice reports
+                Route::middleware('permission:invoices:view_any')->group(function () {
+                    Route::get('reports/invoice', 'invoice')->name('reports.invoice');
+                    Route::get('reports/invoice-revenue/pdf', 'downloadInvoiceRevenuePdf')->name('reports.invoice-revenue.pdf');
+                });
+
+                // Consultation reports
+                Route::middleware('permission:consultations:view_any')->group(function () {
+                    Route::get('reports/consultation', 'consultation')->name('reports.consultation');
+                    Route::get('reports/consultation-type-ranking/pdf', 'downloadConsultationTypeRankingPdf')->name('reports.consultation-type-ranking.pdf');
+                    Route::get('reports/consultation-volume/pdf', 'downloadMonthlyConsultationVolumePdf')->name('reports.consultation-volume.pdf');
+                });
+
+                // Laboratory Result reports
+                Route::middleware('permission:laboratory_results:view_any')->group(function () {
+                    Route::get('reports/laboratory-result', 'laboratoryResult')->name('reports.laboratory-result');
+                    Route::get('reports/laboratory-result-type-ranking/pdf', 'downloadLaboratoryResultTypeRankingPdf')->name('reports.laboratory-result-type-ranking.pdf');
+                    Route::get('reports/laboratory-result-volume/pdf', 'downloadMonthlyLaboratoryResultVolumePdf')->name('reports.laboratory-result-volume.pdf');
+                });
+            });
 
         /**
          * Users
@@ -190,50 +201,53 @@ Route::prefix('admin')
 |  User authenticated routes
 | -----------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'verified', 'is_active', 'role:patient', 'redirect_by_role'])->group(function () {
-    Route::get('/dashboard', UserDashboardController::class)->name('dashboard');
+Route::middleware([
+    'auth', 'verified', 'is_active', 'role:patient', 'redirect_by_role'
+])
+    ->group(function () {
+        Route::get('/dashboard', UserDashboardController::class)->name('dashboard');
 
-    /**
-     * Patients
-     */
-    Route::controller(UserPatientController::class)->group(function () {
-        Route::get('/patients/me', 'show')->name('patients.show');
-        Route::get('/patients/{patient}/edit', 'edit')->name('patients.edit');
-        Route::patch('/patients/{patient}', 'update')->name('patients.update');
-    });
+        /**
+         * Patients
+         */
+        Route::controller(UserPatientController::class)->group(function () {
+            Route::get('/patients/me', 'show')->name('patients.show');
+            Route::get('/patients/{patient}/edit', 'edit')->name('patients.edit');
+            Route::patch('/patients/{patient}', 'update')->name('patients.update');
+        });
 
-    /**
-     * Appointments
-     */
-    Route::controller(UserAppointmentController::class)->group(function () {
-        Route::get('/appointments', 'index')->name('appointments.index');
-        Route::get('/appointments/create', 'create')->name('appointments.create');
-        Route::post('/appointments', 'store')->name('appointments.store');
-        Route::patch('/appointments/{appointment}/reschedule', 'reschedule')->name('appointments.reschedule');
-        Route::patch('/appointments/{appointment}/cancel', 'cancel')->name('appointments.cancel');
-    });
+        /**
+         * Appointments
+         */
+        Route::controller(UserAppointmentController::class)->group(function () {
+            Route::get('/appointments', 'index')->name('appointments.index');
+            Route::get('/appointments/create', 'create')->name('appointments.create');
+            Route::post('/appointments', 'store')->name('appointments.store');
+            Route::patch('/appointments/{appointment}/reschedule', 'reschedule')->name('appointments.reschedule');
+            Route::patch('/appointments/{appointment}/cancel', 'cancel')->name('appointments.cancel');
+        });
 
-    /**
-     * Invoices
-     */
-    Route::controller(UserInvoiceController::class)->group(function () {
-        Route::get('/invoices', 'index')->name('invoices.index');
-    });
+        /**
+         * Invoices
+         */
+        Route::controller(UserInvoiceController::class)->group(function () {
+            Route::get('/invoices', 'index')->name('invoices.index');
+        });
 
-    /**
-     * Consultations
-     */
-    Route::controller(UserConsultationController::class)->group(function () {
-        Route::get('/consultations', 'index')->name('consultations.index');
-    });
+        /**
+         * Consultations
+         */
+        Route::controller(UserConsultationController::class)->group(function () {
+            Route::get('/consultations', 'index')->name('consultations.index');
+        });
 
-    /**
-     * Laboratory Results
-     */
-    Route::controller(UserLaboratoryResultController::class)->group(function () {
-        Route::get('/laboratory_results', 'index')->name('laboratory_results.index');
+        /**
+         * Laboratory Results
+         */
+        Route::controller(UserLaboratoryResultController::class)->group(function () {
+            Route::get('/laboratory_results', 'index')->name('laboratory_results.index');
+        });
     });
-});
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

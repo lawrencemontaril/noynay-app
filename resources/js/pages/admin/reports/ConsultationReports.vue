@@ -7,12 +7,12 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 
 defineProps<{
-    appointmentTypeRanking: {
+    consultationTypeRanking: {
         rank: number;
         label: string;
         total: number;
     }[];
-    monthlyAppointmentVolume: {
+    monthlyConsultationVolume: {
         month: string;
         total: number;
     }[];
@@ -20,8 +20,8 @@ defineProps<{
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Appointment Reports',
-        href: route('admin.reports.appointment'),
+        title: 'Consultation Reports',
+        href: route('admin.reports.consultation'),
     },
 ];
 </script>
@@ -29,16 +29,16 @@ const breadcrumbs: BreadcrumbItem[] = [
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <Container class="space-y-8">
-            <!-- Appointment Type Ranking Table -->
+            <!-- Consultation Type Ranking -->
             <Card>
                 <CardHeader>
                     <div class="flex items-center justify-between gap-4">
-                        <CardTitle>Appointment Type Ranking by Frequency</CardTitle>
+                        <CardTitle>Consultation Type Ranking by Frequency</CardTitle>
 
                         <Button
                             as="a"
                             variant="destructive"
-                            :href="route('admin.reports.appointment-type-ranking.pdf')"
+                            :href="route('admin.reports.consultation-type-ranking.pdf')"
                             target="_blank"
                         >
                             Download PDF
@@ -58,7 +58,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
                         <TableBody>
                             <TableRow
-                                v-for="item in appointmentTypeRanking"
+                                v-for="item in consultationTypeRanking"
                                 :key="item.rank"
                             >
                                 <TableCell>{{ item.rank }}</TableCell>
@@ -67,7 +67,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                             </TableRow>
 
                             <TableEmpty
-                                v-if="!appointmentTypeRanking.length"
+                                v-if="!consultationTypeRanking.length"
                                 :colspan="4"
                             >
                                 No appointment data available.
@@ -77,16 +77,16 @@ const breadcrumbs: BreadcrumbItem[] = [
                 </CardContent>
             </Card>
 
-            <!-- Appointment Monthly Volume -->
+            <!-- Monthly Consultation Volume -->
             <Card>
                 <CardHeader>
                     <div class="flex items-center justify-between gap-4">
-                        <CardTitle>Monthly Appointment Volume</CardTitle>
+                        <CardTitle>Monthly Consultation Volume</CardTitle>
 
                         <Button
                             as="a"
                             variant="destructive"
-                            :href="route('admin.reports.appointment-volume.pdf')"
+                            :href="route('admin.reports.consultation-volume.pdf')"
                             target="_blank"
                         >
                             Download PDF
@@ -99,19 +99,19 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Month</TableHead>
-                                <TableHead class="text-right">Total Appointments</TableHead>
+                                <TableHead class="text-right">Total Consultations</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             <TableRow
-                                v-for="row in monthlyAppointmentVolume"
+                                v-for="row in monthlyConsultationVolume"
                                 :key="row.month"
                             >
                                 <TableCell>{{ row.month }}</TableCell>
                                 <TableCell class="text-right font-semibold">{{ row.total }}</TableCell>
                             </TableRow>
                             <TableEmpty
-                                v-if="!monthlyAppointmentVolume.length"
+                                v-if="!monthlyConsultationVolume.length"
                                 :colspan="2"
                             >
                                 <TableCell class="py-4 text-center text-muted-foreground">No data available</TableCell>

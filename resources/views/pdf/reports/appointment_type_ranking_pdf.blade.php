@@ -101,7 +101,6 @@
         <thead>
             <tr>
                 <th style="width: 10%;">Rank</th>
-                <th style="width: 25%;">Type</th>
                 <th>Label</th>
                 <th class="right" style="width: 15%;">Total</th>
             </tr>
@@ -110,7 +109,6 @@
             @forelse ($ranking as $item)
                 <tr>
                     <td>{{ $item['rank'] }}</td>
-                    <td>{{ $item['type'] }}</td>
                     <td>{{ $item['label'] }}</td>
                     <td class="right">{{ $item['total'] }}</td>
                 </tr>

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Monthly Appointment Volume Report</title>
+    <title>Monthly Consultation Volume Report</title>
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
@@ -90,22 +90,22 @@
             <div class="clinic-name">Noynay Medical Center</div>
         </div>
         <div class="report-info">
-            <div><strong>Report:</strong> Monthly Appointment Volume (Last 12 Months)</div>
+            <div><strong>Report:</strong> Monthly Consultation Volume (Last 12 Months)</div>
             <div><strong>Generated on:</strong> {{ $generated_at }}</div>
         </div>
     </div>
 
     <!-- Table Section -->
-    <div class="section-title">Monthly Appointment Summary</div>
+    <div class="section-title">Monthly Consultation Summary</div>
     <table>
         <thead>
             <tr>
                 <th style="width:70%;">Month</th>
-                <th class="right" style="width:30%;">Total Appointments</th>
+                <th class="right" style="width:30%;">Total Consultations</th>
             </tr>
         </thead>
         <tbody>
-            @forelse ($monthlyAppointmentVolume as $row)
+            @forelse ($monthlyConsultationVolume as $row)
                 <tr>
                     <td>{{ $row['month'] }}</td>
                     <td class="right">{{ $row['total'] }}</td>
@@ -113,7 +113,7 @@
             @empty
                 <tr>
                     <td colspan="2" style="text-align:center; color:#999; padding:20px;">
-                        No appointment data available.
+                        No consultation data available.
                     </td>
                 </tr>
             @endforelse

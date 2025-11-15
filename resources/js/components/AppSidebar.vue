@@ -27,6 +27,7 @@ import {
     Table2,
     User,
 } from 'lucide-vue-next';
+import { computed } from 'vue';
 import AppLogo from './AppLogo.vue';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 
@@ -48,23 +49,41 @@ const adminReportsNavItems: NavItem[] = [
         href: route('admin.reports.patient'),
         icon: FolderHeart,
         isActive: route().current('admin.reports.patient'),
-        access: hasAnyRole(['cashier', 'admin']),
+        access: hasPermissionTo('patients:view_any'),
     },
     {
         title: 'Appointment',
         href: route('admin.reports.appointment'),
         icon: ClipboardList,
         isActive: route().current('admin.reports.appointment'),
-        access: hasAnyRole(['cashier', 'admin']),
+        access: hasPermissionTo('appointments:view_any'),
     },
     {
         title: 'Invoice',
         href: route('admin.reports.invoice'),
         icon: ReceiptText,
         isActive: route().current('admin.reports.invoice'),
-        access: hasAnyRole(['cashier', 'admin']),
+        access: hasPermissionTo('invoices:view_any'),
+    },
+    {
+        title: 'Consultation',
+        href: route('admin.reports.consultation'),
+        icon: MessagesSquare,
+        isActive: route().current('admin.reports.consultation'),
+        access: hasPermissionTo('consultations:view_any'),
+    },
+    {
+        title: 'Laboratory',
+        href: route('admin.reports.laboratory-result'),
+        icon: FlaskConical,
+        isActive: route().current('admin.reports.laboratory-result'),
+        access: hasPermissionTo('laboratory_results:view_any'),
     },
 ];
+
+const filteredAdminReportsNavItems = computed(() => {
+    return adminReportsNavItems.filter((item) => item.access);
+});
 
 const adminMainNavItems: NavItem[] = [
     {
@@ -199,7 +218,7 @@ const page = usePage();
                         <CollapsibleContent>
                             <SidebarMenuSub>
                                 <SidebarMenuSubItem
-                                    v-for="reportsNavItem in adminReportsNavItems"
+                                    v-for="reportsNavItem in filteredAdminReportsNavItems"
                                     :key="reportsNavItem.href"
                                 >
                                     <SidebarMenuSubButton

@@ -141,10 +141,51 @@ const downloadInvoice = async () => {
                             <TableCell
                                 colspan="4"
                                 class="text-right"
+                                >Subtotal</TableCell
                             >
-                                Total
+                            <TableCell class="text-right">{{ formatCurrency(invoice!.subtotal) }}</TableCell>
+                        </TableRow>
+
+                        <TableRow v-if="invoice?.with_discount">
+                            <TableCell
+                                colspan="4"
+                                class="text-right"
+                                >Discount</TableCell
+                            >
+                            <TableCell class="text-right"> -{{ formatCurrency(invoice!.discount_amount) }} </TableCell>
+                        </TableRow>
+
+                        <TableRow>
+                            <TableCell
+                                colspan="4"
+                                class="text-right"
+                                >Subtotal After Discount</TableCell
+                            >
+                            <TableCell class="text-right">
+                                {{ formatCurrency(invoice!.subtotal_after_discount) }}
                             </TableCell>
-                            <TableCell class="text-right">{{ formatCurrency(invoice!.total) }}</TableCell>
+                        </TableRow>
+
+                        <TableRow>
+                            <TableCell
+                                colspan="4"
+                                class="text-right"
+                                >VAT</TableCell
+                            >
+                            <TableCell class="text-right">
+                                {{ formatCurrency(invoice!.vat_amount) }}
+                            </TableCell>
+                        </TableRow>
+
+                        <TableRow>
+                            <TableCell
+                                colspan="4"
+                                class="text-right font-semibold"
+                                >Total</TableCell
+                            >
+                            <TableCell class="text-right font-semibold">
+                                {{ formatCurrency(invoice!.total) }}
+                            </TableCell>
                         </TableRow>
                     </TableFooter>
                 </Table>
