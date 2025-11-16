@@ -16,6 +16,7 @@ import { ref } from 'vue';
 const props = defineProps<{
     user: User;
     activities?: Activity[];
+    user_activities?: Activity[];
 }>();
 
 const { getFullName } = useFormatters();
@@ -106,7 +107,14 @@ function openEditUserDialog() {
                 </DataCard>
             </div>
 
-            <ActivityTimeline :activities="activities" />
+            <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <ActivityTimeline :activities="activities" />
+                <ActivityTimeline
+                    title="User Activity Trail"
+                    data="user_activities"
+                    :activities="user_activities"
+                />
+            </div>
 
             <EditUserDialog
                 v-model:open="isEditUserDialogOpen"

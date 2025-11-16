@@ -9,6 +9,7 @@ use App\Http\Resources\ActivityResource;
 use App\Models\User;
 use App\Http\Requests\{StoreUserRequest, UpdateUserRequest};
 use Inertia\Inertia;
+use Spatie\Activitylog\Models\Activity;
 
 class UserController extends Controller
 {
@@ -75,11 +76,16 @@ class UserController extends Controller
     {
         Gate::authorize('view', $user);
 
+        $userActivities = Activity::causedBy($user)->with('causer')->latest()->get();
+
         return Inertia::render('admin/users/UsersShow', [
             'user' => $user->toResource(),
             'activities' => Inertia::optional(
                 fn () => ActivityResource::collection($user->activities()->with('causer')->latest()->get())
-            )
+            ),
+            'user_activities' => Inertia::optional(
+                fn () => ActivityResource::collection($userActivities)
+            ),
         ]);
     }
 

@@ -8,21 +8,17 @@ use Illuminate\Validation\{Rule, Rules};
 
 class UpdateUserRequest extends FormRequest
 {
-    /*
-    | -----------------------------------------------------------
-    |  Determine if the user is authorized to make this request.
-    | -----------------------------------------------------------
-    */
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
         return Gate::allows('update', $this->user);
     }
 
-    /*
-    | -----------------------------------------------------
-    |  Get the validation rules that apply to the request.
-    | -----------------------------------------------------
-    */
+    /**
+     * Get the validation rules that apply to the request.
+     */
     public function rules(): array
     {
         return [

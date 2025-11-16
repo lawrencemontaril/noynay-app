@@ -8,7 +8,9 @@ import { ref } from 'vue';
 import Button from './ui/button/Button.vue';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
-defineProps<{
+const props = defineProps<{
+    title?: string;
+    data?: string;
     activities?: Activity[];
 }>();
 
@@ -20,7 +22,7 @@ const hasLoaded = ref(false);
 
 const loadActivities = () => {
     router.reload({
-        only: ['activities'],
+        only: [props.data ?? 'activities'],
         onBefore: () => (isLoading.value = true),
         onFinish: () => {
             isLoading.value = false;
@@ -36,7 +38,7 @@ const loadActivities = () => {
         class="gap-0"
     >
         <CardHeader class="flex items-center justify-between border-b">
-            <CardTitle class="text-lg font-semibold">Audit Trail</CardTitle>
+            <CardTitle class="text-lg font-semibold">{{ title ?? 'Audit Trail' }}</CardTitle>
 
             <div class="flex items-center gap-2">
                 <Button

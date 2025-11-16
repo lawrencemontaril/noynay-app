@@ -54,10 +54,13 @@ const auth = computed(() => page.props.auth);
                             v-if="auth.user.notifications_unread_count > 0"
                             class="absolute -top-1 -right-2 flex h-4 w-fit items-center justify-center rounded-full bg-destructive p-1 text-[10px] leading-none font-semibold text-white"
                         >
-                            <span
-                                >{{ auth.user.notifications_unread_count
-                                }}{{ auth.user.notifications_unread_count >= 10 ? '+' : '' }}</span
-                            >
+                            <span>
+                                {{
+                                    auth.user.notifications_unread_count >= 10
+                                        ? 10
+                                        : auth.user.notifications_unread_count
+                                }}{{ auth.user.notifications_unread_count >= 10 ? '+' : '' }}
+                            </span>
                         </div>
                     </div>
                 </DropdownMenuTrigger>

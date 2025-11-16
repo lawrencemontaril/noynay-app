@@ -52,7 +52,7 @@ class HandleInertiaRequests extends Middleware
                     'notifications_unread_count' => $user->unreadNotifications()->latest()->take(10)->count(),
                     'notifications' => $user
                         ? $user
-                            ->notifications()
+                            ->unreadNotifications()
                             ->latest()
                             ->take(10)
                             ->get()
