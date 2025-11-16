@@ -17,8 +17,8 @@ class ConsultationController extends Controller
     {
         $patient = auth()->user()->patient;
 
-        $consultations = $patient
-            ->consultations()
+        $consultations = $patient->consultations()
+            ->whereHas('appointment.invoice.payments')
             ->when($request->filled('id') && $request->input('id') !== '', fn ($q) =>
                 $q->where('consultations.id', $request->input('id'))
             )

@@ -49,35 +49,35 @@ const adminReportsNavItems: NavItem[] = [
         href: route('admin.reports.patient'),
         icon: FolderHeart,
         isActive: route().current('admin.reports.patient'),
-        access: hasPermissionTo('patients:view_any'),
+        access: hasAnyRole(['admin', 'system_admin']),
     },
     {
         title: 'Appointment',
         href: route('admin.reports.appointment'),
         icon: ClipboardList,
         isActive: route().current('admin.reports.appointment'),
-        access: hasPermissionTo('appointments:view_any'),
+        access: hasAnyRole(['admin', 'system_admin']),
     },
     {
         title: 'Invoice',
         href: route('admin.reports.invoice'),
         icon: ReceiptText,
         isActive: route().current('admin.reports.invoice'),
-        access: hasPermissionTo('invoices:view_any'),
+        access: hasAnyRole(['admin', 'cashier', 'system_admin']),
     },
     {
         title: 'Consultation',
         href: route('admin.reports.consultation'),
         icon: MessagesSquare,
         isActive: route().current('admin.reports.consultation'),
-        access: hasPermissionTo('consultations:view_any'),
+        access: hasAnyRole(['admin', 'system_admin']),
     },
     {
         title: 'Laboratory',
         href: route('admin.reports.laboratory-result'),
         icon: FlaskConical,
         isActive: route().current('admin.reports.laboratory-result'),
-        access: hasPermissionTo('laboratory_results:view_any'),
+        access: hasAnyRole(['admin', 'system_admin']),
     },
 ];
 
@@ -203,7 +203,10 @@ const page = usePage();
                 :items="adminAnalyticsNavItems"
             />
 
-            <SidebarMenu class="px-2 py-0">
+            <SidebarMenu
+                v-if="hasAnyRole(['admin', 'system_admin', 'cashier'])"
+                class="px-2 py-0"
+            >
                 <Collapsible
                     :defaultOpen="route().current('admin.reports*')"
                     class="group/collapsible"

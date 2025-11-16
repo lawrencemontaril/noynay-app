@@ -44,7 +44,7 @@ class RolePermissionSeeder extends Seeder
 
         $rolePermissions = [
             'admin' => [
-                'users:view_any', 'users:view',
+                'users:view',
                 'patients:view_any', 'patients:view',
                 'appointments:view_any', 'appointments:view', 'appointments:delete', 'appointments:restore', 'appointments:approve', 'appointments:reject',
                 'invoices:view',
@@ -54,7 +54,7 @@ class RolePermissionSeeder extends Seeder
                 'patients:view_any', 'patients:view', 'patients:create', 'patients:update', 'patients:delete', 'patients:restore',
             ],
             'cashier' => [
-                'patients:view_any', 'patients:view',
+                'patients:view',
                 'appointments:view_any', 'appointments:view',
                 'invoices:view_any', 'invoices:view', 'invoices:create',
                 'invoice_items:create',

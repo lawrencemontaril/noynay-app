@@ -10,6 +10,40 @@ enum LaboratoryResultType: string
     case URINALYSIS = 'urinalysis';
     case FECALYSIS = 'fecalysis';
 
+    public static function options(): array
+    {
+        return collect(self::cases())
+            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
+            ->toArray();
+    }
+
+    public function service(): string
+    {
+        return match ($this) {
+                // ---------------------------------------------------------
+                // Laboratory Services
+                // ---------------------------------------------------------
+            self::PREGNANCY_TEST,
+            self::PAPSMEAR,
+            self::CBC,
+            self::URINALYSIS,
+            self::FECALYSIS
+            => 'laboratory_services',
+        };
+    }
+
+    public function serviceLabel(): string
+    {
+        return match ($this->service()) {
+            'consultation' => 'Consultation',
+            'family_planning_service' => 'Family Planning Services',
+            'integrative_and_wellness' => 'Integrative and Wellness Healthcare Services',
+            'laboratory_services' => 'Laboratory Services',
+            'maternal_and_child_health_services' => 'Maternal and Child Health Services',
+            'medical_surgical_services' => 'Medical/Surgical Services',
+        };
+    }
+
     public function label(): string
     {
         return match ($this) {
@@ -21,10 +55,8 @@ enum LaboratoryResultType: string
         };
     }
 
-    public static function options(): array
+    public function fullDescription(): string
     {
-        return collect(self::cases())
-            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
-            ->toArray();
+        return $this->serviceLabel().'/'.$this->label();
     }
 }

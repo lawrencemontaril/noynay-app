@@ -21,14 +21,15 @@ use Inertia\Inertia;
 class ReportController extends Controller
 {
     /*
-|--------------------------------------------------------------------------
-| Patient Reports
-|--------------------------------------------------------------------------
-*/
+    |--------------------------------------------------------------------------
+    | Patient Reports
+    |--------------------------------------------------------------------------
+    */
     public function patient(Request $request)
     {
         return Inertia::render('admin/reports/PatientReports', [
             'mostLoyalPatients' => $this->getMostLoyalPatients(),
+            'patientAgeGroups' => $this->getPatientByAgeGroup()
         ]);
     }
 
@@ -105,7 +106,7 @@ class ReportController extends Controller
                 'name' => $p->name,
                 'total_appointments' => (int) $p->total_appointments,
                 'visits_per_year' => $visitsPerYear,
-                'last_visit' => $lastVisit?->diffForHumans(),
+                'last_visit' => $p->last_visit,
                 'tenure_years' => $tenureYears,
                 'distinct_services' => (int) $p->distinct_services,
                 'total_spend' => (float) $p->total_spend,
@@ -136,6 +137,50 @@ class ReportController extends Controller
         ])->setPaper('a4', 'portrait');
 
         return $pdf->download('Most_Loyal_Patients_Report.pdf');
+    }
+
+    protected function getPatientByAgeGroup()
+    {
+        $ageGroups = [
+            '0-12' => [0, 12],
+            '13-18' => [13, 18],
+            '19-25' => [19, 25],
+            '26-35' => [26, 35],
+            '36-45' => [36, 45],
+            '46-60' => [46, 60],
+            '61+' => [61, 200],
+        ];
+
+        $patients = Patient::query()
+            ->select([
+                'id',
+                'birthdate',
+            ])
+            ->get()
+            ->map(function ($p) {
+                $p->age = Carbon::parse($p->birthdate)->age;
+                return $p;
+            });
+
+        $result = collect($ageGroups)->map(function ($range, $label) use ($patients) {
+            $count = $patients->filter(fn ($p) => $p->age >= $range[0] && $p->age <= $range[1])->count();
+            return [
+                'age_group' => $label,
+                'patient_count' => $count,
+            ];
+        });
+
+        return $result;
+    }
+
+    public function downloadPatientByAgeGroupPdf()
+    {
+        $pdf = Pdf::loadView('pdf.reports.patient_by_age_group_pdf', [
+            'patientAgeGroups' => $this->getPatientByAgeGroup(),
+            'generated_at' => now()->timezone('Asia/Manila')->format('F d, Y h:i A'),
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download('Patient_By_Age_Group_Report.pdf');
     }
 
     /*

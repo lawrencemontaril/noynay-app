@@ -33,6 +33,88 @@ enum AppointmentType: string
     case URINALYSIS = 'urinalysis';
     case FECALYSIS = 'fecalysis';
 
+    public static function options(): array
+    {
+        return collect(self::cases())
+            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
+            ->toArray();
+    }
+
+    public function service(): string
+    {
+        return match ($this) {
+
+                // ---------------------------------------------------------
+                // Consultation
+                // ---------------------------------------------------------
+            self::CONSULTATION => 'consultation',
+
+                // ---------------------------------------------------------
+                // Family Planning Services
+                // ---------------------------------------------------------
+            self::FAMILY_PLANNING_COUNSELING,
+            self::NATURAL_METHODS
+            => 'family_planning_service',
+
+                // ---------------------------------------------------------
+                // Integrative and Wellness Healthcare Services
+                // ---------------------------------------------------------
+            self::CHELATION_THERAPY,
+            self::MAGNETIC_RESONANCE_ANALYSIS,
+            self::MULTIFUNCTIONAL_THERAPEUTIC_SERVICES,
+            self::WEIGHT_LOSS_MANAGEMENT,
+            self::PSYCHOSOCIAL_AND_SPIRITUAL_COUNSELING
+            => 'integrative_and_wellness',
+
+                // ---------------------------------------------------------
+                // Laboratory Services
+                // ---------------------------------------------------------
+            self::PREGNANCY_TEST,
+            self::PAPSMEAR,
+            self::CBC,
+            self::URINALYSIS,
+            self::FECALYSIS
+            => 'laboratory_services',
+
+                // ---------------------------------------------------------
+                // Maternal & Child Health Services
+                // ---------------------------------------------------------
+            self::PRE_NATAL_AND_POST_NATAL,
+            self::NORMAL_SPONTANEOUS_DELIVERY,
+            self::IMMUNIZATION,
+            self::EAR_PIERCING,
+            self::NEBULIZATION,
+            self::FOLEY_CATHETER_INSERTION,
+            self::SURGICAL_WOUND_DRESSING,
+            self::CORD_DRESSING,
+            self::SUTURE_REMOVAL,
+            self::ISSUANCE_OF_BC_NEWBORN_SCREENING
+            => 'maternal_and_child_health_services',
+
+                // ---------------------------------------------------------
+                // Medical / Surgical Services
+                // ---------------------------------------------------------
+            self::GENERAL_OPD_CONSULTATION,
+            self::MEDICAL_OPD_CONSULTATION,
+            self::MINOR_SURGICAL_PROCEDURES,
+            self::ISSUANCE_OF_MEDICAL_CERTIFICATE,
+            self::PEDIA_ADULT_VACCINATION_SERVICES
+            => 'medical_surgical_services',
+        };
+    }
+
+    public function serviceLabel(): string
+    {
+        return match ($this->service()) {
+            'consultation' => 'Consultation',
+            'family_planning_service' => 'Family Planning Services',
+            'integrative_and_wellness' => 'Integrative and Wellness Healthcare Services',
+            'laboratory_services' => 'Laboratory Services',
+            'maternal_and_child_health_services' => 'Maternal and Child Health Services',
+            'medical_surgical_services' => 'Medical/Surgical Services',
+        };
+    }
+
     public function label(): string
     {
         return match ($this) {
@@ -67,11 +149,9 @@ enum AppointmentType: string
         };
     }
 
-    public static function options(): array
+    public function fullDescription(): string
     {
-        return collect(self::cases())
-            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
-            ->toArray();
+        return $this->serviceLabel().'/'.$this->label();
     }
 
     public function isLab(): bool

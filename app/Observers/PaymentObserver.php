@@ -2,8 +2,10 @@
 
 namespace App\Observers;
 
+use App\Enums\AppointmentStatus;
 use App\Enums\InvoiceStatus;
 use App\Models\Payment;
+use App\Notifications\AppointmentCompleted;
 use App\Notifications\InvoicePaid;
 
 class PaymentObserver
@@ -27,5 +29,12 @@ class PaymentObserver
         }
 
         $invoice->save();
+
+        if ($payment->invoice->wasChanged('status') && in_array($payment->invoice->status, [InvoiceStatus::PARTIALLY_PAID, InvoiceStatus::PAID])) {
+            $appointment = $payment->invoice->appointment;
+            $appointment->update(['status' => AppointmentStatus::COMPLETED]);
+
+            $appointment->patient->user?->notify(new AppointmentCompleted($appointment));
+        }
     }
 }

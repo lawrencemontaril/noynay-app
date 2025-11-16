@@ -17,6 +17,7 @@ class LaboratoryResultController extends Controller
         $patient = $request->user()->patient;
 
         $laboratoryResults = $patient->laboratoryResults()
+            ->whereHas('appointment.invoice.payments')
             ->when($request->filled('type') && $request->input('type') !== 'all', fn ($q) =>
                 $q->where('type', $request->input('type'))
             )

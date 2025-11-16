@@ -80,7 +80,8 @@ class Appointment extends Model
     {
         return Attribute::get(function () {
             return in_array($this->status, [AppointmentStatus::PENDING, AppointmentStatus::APPROVED])
-                && $this->scheduled_at->greaterThanOrEqualTo(now()->addDay());
+                && $this->scheduled_at->greaterThanOrEqualTo(now()->addDay()
+                    && ! $this->has_been_serviced);
         });
     }
 
@@ -88,6 +89,13 @@ class Appointment extends Model
     {
         return Attribute::get(
             fn () => in_array($this->status, [AppointmentStatus::APPROVED, AppointmentStatus::COMPLETED])
+        );
+    }
+
+    protected function hasBeenServiced(): Attribute
+    {
+        return Attribute::get(
+            fn () => $this->consultations()->exists() || $this->laboratoryResults()->exists()
         );
     }
 

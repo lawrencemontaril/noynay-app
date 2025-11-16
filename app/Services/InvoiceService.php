@@ -41,7 +41,6 @@ class InvoiceService
         }
 
         $this->notifyInvoiceCreation($invoice);
-        $this->notifyPatientOfAppointmentCompletion($invoice->appointment);
 
         return $invoice;
     }
@@ -157,12 +156,5 @@ class InvoiceService
         if ($user) {
             $user->notify(new InvoiceCreated($invoice));
         }
-    }
-
-    protected function notifyPatientOfAppointmentCompletion(Appointment $appointment)
-    {
-        $appointment->update(['status' => AppointmentStatus::COMPLETED]);
-
-        $appointment->patient->user?->notify(new AppointmentCompleted($appointment));
     }
 }

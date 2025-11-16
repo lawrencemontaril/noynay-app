@@ -65,33 +65,34 @@ Route::prefix('admin')
         Route::controller(AdminReportController::class)
             ->group(function () {
                 // Patient reports
-                Route::middleware('permission:patients:view_any')->group(function () {
+                Route::middleware('role:admin|system_admin')->group(function () {
                     Route::get('reports/patient', 'patient')->middleware('permission:patients:view_any')->name('reports.patient');
                     Route::get('reports/patient-loyalty/pdf', 'downloadMostLoyalPatientsPdf')->name('reports.patient-loyalty.pdf');
+                    Route::get('reports/patient-by-age-group/pdf', 'downloadPatientByAgeGroupPdf')->name('reports.patient-by-age-group.pdf');
                 });
 
                 // Appointment reports
-                Route::middleware('permission:appointments:view_any')->group(function () {
+                Route::middleware('role:admin|system_admin')->group(function () {
                     Route::get('reports/appointment', 'appointment')->name('reports.appointment');
                     Route::get('reports/appointment-type-ranking/pdf', 'downloadAppointmentTypeRankingPdf')->name('reports.appointment-type-ranking.pdf');
                     Route::get('reports/appointment-volume/pdf', 'downloadMonthlyAppointmentVolumePdf')->name('reports.appointment-volume.pdf');
                 });
 
                 // Invoice reports
-                Route::middleware('permission:invoices:view_any')->group(function () {
+                Route::middleware('role:admin|system_admin|cashier')->group(function () {
                     Route::get('reports/invoice', 'invoice')->name('reports.invoice');
                     Route::get('reports/invoice-revenue/pdf', 'downloadInvoiceRevenuePdf')->name('reports.invoice-revenue.pdf');
                 });
 
                 // Consultation reports
-                Route::middleware('permission:consultations:view_any')->group(function () {
+                Route::middleware('role:admin|system_admin')->group(function () {
                     Route::get('reports/consultation', 'consultation')->name('reports.consultation');
                     Route::get('reports/consultation-type-ranking/pdf', 'downloadConsultationTypeRankingPdf')->name('reports.consultation-type-ranking.pdf');
                     Route::get('reports/consultation-volume/pdf', 'downloadMonthlyConsultationVolumePdf')->name('reports.consultation-volume.pdf');
                 });
 
                 // Laboratory Result reports
-                Route::middleware('permission:laboratory_results:view_any')->group(function () {
+                Route::middleware('role:admin|system_admin')->group(function () {
                     Route::get('reports/laboratory-result', 'laboratoryResult')->name('reports.laboratory-result');
                     Route::get('reports/laboratory-result-type-ranking/pdf', 'downloadLaboratoryResultTypeRankingPdf')->name('reports.laboratory-result-type-ranking.pdf');
                     Route::get('reports/laboratory-result-volume/pdf', 'downloadMonthlyLaboratoryResultVolumePdf')->name('reports.laboratory-result-volume.pdf');

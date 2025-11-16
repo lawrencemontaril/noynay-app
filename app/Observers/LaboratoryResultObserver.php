@@ -32,4 +32,15 @@ class LaboratoryResultObserver
             $laboratoryResult->status = LaboratoryResultStatus::PENDING;
         }
     }
+
+    /**
+     * Handle the LaboratoryResult "created" event.
+     */
+    public function created(LaboratoryResult $laboratoryResult)
+    {
+        $laboratoryResult->appointment->procedures()->create([
+            'description' => $laboratoryResult->type->fullDescription().' Fee',
+            'quantity' => 1
+        ]);
+    }
 }

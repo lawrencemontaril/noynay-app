@@ -11,7 +11,7 @@ class ConsultationObserver
 {
     /**
      * Handle the Consultation "creating" event.
-     * 
+     *
      * We check if the appointment has been serviced in the "creating" model
      * event so that it checks for other services within this appointment
      * excluding this one.
@@ -34,5 +34,10 @@ class ConsultationObserver
     public function created(Consultation $consultation): void
     {
         $consultation->appointment->patient->user?->notify(new ConsultationCreated($consultation));
+
+        $consultation->appointment->procedures()->create([
+            'description' => $consultation->type->fullDescription(),
+            'quantity' => 1
+        ]);
     }
 }

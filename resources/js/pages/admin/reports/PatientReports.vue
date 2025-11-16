@@ -22,6 +22,10 @@ defineProps<{
         status_score: number;
         loyalty_score: number;
     }>;
+    patientAgeGroups: Array<{
+        age_group: string;
+        patient_count: number;
+    }>;
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -94,6 +98,41 @@ const breadcrumbs: BreadcrumbItem[] = [
                                     class="py-4 text-center text-muted-foreground"
                                     >No patient data available.</TableCell
                                 >
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader class="flex items-center justify-between gap-4">
+                    <CardTitle>Patients By Age Group</CardTitle>
+
+                    <Button
+                        as="a"
+                        variant="destructive"
+                        :href="route('admin.reports.patient-by-age-group.pdf')"
+                        target="_blank"
+                    >
+                        Download PDF
+                    </Button>
+                </CardHeader>
+
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Age Group</TableHead>
+                                <TableHead class="text-right">Patient Count</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow
+                                v-for="row in patientAgeGroups"
+                                :key="row.age_group"
+                            >
+                                <TableCell>{{ row.age_group }}</TableCell>
+                                <TableCell class="text-right">{{ row.patient_count }}</TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>

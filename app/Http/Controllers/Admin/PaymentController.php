@@ -15,7 +15,7 @@ class PaymentController extends Controller
      */
     public function store(StorePaymentRequest $request)
     {
-        Payment::create($request->validated());
+        $payment = Payment::create($request->validated());
 
         return redirect()
             ->back()
