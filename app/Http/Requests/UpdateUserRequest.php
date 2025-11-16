@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\{Rule, Rules};
 
 class UpdateUserRequest extends FormRequest
 {
@@ -52,7 +52,9 @@ class UpdateUserRequest extends FormRequest
                 Rule::unique('users', 'email')->ignore($this->user)
             ],
             'password' => [
-                'prohibited',
+                'sometimes',
+                'confirmed',
+                Rules\Password::defaults()
             ],
             'is_active' => [
                 'required',

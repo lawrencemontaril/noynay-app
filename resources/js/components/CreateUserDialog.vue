@@ -13,9 +13,9 @@ import Input from '@/components/ui/input/Input.vue';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useForm as useInertiaForm } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
-import { LoaderCircle } from 'lucide-vue-next';
+import { Eye, EyeOff, LoaderCircle } from 'lucide-vue-next';
 import { useForm as useVeeForm } from 'vee-validate';
-import { watch } from 'vue';
+import { ref, watch } from 'vue';
 import * as z from 'zod';
 import Switch from './ui/switch/Switch.vue';
 
@@ -23,6 +23,9 @@ const props = defineProps<{
     open: boolean;
 }>();
 const emit = defineEmits(['update:open']);
+
+const showPassword = ref(false);
+const showPasswordConfirmation = ref(false);
 
 function closeDialog() {
     emit('update:open', false);
@@ -51,8 +54,8 @@ const formSchema = toTypedSchema(
                 .max(255),
             role: z.string({ required_error: 'Role field is required. ' }),
             is_active: z.boolean({ required_error: 'Account Status field is required.' }),
-            password: z.string({ required_error: 'Password field is required.' }),
-            password_confirmation: z.string({ required_error: 'Password Confirmation field is required.' }),
+            password: z.string({ required_error: 'Password field is required.' }).min(8),
+            password_confirmation: z.string({ required_error: 'Password Confirmation field is required.' }).min(8),
         })
         .refine((data) => data.password == data.password_confirmation, {
             message: 'Passwords must match.',
@@ -180,13 +183,29 @@ watch(
                     name="password"
                 >
                     <FormItem>
-                        <FormLabel required> Password </FormLabel>
+                        <FormLabel>Password</FormLabel>
 
                         <FormControl>
-                            <Input
-                                v-bind="componentField"
-                                type="password"
-                            />
+                            <div class="relative w-full">
+                                <Input
+                                    v-bind="componentField"
+                                    :type="showPassword ? 'text' : 'password'"
+                                    autocomplete="current-password"
+                                    :tabindex="2"
+                                    placeholder="Password"
+                                />
+
+                                <Button
+                                    @click="showPassword = !showPassword"
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    class="absolute top-1/2 right-1 -translate-y-1/2"
+                                >
+                                    <EyeOff v-if="showPassword" />
+                                    <Eye v-else />
+                                </Button>
+                            </div>
                         </FormControl>
 
                         <FormMessage />
@@ -198,13 +217,29 @@ watch(
                     name="password_confirmation"
                 >
                     <FormItem>
-                        <FormLabel required> Password Confirmation </FormLabel>
+                        <FormLabel>Confirm Password</FormLabel>
 
                         <FormControl>
-                            <Input
-                                v-bind="componentField"
-                                type="password"
-                            />
+                            <div class="relative w-full">
+                                <Input
+                                    v-bind="componentField"
+                                    :type="showPasswordConfirmation ? 'text' : 'password'"
+                                    autocomplete="current-password"
+                                    :tabindex="2"
+                                    placeholder="Password"
+                                />
+
+                                <Button
+                                    @click="showPasswordConfirmation = !showPasswordConfirmation"
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    class="absolute top-1/2 right-1 -translate-y-1/2"
+                                >
+                                    <EyeOff v-if="showPasswordConfirmation" />
+                                    <Eye v-else />
+                                </Button>
+                            </div>
                         </FormControl>
 
                         <FormMessage />

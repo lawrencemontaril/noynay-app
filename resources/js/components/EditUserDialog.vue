@@ -14,9 +14,9 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { User } from '@/types';
 import { useForm as useInertiaForm } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
-import { LoaderCircle } from 'lucide-vue-next';
+import { Eye, EyeOff, LoaderCircle } from 'lucide-vue-next';
 import { useForm as useVeeForm } from 'vee-validate';
-import { watch } from 'vue';
+import { ref, watch } from 'vue';
 import * as z from 'zod';
 import Switch from './ui/switch/Switch.vue';
 
@@ -25,6 +25,9 @@ const props = defineProps<{
     user: User | null;
 }>();
 const emit = defineEmits(['update:open']);
+
+const showPassword = ref(false);
+const showPasswordConfirmation = ref(false);
 
 function closeDialog() {
     emit('update:open', false);
@@ -35,6 +38,8 @@ const inertiaForm = useInertiaForm({
     last_name: '',
     middle_name: null as string | null,
     email: '',
+    password: null as string | null | undefined,
+    password_confirmation: null as string | null | undefined,
     role: '',
     is_active: false,
 });
@@ -48,6 +53,8 @@ const formSchema = toTypedSchema(
             .string({ required_error: 'Email address field is required.' })
             .email({ message: 'Must be a valid email address.' })
             .max(255),
+        password: z.string().min(8).optional().nullable(),
+        password_confirmation: z.string().min(8).optional().nullable(),
         role: z.string({ required_error: 'Role field is required. ' }),
         is_active: z.boolean({ required_error: 'Account status field is required.' }),
     }),
@@ -60,6 +67,11 @@ const { handleSubmit, setErrors, resetForm, setValues } = useVeeForm({
 
 const updateUser = handleSubmit((validatedValues) => {
     Object.assign(inertiaForm, validatedValues);
+
+    if (!inertiaForm.password) {
+        delete inertiaForm.password;
+        delete inertiaForm.password_confirmation;
+    }
 
     inertiaForm.patch(route('admin.users.update', props.user?.id), {
         onError: (serverErrors) => setErrors(serverErrors),
@@ -173,6 +185,74 @@ watch(
                                 type="email"
                                 placeholder="e.g. juansantos@example.com"
                             />
+                        </FormControl>
+
+                        <FormMessage />
+                    </FormItem>
+                </FormField>
+
+                <FormField
+                    v-slot="{ componentField }"
+                    name="password"
+                >
+                    <FormItem>
+                        <FormLabel>Password</FormLabel>
+
+                        <FormControl>
+                            <div class="relative w-full">
+                                <Input
+                                    v-bind="componentField"
+                                    :type="showPassword ? 'text' : 'password'"
+                                    autocomplete="current-password"
+                                    :tabindex="2"
+                                    placeholder="Password"
+                                />
+
+                                <Button
+                                    @click="showPassword = !showPassword"
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    class="absolute top-1/2 right-1 -translate-y-1/2"
+                                >
+                                    <EyeOff v-if="showPassword" />
+                                    <Eye v-else />
+                                </Button>
+                            </div>
+                        </FormControl>
+
+                        <FormMessage />
+                    </FormItem>
+                </FormField>
+
+                <FormField
+                    v-slot="{ componentField }"
+                    name="password_confirmation"
+                >
+                    <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+
+                        <FormControl>
+                            <div class="relative w-full">
+                                <Input
+                                    v-bind="componentField"
+                                    :type="showPasswordConfirmation ? 'text' : 'password'"
+                                    autocomplete="current-password"
+                                    :tabindex="2"
+                                    placeholder="Password"
+                                />
+
+                                <Button
+                                    @click="showPasswordConfirmation = !showPasswordConfirmation"
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    class="absolute top-1/2 right-1 -translate-y-1/2"
+                                >
+                                    <EyeOff v-if="showPasswordConfirmation" />
+                                    <Eye v-else />
+                                </Button>
+                            </div>
                         </FormControl>
 
                         <FormMessage />
