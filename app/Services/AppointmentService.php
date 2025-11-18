@@ -34,27 +34,27 @@ class AppointmentService
         $scheduledAt = Carbon::parse($data['scheduled_at']);
 
         // Check if patient already has an unsettled appointment
-        if ($this->hasUnsettledAppointment($data['patient_id'] ?? null)) {
+        if ($this->hasUnsettledAppointment($data['patient_id'] ?? auth()->user()->patient->id)) {
             throw ValidationException::withMessages([
                 'patient_id' => 'This patient already has an unsettled appointment.',
             ]);
         }
 
+        // Check if the slot has already elapsed
+        if ($this->hasScheduledSlotElapsed($scheduledAt)) {
+            throw ValidationException::withMessages([
+                'scheduled_at' => 'The selected date and time has already elapsed. Please select a valid date and time.',
+            ]);
+        }
+
         // Check if slot is already full
-        if ($this->isFull($scheduledAt)) {
+        if ($this->isScheduledSlotFull($scheduledAt)) {
             throw ValidationException::withMessages([
                 'scheduled_at' => 'The selected date and time has reached the maximum number of appointments ('.$this->maxAppointmentsPerSlot.').',
             ]);
         }
 
-        // Create the main appointment
-        $appointment = Appointment::create([
-            'patient_id' => $data['patient_id'] ?? null,
-            'complaints' => $data['complaints'] ?? null,
-            'type' => $data['type'] ?? null,
-            'status' => $data['status'] ?? 'pending',
-            'scheduled_at' => $scheduledAt,
-        ]);
+        $appointment = Appointment::create($data);
 
         $this->notifyAdminsOfAppointmentCreation($appointment);
 
@@ -63,31 +63,19 @@ class AppointmentService
 
     /**
      * Update an appointment
+     *
+     * ?
+     * No role could update and appointment now.
+     * Keeping this method for possible future implementation.
      */
-    public function update(Appointment $appointment, array $data): Appointment
+    public function update(Appointment $appointment, array $data): void
     {
-        if (isset($data['scheduled_at'])) {
-            $scheduledAt = Carbon::parse($data['scheduled_at']);
-
-            // Ensure new datetime isn’t already full (excluding this one)
-            if ($this->isFull($scheduledAt, $appointment->id)) {
-                throw ValidationException::withMessages([
-                    'scheduled_at' => 'The selected date and time has reached the maximum number of appointments ('.$this->maxAppointmentsPerSlot.').',
-                ]);
-            }
-
-            $appointment->scheduled_at = $scheduledAt;
-        }
-
-        $appointment->update([
-            'complaints' => $data['complaints'] ?? $appointment->complaints,
-            'type' => $data['type'] ?? $appointment->type,
-            'status' => $data['status'] ?? $appointment->status,
-        ]);
-
-        return $appointment;
+        //
     }
 
+    /**
+     * Approve an appointment
+     */
     public function approve(Appointment $appointment)
     {
         $appointment->update(['status' => AppointmentStatus::APPROVED]);
@@ -105,6 +93,9 @@ class AppointmentService
         $this->notifyPatientOfAppointmentApprovals($appointment);
     }
 
+    /**
+     * Reject an appointment
+     */
     public function reject(Appointment $appointment)
     {
         $appointment->update(['status' => AppointmentStatus::REJECTED]);
@@ -112,6 +103,9 @@ class AppointmentService
         $this->notifyPatientOfAppointmentRejection($appointment);
     }
 
+    /**
+     * Mark the appointment as "no show"
+     */
     public function noShow(Appointment $appointment)
     {
         $appointment->update(['status' => AppointmentStatus::NO_SHOW]);
@@ -131,7 +125,7 @@ class AppointmentService
         $scheduledAt = Carbon::parse($data['scheduled_at']);
 
         // Ensure new datetime isn’t already full (excluding this one)
-        if ($this->isFull($scheduledAt, $appointment->id)) {
+        if ($this->isScheduledSlotFull($scheduledAt, $appointment->id)) {
             throw ValidationException::withMessages([
                 'scheduled_at' => 'The selected date and time has reached the maximum number of appointments ('.$this->maxAppointmentsPerSlot.').',
             ]);
@@ -164,9 +158,9 @@ class AppointmentService
     */
 
     /**
-     * Check if a datetime slot already has 5 or more appointments.
+     * Check if a datetime slot already has reached the configured maximum slots
      */
-    protected function isFull(Carbon $scheduledAt, ?int $ignoreId = null): bool
+    protected function isScheduledSlotFull(Carbon $scheduledAt, ?int $ignoreId = null): bool
     {
         $count = Appointment::where('scheduled_at', $scheduledAt)
             ->whereIn('status', [
@@ -183,12 +177,8 @@ class AppointmentService
     /**
      * Check if patient has an unsettled appointment.
      */
-    public function hasUnsettledAppointment(?int $patientId): bool
+    public function hasUnsettledAppointment(int $patientId): bool
     {
-        if (! $patientId) {
-            return false;
-        }
-
         return Appointment::where('patient_id', $patientId)
             ->whereNotIn('status', [
                 AppointmentStatus::REJECTED,
@@ -206,6 +196,14 @@ class AppointmentService
     {
         return $appointment->consultations()->exists() ||
             $appointment->laboratoryResults()->exists();
+    }
+
+    /**
+     * Check if the scheduled date has elapsed
+     */
+    protected function hasScheduledSlotElapsed(Carbon $scheduledAt): bool
+    {
+        return $scheduledAt->isBefore(now());
     }
 
     /*

@@ -33,14 +33,10 @@ class UpdateAppointmentRequest extends FormRequest
                 'date',
             ],
             'type' => [
-                'sometimes',
-                'string',
-                Rule::enum(AppointmentType::class),
+                'prohibited'
             ],
             'status' => [
-                'sometimes',
-                'string',
-                Rule::enum(AppointmentStatus::class)
+                'prohibited'
             ],
         ];
     }
