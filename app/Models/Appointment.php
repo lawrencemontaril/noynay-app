@@ -80,8 +80,8 @@ class Appointment extends Model
     {
         return Attribute::get(function () {
             return in_array($this->status, [AppointmentStatus::PENDING, AppointmentStatus::APPROVED])
-                && $this->scheduled_at->greaterThanOrEqualTo(now()->addDay()
-                    && ! $this->has_been_serviced);
+                && $this->scheduled_at->greaterThanOrEqualTo(now()->addDay())
+                    && ! $this->has_been_serviced;
         });
     }
 
