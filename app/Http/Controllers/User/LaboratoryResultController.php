@@ -19,10 +19,10 @@ class LaboratoryResultController extends Controller
         $laboratoryResults = $patient->laboratoryResults()
             ->whereHas('appointment.invoice.payments')
             ->when($request->filled('type') && $request->input('type') !== 'all', fn ($q) =>
-                $q->where('type', $request->input('type'))
+                $q->where('laboratory_results.type', $request->input('type'))
             )
             ->when($request->filled('status') && $request->input('status') !== 'all', fn ($q) =>
-                $q->where('status', $request->input('status'))
+                $q->where('laboratory_results.status', $request->input('status'))
             )
             ->when($request->filled('id') && $request->input('id') !== '', fn ($q) =>
                 $q->where('laboratory_results.id', $request->input('id'))
