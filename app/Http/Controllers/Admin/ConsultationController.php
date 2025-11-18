@@ -24,12 +24,15 @@ class ConsultationController extends Controller
             ->when($request->filled('id') && $request->input('id') !== '', fn ($q) =>
                 $q->where('consultations.id', $request->input('id'))
             )
+            ->when($request->filled('type') && $request->input('type') !== 'all', fn ($q) =>
+                $q->where('consultations.type', $request->input('type'))
+            )
             ->paginate(10)
             ->withQueryString();
 
         return Inertia::render('admin/consultations/ConsultationsIndex', [
             'consultations' => $consultations->toResourceCollection(),
-            'filters' => $request->only(['q'])
+            'filters' => $request->only(['q', 'type'])
         ]);
     }
 

@@ -157,7 +157,7 @@ const downloadInvoice = async () => {
                                 :key="item.id"
                                 class="border-b last:border-0 hover:bg-muted/30"
                             >
-                                <TableCell class="py-2">{{ item.description }}</TableCell>
+                                <TableCell class="max-w-64 truncate py-2">{{ item.description }}</TableCell>
                                 <TableCell class="py-2 text-center">{{ item.quantity }}</TableCell>
                                 <TableCell class="py-2 text-right">{{ formatCurrency(item.unit_price) }}</TableCell>
                                 <TableCell class="py-2 text-right font-medium">{{

@@ -5,11 +5,13 @@ import EditConsultationDialog from '@/components/EditConsultationDialog.vue';
 import Pagination from '@/components/Pagination.vue';
 import { Button } from '@/components/ui/button';
 import Input from '@/components/ui/input/Input.vue';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useFormatters } from '@/composables/useFormatters';
 import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, Consultation, PaginatedData } from '@/types';
+import { CONSULTATION_TYPES } from '@/types/constants';
 import { Link, router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 import { Eye, Pencil, Search, Trash, X } from 'lucide-vue-next';
@@ -17,7 +19,7 @@ import { ref, watch } from 'vue';
 
 const props = defineProps<{
     consultations: PaginatedData<Consultation>;
-    filters: { q: string };
+    filters: { q: string; type: string };
 }>();
 
 const { hasPermissionTo, hasAnyPermissionTo } = usePermissions();
@@ -45,9 +47,14 @@ function openDeleteDialog(consultation: Consultation) {
 }
 
 const q = ref(props.filters.q ?? '');
+const type = ref(props.filters.type ?? 'all');
 
 const filterConsultations = useDebounceFn(() => {
-    router.get(route('admin.consultations.index'), { q: q.value }, { preserveState: true, replace: true });
+    router.get(
+        route('admin.consultations.index'),
+        { q: q.value, type: type.value },
+        { preserveState: true, replace: true },
+    );
 }, 400);
 
 function clearSearch() {
@@ -55,7 +62,7 @@ function clearSearch() {
     filterConsultations();
 }
 
-watch([q], () => filterConsultations());
+watch([q, type], () => filterConsultations());
 </script>
 
 <template>
@@ -93,6 +100,29 @@ watch([q], () => filterConsultations());
                         <TableRow>
                             <TableHead>#</TableHead>
                             <TableHead>Patient Name</TableHead>
+                            <TableHead>
+                                <Select v-model="type">
+                                    <SelectTrigger>
+                                        Type:
+                                        <SelectValue
+                                            placeholder="Type"
+                                            class="max-w-48 truncate"
+                                        />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem value="all">All</SelectItem>
+                                            <SelectItem
+                                                v-for="type in CONSULTATION_TYPES"
+                                                :key="type.value"
+                                                :value="type.value"
+                                            >
+                                                {{ type.label }}
+                                            </SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </TableHead>
                             <TableHead>Age</TableHead>
                             <TableHead>Blood Pressure</TableHead>
                             <TableHead>Heart Rate</TableHead>
@@ -125,6 +155,10 @@ watch([q], () => filterConsultations());
                                         consultation.appointment?.patient?.middle_name!,
                                     )
                                 }}
+                            </TableCell>
+
+                            <TableCell>
+                                {{ CONSULTATION_TYPES.find((type) => type.value === consultation.type)?.label }}
                             </TableCell>
 
                             <TableCell>{{ consultation.appointment?.patient?.age.formatted_long }}</TableCell>

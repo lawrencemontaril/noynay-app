@@ -73,165 +73,169 @@ const downloadInvoice = async () => {
         :open="open"
         @update:open="closeDialog"
     >
-        <DialogScrollContent>
+        <DialogScrollContent class="max-w-2xl">
             <DialogHeader>
                 <DialogTitle>Invoice #{{ invoice?.id }}</DialogTitle>
             </DialogHeader>
 
-            <!-- Patient Info -->
-            <DataCard
-                title="Patient Information"
-                :columns="2"
-            >
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Name</label>
-                    <p class="text-sm font-semibold">
-                        {{ getFullName(patient?.last_name!, patient?.first_name!, patient?.middle_name!) }}
-                    </p>
-                </div>
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Payment Status</label>
-                    <p
-                        class="text-sm font-semibold capitalize"
-                        :class="{
-                            'text-primary': invoice?.status === 'paid',
-                            'text-destructive': invoice?.status === 'cancelled',
-                            'text-warning': invoice?.status === 'unpaid' || invoice?.status === 'partially_paid',
-                        }"
-                    >
-                        {{ INVOICE_STATUSES.find((status) => status.value === invoice?.status)?.label }}
-                    </p>
-                </div>
-            </DataCard>
-
-            <DataCard title="Invoice Items">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>#</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead>Price</TableHead>
-                            <TableHead>Qty.</TableHead>
-                            <TableHead class="text-right">Sum</TableHead>
-                        </TableRow>
-                    </TableHeader>
-
-                    <TableBody>
-                        <TableRow
-                            v-for="(invoiceItem, index) in invoice?.invoice_items"
-                            :key="invoiceItem.id"
+            <div class="space-y-4">
+                <!-- Patient Info -->
+                <DataCard
+                    title="Patient Information"
+                    :columns="2"
+                >
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">Name</label>
+                        <p class="text-sm font-semibold">
+                            {{ getFullName(patient?.last_name!, patient?.first_name!, patient?.middle_name!) }}
+                        </p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-muted-foreground">Payment Status</label>
+                        <p
+                            class="text-sm font-semibold capitalize"
+                            :class="{
+                                'text-primary': invoice?.status === 'paid',
+                                'text-destructive': invoice?.status === 'cancelled',
+                                'text-warning': invoice?.status === 'unpaid' || invoice?.status === 'partially_paid',
+                            }"
                         >
-                            <TableCell>{{ index + 1 }}</TableCell>
-                            <TableCell>{{ invoiceItem.description }}</TableCell>
-                            <TableCell>{{ formatCurrency(invoiceItem.unit_price) }}</TableCell>
-                            <TableCell>{{ invoiceItem.quantity }}</TableCell>
-                            <TableCell class="text-right">{{ formatCurrency(invoiceItem.line_total) }}</TableCell>
-                        </TableRow>
+                            {{ INVOICE_STATUSES.find((status) => status.value === invoice?.status)?.label }}
+                        </p>
+                    </div>
+                </DataCard>
 
-                        <TableEmpty
-                            v-if="!invoice?.invoice_items?.length"
-                            :colspan="5"
-                        >
-                            <p>No invoice items yet.</p>
-                        </TableEmpty>
-                    </TableBody>
+                <DataCard title="Invoice Items">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>#</TableHead>
+                                <TableHead>Description</TableHead>
+                                <TableHead>Price</TableHead>
+                                <TableHead>Qty.</TableHead>
+                                <TableHead class="text-right">Sum</TableHead>
+                            </TableRow>
+                        </TableHeader>
 
-                    <TableFooter v-if="invoice?.invoice_items?.length">
-                        <TableRow>
-                            <TableCell
-                                colspan="4"
-                                class="text-right"
-                                >Subtotal</TableCell
+                        <TableBody>
+                            <TableRow
+                                v-for="(invoiceItem, index) in invoice?.invoice_items"
+                                :key="invoiceItem.id"
                             >
-                            <TableCell class="text-right">{{ formatCurrency(invoice!.subtotal) }}</TableCell>
-                        </TableRow>
+                                <TableCell>{{ index + 1 }}</TableCell>
+                                <TableCell class="max-w-32 truncate">{{ invoiceItem.description }}</TableCell>
+                                <TableCell>{{ formatCurrency(invoiceItem.unit_price) }}</TableCell>
+                                <TableCell>{{ invoiceItem.quantity }}</TableCell>
+                                <TableCell class="text-right">{{ formatCurrency(invoiceItem.line_total) }}</TableCell>
+                            </TableRow>
 
-                        <TableRow v-if="invoice?.with_discount">
-                            <TableCell
-                                colspan="4"
-                                class="text-right"
-                                >Discount</TableCell
+                            <TableEmpty
+                                v-if="!invoice?.invoice_items?.length"
+                                :colspan="5"
                             >
-                            <TableCell class="text-right"> -{{ formatCurrency(invoice!.discount_amount) }} </TableCell>
-                        </TableRow>
+                                <p>No invoice items yet.</p>
+                            </TableEmpty>
+                        </TableBody>
 
-                        <TableRow>
-                            <TableCell
-                                colspan="4"
-                                class="text-right"
-                                >Subtotal After Discount</TableCell
+                        <TableFooter v-if="invoice?.invoice_items?.length">
+                            <TableRow>
+                                <TableCell
+                                    colspan="4"
+                                    class="text-right"
+                                    >Subtotal</TableCell
+                                >
+                                <TableCell class="text-right">{{ formatCurrency(invoice!.subtotal) }}</TableCell>
+                            </TableRow>
+
+                            <TableRow v-if="invoice?.with_discount">
+                                <TableCell
+                                    colspan="4"
+                                    class="text-right"
+                                    >Discount</TableCell
+                                >
+                                <TableCell class="text-right">
+                                    -{{ formatCurrency(invoice!.discount_amount) }}
+                                </TableCell>
+                            </TableRow>
+
+                            <TableRow>
+                                <TableCell
+                                    colspan="4"
+                                    class="text-right"
+                                    >Subtotal After Discount</TableCell
+                                >
+                                <TableCell class="text-right">
+                                    {{ formatCurrency(invoice!.subtotal_after_discount) }}
+                                </TableCell>
+                            </TableRow>
+
+                            <TableRow>
+                                <TableCell
+                                    colspan="4"
+                                    class="text-right"
+                                    >VAT</TableCell
+                                >
+                                <TableCell class="text-right">
+                                    {{ formatCurrency(invoice!.vat_amount) }}
+                                </TableCell>
+                            </TableRow>
+
+                            <TableRow>
+                                <TableCell
+                                    colspan="4"
+                                    class="text-right font-semibold"
+                                    >Total</TableCell
+                                >
+                                <TableCell class="text-right font-semibold">
+                                    {{ formatCurrency(invoice!.total) }}
+                                </TableCell>
+                            </TableRow>
+                        </TableFooter>
+                    </Table>
+                </DataCard>
+
+                <DataCard title="Payments">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>#</TableHead>
+                                <TableHead>Date</TableHead>
+                                <TableHead class="text-right">Amount</TableHead>
+                            </TableRow>
+                        </TableHeader>
+
+                        <TableBody>
+                            <TableRow
+                                v-for="(payment, index) in invoice?.payments"
+                                :key="payment.id"
                             >
-                            <TableCell class="text-right">
-                                {{ formatCurrency(invoice!.subtotal_after_discount) }}
-                            </TableCell>
-                        </TableRow>
+                                <TableCell>{{ index + 1 }}</TableCell>
+                                <TableCell>{{ payment.created_at.formatted_date }}</TableCell>
+                                <TableCell class="text-right">{{ formatCurrency(payment.amount) }}</TableCell>
+                            </TableRow>
 
-                        <TableRow>
-                            <TableCell
-                                colspan="4"
-                                class="text-right"
-                                >VAT</TableCell
+                            <TableEmpty
+                                v-if="!invoice?.payments?.length"
+                                :colspan="3"
                             >
-                            <TableCell class="text-right">
-                                {{ formatCurrency(invoice!.vat_amount) }}
-                            </TableCell>
-                        </TableRow>
+                                <p>No payments yet.</p>
+                            </TableEmpty>
+                        </TableBody>
 
-                        <TableRow>
-                            <TableCell
-                                colspan="4"
-                                class="text-right font-semibold"
-                                >Total</TableCell
-                            >
-                            <TableCell class="text-right font-semibold">
-                                {{ formatCurrency(invoice!.total) }}
-                            </TableCell>
-                        </TableRow>
-                    </TableFooter>
-                </Table>
-            </DataCard>
-
-            <DataCard title="Payments">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>#</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead class="text-right">Amount</TableHead>
-                        </TableRow>
-                    </TableHeader>
-
-                    <TableBody>
-                        <TableRow
-                            v-for="(payment, index) in invoice?.payments"
-                            :key="payment.id"
-                        >
-                            <TableCell>{{ index + 1 }}</TableCell>
-                            <TableCell>{{ payment.created_at.formatted_date }}</TableCell>
-                            <TableCell class="text-right">{{ formatCurrency(payment.amount) }}</TableCell>
-                        </TableRow>
-
-                        <TableEmpty
-                            v-if="!invoice?.payments?.length"
-                            :colspan="3"
-                        >
-                            <p>No payments yet.</p>
-                        </TableEmpty>
-                    </TableBody>
-
-                    <TableFooter v-if="invoice?.payments?.length">
-                        <TableRow>
-                            <TableCell
-                                colspan="2"
-                                class="text-right"
-                            >
-                                Total
-                            </TableCell>
-                            <TableCell class="text-right">{{ formatCurrency(invoice!.total_paid) }}</TableCell>
-                        </TableRow>
-                    </TableFooter>
-                </Table>
-            </DataCard>
+                        <TableFooter v-if="invoice?.payments?.length">
+                            <TableRow>
+                                <TableCell
+                                    colspan="2"
+                                    class="text-right"
+                                >
+                                    Total
+                                </TableCell>
+                                <TableCell class="text-right">{{ formatCurrency(invoice!.total_paid) }}</TableCell>
+                            </TableRow>
+                        </TableFooter>
+                    </Table>
+                </DataCard>
+            </div>
 
             <DialogFooter>
                 <Button
