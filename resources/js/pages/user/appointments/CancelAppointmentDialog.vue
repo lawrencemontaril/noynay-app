@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import DataCard from '@/components/DataCard.vue';
-import DataText from '@/components/DataText.vue';
 import Button from '@/components/ui/button/Button.vue';
+import { DataCard, DataText } from '@/components/ui/data';
 import { Dialog, DialogFooter, DialogHeader, DialogScrollContent, DialogTitle } from '@/components/ui/dialog';
 import { Appointment } from '@/types';
 import { useForm as useInertiaForm } from '@inertiajs/vue3';

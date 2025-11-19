@@ -10,7 +10,7 @@ import Button from '@/components/ui/button/Button.vue';
 import { Appointment } from '@/types';
 import { useForm as useInertiaForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
-import DataCard from './DataCard.vue';
+import { DataCard, DataText } from './ui/data';
 
 interface Props {
     open: boolean;
@@ -46,7 +46,7 @@ const restoreAppointment = () => {
             </AlertDialogHeader>
 
             <DataCard title="Archive date">
-                <p class="text-sm">{{ appointment?.deleted_at?.formatted_date }}</p>
+                <DataText>{{ appointment?.deleted_at?.formatted_date }}</DataText>
             </DataCard>
 
             <AlertDialogFooter>

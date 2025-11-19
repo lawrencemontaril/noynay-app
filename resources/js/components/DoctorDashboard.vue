@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { Appointment } from '@/types';
-import ChartCard from './ChartCard.vue';
-import ChartGrid from './ChartGrid.vue';
 import DoctorPendingConsultationsTable from './DoctorPendingConsultationsTable.vue';
+import { ChartCard, ChartGrid } from './ui/charts';
 
 defineProps<{
     patientsByGenderChart: any;

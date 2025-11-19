@@ -4,10 +4,7 @@ import { Dialog, DialogFooter, DialogHeader, DialogScrollContent, DialogTitle } 
 import { useFormatters } from '@/composables/useFormatters';
 import { LaboratoryResult, Patient } from '@/types';
 import { LAB_TYPES, PATIENT_GENDERS } from '@/types/constants';
-import DataCard from './DataCard.vue';
-import DataCell from './DataCell.vue';
-import DataLabel from './DataLabel.vue';
-import DataText from './DataText.vue';
+import { DataCard, DataCell, DataLabel, DataText } from './ui/data';
 
 defineProps<{
     open: boolean;

@@ -2,8 +2,7 @@
 import { Appointment, Invoice } from '@/types';
 import CashierPendingInvoicesTable from './CashierPendingInvoicesTable.vue';
 import CashierUnpaidInvoicesTable from './CashierUnpaidInvoicesTable.vue';
-import ChartCard from './ChartCard.vue';
-import ChartGrid from './ChartGrid.vue';
+import { ChartCard, ChartGrid } from './ui/charts';
 
 defineProps<{
     approvedAppointments: Appointment[];

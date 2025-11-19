@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import ActivityTimeline from '@/components/ActivityTimeline.vue';
 import CreatePaymentDialog from '@/components/CreatePaymentDialog.vue';
-import EditInvoiceDialog from '@/components/EditInvoiceDialog.vue';
 import PatientProfileTabs from '@/components/PatientProfileTabs.vue';
 import Badge from '@/components/ui/badge/Badge.vue';
 import Button from '@/components/ui/button/Button.vue';
@@ -49,8 +48,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const isEditInvoiceDialogOpen = ref(false);
-// const isCreateInvoiceItemDialogOpen = ref(false);
 const isCreatePaymentDialogOpen = ref(false);
 
 const isDownloading = ref(false);
@@ -173,24 +170,6 @@ const downloadInvoice = async () => {
                         </TableBody>
                     </Table>
 
-                    <!-- <Button
-                        v-if="
-                            hasRole('cashier') && hasPermissionTo('invoice_items:create') && appointment.is_operatable
-                        "
-                        @click="isCreateInvoiceItemDialogOpen = true"
-                        class="mt-4 w-full"
-                    >
-                        Add invoice items
-                    </Button> -->
-
-                    <Button
-                        v-if="hasRole('doctor') && hasPermissionTo('invoices:update') && appointment.is_operatable"
-                        @click="isEditInvoiceDialogOpen = true"
-                        class="mt-4 w-full"
-                    >
-                        Add/Edit/Remove items
-                    </Button>
-
                     <Separator class="my-4" />
 
                     <!-- Payments Table -->
@@ -272,7 +251,6 @@ const downloadInvoice = async () => {
                 </CardFooter>
             </Card>
 
-            <!-- Empty state -->
             <div
                 v-if="!invoice"
                 class="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-muted/20 p-8 text-center"
@@ -283,22 +261,6 @@ const downloadInvoice = async () => {
             <ActivityTimeline
                 v-if="invoice"
                 :activities="activities"
-            />
-
-            <!-- <CreateInvoiceItemDialog
-                v-if="hasRole('cashier')"
-                v-model:open="isCreateInvoiceItemDialogOpen"
-                :patient="patient"
-                :appointment="appointment"
-                :invoice="invoice"
-            /> -->
-
-            <EditInvoiceDialog
-                v-if="hasRole('doctor')"
-                v-model:open="isEditInvoiceDialogOpen"
-                :patient="patient"
-                :appointment="appointment"
-                :invoice="invoice"
             />
 
             <CreatePaymentDialog

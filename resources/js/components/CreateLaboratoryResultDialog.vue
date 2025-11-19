@@ -18,9 +18,8 @@ import { LoaderCircle } from 'lucide-vue-next';
 import { useForm as useVeeForm } from 'vee-validate';
 import { watch } from 'vue';
 import * as z from 'zod';
-import DataCard from './DataCard.vue';
-import DataText from './DataText.vue';
 import InputError from './InputError.vue';
+import { DataCard, DataText } from './ui/data';
 import Input from './ui/input/Input.vue';
 import Textarea from './ui/textarea/Textarea.vue';
 
@@ -101,7 +100,7 @@ function closeDialog() {
         :open="open"
         @update:open="closeDialog"
     >
-        <DialogScrollContent class="w-[768px]">
+        <DialogScrollContent>
             <DialogHeader>
                 <DialogTitle>Create a laboratory result</DialogTitle>
                 <DialogDescription>Fill up patient laboratory result details.</DialogDescription>

@@ -12,8 +12,8 @@ import { LoaderCircle, Plus, Trash } from 'lucide-vue-next';
 import { useFieldArray, useForm as useVeeForm } from 'vee-validate';
 import { watch } from 'vue';
 import * as z from 'zod';
-import DataCard from './DataCard.vue';
 import InputError from './InputError.vue';
+import { DataCard, DataCell, DataLabel, DataText } from './ui/data';
 
 const props = defineProps<{
     open: boolean;
@@ -112,18 +112,18 @@ const addItem = () => {
                     title="Patient Information"
                     :columns="2"
                 >
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Name</label>
-                        <p class="text-sm font-semibold">
+                    <DataCell>
+                        <DataLabel>Name</DataLabel>
+                        <DataText>
                             {{ getFullName(patient?.last_name!, patient?.first_name!, patient?.middle_name!) }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Service</label>
-                        <p class="text-sm">
+                        </DataText>
+                    </DataCell>
+                    <DataCell>
+                        <DataLabel>Service</DataLabel>
+                        <DataText>
                             {{ ALL_SERVICES.find((service) => service.value === appointment?.type)?.label }}
-                        </p>
-                    </div>
+                        </DataText>
+                    </DataCell>
                 </DataCard>
 
                 <FormField name="items">

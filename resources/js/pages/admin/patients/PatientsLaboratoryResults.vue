@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import CreateLaboratoryResultDialog from '@/components/CreateLaboratoryResultDialog.vue';
-import DataCard from '@/components/DataCard.vue';
-import DataText from '@/components/DataText.vue';
 import DeleteLaboratoryResultDialog from '@/components/DeleteLaboratoryResultDialog.vue';
 import PatientProfileTabs from '@/components/PatientProfileTabs.vue';
 import RequestLaboratoryResultDialog from '@/components/RequestLaboratoryResultDialog.vue';
 import Button from '@/components/ui/button/Button.vue';
+import { DataCard, DataText } from '@/components/ui/data';
 import { useFormatters } from '@/composables/useFormatters';
 import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';

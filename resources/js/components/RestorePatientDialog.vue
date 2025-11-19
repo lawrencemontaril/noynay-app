@@ -11,7 +11,7 @@ import { useFormatters } from '@/composables/useFormatters';
 import { Patient } from '@/types';
 import { useForm as useInertiaForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
-import DataCard from './DataCard.vue';
+import { DataCard, DataCell, DataLabel } from './ui/data';
 
 const props = defineProps<{
     open: boolean;
@@ -50,28 +50,28 @@ const restorePatient = () => {
                 title="Patient Information"
                 :columns="3"
             >
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Name</label>
-                    <p class="text-sm font-semibold">
+                <DataCell>
+                    <DataLabel>Name</DataLabel>
+                    <DataText>
                         {{ getFullName(patient?.last_name!, patient?.first_name!, patient?.middle_name!) }}
-                    </p>
-                </div>
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Gender</label>
-                    <p class="text-sm capitalize">
+                    </DataText>
+                </DataCell>
+                <DataCell>
+                    <DataLabel>Gender</DataLabel>
+                    <DataText>
                         {{ patient?.gender }}
-                    </p>
-                </div>
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Age</label>
-                    <p class="text-sm">
+                    </DataText>
+                </DataCell>
+                <DataCell>
+                    <DataLabel>Age</DataLabel>
+                    <DataText>
                         {{ patient?.age?.formatted_long }}
-                    </p>
-                </div>
+                    </DataText>
+                </DataCell>
             </DataCard>
 
             <DataCard title="Archive date">
-                <p class="text-sm">{{ patient?.deleted_at?.formatted_date }}</p>
+                <DataText>{{ patient?.deleted_at?.formatted_date }}</DataText>
             </DataCard>
 
             <AlertDialogFooter>

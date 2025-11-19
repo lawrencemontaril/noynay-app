@@ -8,7 +8,7 @@ import {
     DialogScrollContent,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import Input from '@/components/ui/input/Input.vue';
 import { useFormatters } from '@/composables/useFormatters';
 import { Appointment, Patient, Procedure } from '@/types';
@@ -19,8 +19,8 @@ import { LoaderCircle, Plus, Trash } from 'lucide-vue-next';
 import { useFieldArray, useForm as useVeeForm } from 'vee-validate';
 import { watch } from 'vue';
 import * as z from 'zod';
-import DataCard from './DataCard.vue';
 import InputError from './InputError.vue';
+import { DataCard, DataCell, DataLabel, DataText } from './ui/data';
 import Switch from './ui/switch/Switch.vue';
 
 const props = defineProps<{
@@ -132,18 +132,18 @@ const addItem = () => {
                     title="Patient Information"
                     :columns="2"
                 >
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Name</label>
-                        <p class="text-sm font-semibold">
+                    <DataCell>
+                        <DataLabel>Name</DataLabel>
+                        <DataText>
                             {{ getFullName(patient.last_name, patient.first_name, patient.middle_name) }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Service</label>
-                        <p class="text-sm">
+                        </DataText>
+                    </DataCell>
+                    <DataCell>
+                        <DataLabel>Service</DataLabel>
+                        <DataText>
                             {{ ALL_SERVICES.find((service) => service.value === appointment?.type)?.label }}
-                        </p>
-                    </div>
+                        </DataText>
+                    </DataCell>
                 </DataCard>
 
                 <FormField
@@ -160,7 +160,7 @@ const addItem = () => {
                             >
                                 Special Discount
                             </FormLabel>
-                            <FormDescription class="text-sm">For PWDs, Senior Citizens, etc.</FormDescription>
+                            <FormDescription>For PWDs, Senior Citizens, etc.</FormDescription>
                         </div>
 
                         <FormControl>

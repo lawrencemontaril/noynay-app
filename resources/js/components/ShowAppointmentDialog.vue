@@ -10,7 +10,7 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { LoaderCircle } from 'lucide-vue-next';
 import { useForm as useVeeForm } from 'vee-validate';
 import * as z from 'zod';
-import DataCard from './DataCard.vue';
+import { DataCard, DataCell, DataLabel, DataText } from './ui/data';
 
 const props = defineProps<{
     open: boolean;
@@ -80,21 +80,19 @@ const noShowAppointment = handleSubmit(() => {
             </DialogHeader>
 
             <div class="space-y-2">
-                <!-- Patient Info -->
                 <DataCard
                     title="Patient Information"
                     :columns="2"
                 >
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Name</label>
-                        <p class="text-sm font-semibold">
+                    <DataCell>
+                        <DataLabel>Name</DataLabel>
+                        <DataText>
                             {{ getFullName(patient?.last_name!, patient?.first_name!, patient?.middle_name!) }}
-                        </p>
-                    </div>
-                    <div v-if="!hasAnyRole(['doctor', 'laboratory_staff'])">
-                        <label class="text-xs font-medium text-muted-foreground">Status</label>
-                        <p
-                            class="text-sm font-semibold capitalize"
+                        </DataText>
+                    </DataCell>
+                    <DataCell v-if="!hasAnyRole(['doctor', 'laboratory_staff'])">
+                        <DataLabel>Status</DataLabel>
+                        <DataText
                             :class="{
                                 'text-primary':
                                     appointment?.status === 'approved' || appointment?.status === 'completed',
@@ -104,26 +102,26 @@ const noShowAppointment = handleSubmit(() => {
                             }"
                         >
                             {{ appointment?.status }}
-                        </p>
-                    </div>
+                        </DataText>
+                    </DataCell>
                 </DataCard>
 
                 <DataCard title="Service Type">
-                    <p class="text-sm">
+                    <DataText>
                         {{ ALL_SERVICES.find((service) => service.value === appointment?.type)?.label }}
-                    </p>
+                    </DataText>
                 </DataCard>
 
                 <DataCard title="Scheduled Date">
-                    <p class="text-sm">
+                    <DataText>
                         {{ appointment?.scheduled_at.formatted_date }}
-                    </p>
+                    </DataText>
                 </DataCard>
 
                 <DataCard title="Complaints / Notes">
-                    <p class="text-sm">
+                    <DataText>
                         {{ appointment?.complaints ?? 'N/A' }}
-                    </p>
+                    </DataText>
                 </DataCard>
             </div>
 

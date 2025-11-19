@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import ActivityTimeline from '@/components/ActivityTimeline.vue';
 import Container from '@/components/Container.vue';
-import DataCard from '@/components/DataCard.vue';
 import EditPatientDialog from '@/components/EditPatientDialog.vue';
 import PatientProfileTabs from '@/components/PatientProfileTabs.vue';
 import Button from '@/components/ui/button/Button.vue';
+import { DataCard, DataCell, DataLabel, DataText } from '@/components/ui/data';
 import { useFormatters } from '@/composables/useFormatters';
 import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Activity, BreadcrumbItem, Patient } from '@/types';
+import { PATIENT_CIVIL_STATUSES, PATIENT_GENDERS } from '@/types/constants';
 import { Pencil } from 'lucide-vue-next';
 import { ref } from 'vue';
 
@@ -58,30 +59,29 @@ function openEditPatientDialog() {
                     </Button>
                 </div>
 
-                <!-- Personal Information -->
                 <DataCard
                     title="Personal Details"
                     :columns="4"
                 >
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">First Name</label>
-                        <p class="text-sm font-medium">{{ patient.first_name }}</p>
-                    </div>
+                    <DataCell>
+                        <DataLabel>First Name</DataLabel>
+                        <DataText>{{ patient.first_name }}</DataText>
+                    </DataCell>
 
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Last Name</label>
-                        <p class="text-sm font-medium">{{ patient.last_name }}</p>
-                    </div>
+                    <DataCell>
+                        <DataLabel>Last Name</DataLabel>
+                        <DataText>{{ patient.last_name }}</DataText>
+                    </DataCell>
 
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Middle Name</label>
-                        <p class="text-sm font-medium">{{ patient.middle_name ?? 'N/A' }}</p>
-                    </div>
+                    <DataCell>
+                        <DataLabel>Middle Name</DataLabel>
+                        <DataText>{{ patient.middle_name ?? 'N/A' }}</DataText>
+                    </DataCell>
 
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Contact Number</label>
-                        <p class="text-sm font-medium">{{ patient.contact_number }}</p>
-                    </div>
+                    <DataCell>
+                        <DataLabel>Contact Number</DataLabel>
+                        <DataText>{{ patient.contact_number }}</DataText>
+                    </DataCell>
                 </DataCard>
 
                 <!-- Demographics -->
@@ -89,25 +89,30 @@ function openEditPatientDialog() {
                     title="Demographics"
                     :columns="4"
                 >
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Gender</label>
-                        <p class="text-sm font-medium capitalize">{{ patient.gender }}</p>
-                    </div>
+                    <DataCell>
+                        <DataLabel>Gender</DataLabel>
+                        <DataText>{{
+                            PATIENT_GENDERS.find((gender) => gender.value === patient.gender)?.label
+                        }}</DataText>
+                    </DataCell>
 
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Civil Status</label>
-                        <p class="text-sm font-medium capitalize">{{ patient.civil_status }}</p>
-                    </div>
+                    <DataCell>
+                        <DataLabel>Civil Status</DataLabel>
+                        <DataText>{{
+                            PATIENT_CIVIL_STATUSES.find((civil_status) => civil_status.value === patient.civil_status)
+                                ?.label
+                        }}</DataText>
+                    </DataCell>
 
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Birthdate</label>
-                        <p class="text-sm font-medium">{{ patient.birthdate.formatted_date }}</p>
-                    </div>
+                    <DataCell>
+                        <DataLabel>Birthdate</DataLabel>
+                        <DataText>{{ patient.birthdate.formatted_date }}</DataText>
+                    </DataCell>
 
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Age</label>
-                        <p class="text-sm font-medium">{{ patient.age.formatted_long }}</p>
-                    </div>
+                    <DataCell>
+                        <DataLabel>Age</DataLabel>
+                        <DataText>{{ patient.age.formatted_long }}</DataText>
+                    </DataCell>
                 </DataCard>
 
                 <!-- Contact Info -->
@@ -115,14 +120,14 @@ function openEditPatientDialog() {
                     title="Contact Information"
                     :columns="2"
                 >
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Email Address</label>
-                        <p class="text-sm font-medium">{{ patient.user?.email }}</p>
-                    </div>
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Address</label>
-                        <p class="text-sm font-medium whitespace-pre-wrap">{{ patient.address }}</p>
-                    </div>
+                    <DataCell>
+                        <DataLabel>Email Address</DataLabel>
+                        <DataText>{{ patient.user?.email }}</DataText>
+                    </DataCell>
+                    <DataCell>
+                        <DataLabel>Address</DataLabel>
+                        <DataText>{{ patient.address }}</DataText>
+                    </DataCell>
                 </DataCard>
             </div>
 

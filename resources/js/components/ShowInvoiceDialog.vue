@@ -17,7 +17,7 @@ import { Invoice, Patient } from '@/types';
 import { INVOICE_STATUSES } from '@/types/constants';
 import { FileText, LoaderCircle } from 'lucide-vue-next';
 import { ref } from 'vue';
-import DataCard from './DataCard.vue';
+import { DataCard, DataCell, DataLabel, DataText } from './ui/data';
 
 const props = defineProps<{
     open: boolean;
@@ -79,21 +79,19 @@ const downloadInvoice = async () => {
             </DialogHeader>
 
             <div class="space-y-4">
-                <!-- Patient Info -->
                 <DataCard
                     title="Patient Information"
                     :columns="2"
                 >
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Name</label>
-                        <p class="text-sm font-semibold">
+                    <DataCell>
+                        <DataLabel>Name</DataLabel>
+                        <DataText>
                             {{ getFullName(patient?.last_name!, patient?.first_name!, patient?.middle_name!) }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Payment Status</label>
-                        <p
-                            class="text-sm font-semibold capitalize"
+                        </DataText>
+                    </DataCell>
+                    <DataCell>
+                        <DataLabel>Payment Status</DataLabel>
+                        <DataText
                             :class="{
                                 'text-primary': invoice?.status === 'paid',
                                 'text-destructive': invoice?.status === 'cancelled',
@@ -101,8 +99,8 @@ const downloadInvoice = async () => {
                             }"
                         >
                             {{ INVOICE_STATUSES.find((status) => status.value === invoice?.status)?.label }}
-                        </p>
-                    </div>
+                        </DataText>
+                    </DataCell>
                 </DataCard>
 
                 <DataCard title="Invoice Items">

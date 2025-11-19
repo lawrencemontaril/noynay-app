@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { Appointment } from '@/types';
 import AdminPendingAppointmentsTable from './AdminPendingAppointmentsTable.vue';
-import ChartCard from './ChartCard.vue';
-import ChartGrid from './ChartGrid.vue';
 
 defineProps<{
     pendingAppointments: Appointment[];

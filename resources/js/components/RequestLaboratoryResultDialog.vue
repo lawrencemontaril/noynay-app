@@ -18,8 +18,8 @@ import { LoaderCircle } from 'lucide-vue-next';
 import { useForm as useVeeForm } from 'vee-validate';
 import { watch } from 'vue';
 import * as z from 'zod';
-import DataCard from './DataCard.vue';
 import InputError from './InputError.vue';
+import DataCard from './ui/data/DataCard.vue';
 import Textarea from './ui/textarea/Textarea.vue';
 
 const props = defineProps<{

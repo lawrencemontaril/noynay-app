@@ -5,7 +5,7 @@ import { useFormatters } from '@/composables/useFormatters';
 import { Consultation, Patient } from '@/types';
 import { CONSULTATION_TYPES } from '@/types/constants';
 import { computed } from 'vue';
-import DataCard from './DataCard.vue';
+import { DataCard, DataCell, DataLabel, DataText } from './ui/data';
 
 const props = defineProps<{
     open: boolean;
@@ -51,83 +51,83 @@ const bmiCategory = computed(() => {
                 title="Patient Information"
                 :columns="3"
             >
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Name</label>
-                    <p class="text-sm font-semibold">
+                <DataCell>
+                    <DataLabel>Name</DataLabel>
+                    <DataText>
                         {{ getFullName(patient?.last_name!, patient?.first_name!, patient?.middle_name!) }}
-                    </p>
-                </div>
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Gender</label>
-                    <p class="text-sm capitalize">
+                    </DataText>
+                </DataCell>
+                <DataCell>
+                    <DataLabel>Gender</DataLabel>
+                    <DataText>
                         {{ patient?.gender }}
-                    </p>
-                </div>
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Age</label>
-                    <p class="text-sm">
+                    </DataText>
+                </DataCell>
+                <DataCell>
+                    <DataLabel>Age</DataLabel>
+                    <DataText>
                         {{ patient?.age?.formatted_long }}
-                    </p>
-                </div>
+                    </DataText>
+                </DataCell>
             </DataCard>
 
             <DataCard
                 title="Type"
                 :columns="1"
             >
-                <p class="text-sm">
+                <DataText>
                     {{ CONSULTATION_TYPES.find((type) => type.value === consultation?.type)?.label }}
-                </p>
+                </DataText>
             </DataCard>
 
             <DataCard
                 title="Chief Complaints"
                 :columns="1"
             >
-                <p class="text-sm">{{ consultation?.chief_complaints }}</p>
+                <DataText>{{ consultation?.chief_complaints }}</DataText>
             </DataCard>
 
             <DataCard
                 title="Assessment"
                 :columns="1"
             >
-                <p class="text-sm">{{ consultation?.assessment }}</p>
+                <DataText>{{ consultation?.assessment }}</DataText>
             </DataCard>
 
             <DataCard
                 title="Plan"
                 :columns="1"
             >
-                <p class="text-sm">{{ consultation?.plan }}</p>
+                <DataText>{{ consultation?.plan }}</DataText>
             </DataCard>
 
             <DataCard
                 title="Vital Signs"
                 :columns="3"
             >
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Blood Pressure</label>
-                    <p class="text-sm font-semibold">
+                <DataCell>
+                    <DataLabel>Blood Pressure</DataLabel>
+                    <DataText>
                         <template v-if="consultation?.systolic != null && consultation?.diastolic != null">
                             {{ consultation.systolic }}/{{ consultation.diastolic }}
                         </template>
                         <template v-else>N/A</template>
-                    </p>
-                </div>
+                    </DataText>
+                </DataCell>
 
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Heart Rate</label>
-                    <p class="text-sm font-semibold">
+                <DataCell>
+                    <DataLabel>Heart Rate</DataLabel>
+                    <DataText>
                         {{ consultation?.heart_rate != null ? consultation.heart_rate + ' bpm' : 'N/A' }}
-                    </p>
-                </div>
+                    </DataText>
+                </DataCell>
 
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Respiratory Rate</label>
-                    <p class="text-sm font-semibold">
+                <DataCell>
+                    <DataLabel>Respiratory Rate</DataLabel>
+                    <DataText>
                         {{ consultation?.respiratory_rate != null ? consultation.respiratory_rate + ' bpm' : 'N/A' }}
-                    </p>
-                </div>
+                    </DataText>
+                </DataCell>
             </DataCard>
 
             <!-- BODY MEASUREMENTS -->
@@ -135,26 +135,26 @@ const bmiCategory = computed(() => {
                 title="Body Measurements"
                 :columns="3"
             >
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Weight (kg)</label>
-                    <p class="text-sm font-semibold">
+                <DataCell>
+                    <DataLabel>Weight (kg)</DataLabel>
+                    <DataText>
                         {{ consultation?.weight_kg != null ? consultation.weight_kg + ' kg' : 'N/A' }}
-                    </p>
-                </div>
+                    </DataText>
+                </DataCell>
 
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Height (cm)</label>
-                    <p class="text-sm font-semibold">
+                <DataCell>
+                    <DataLabel>Height (cm)</DataLabel>
+                    <DataText>
                         {{ consultation?.height_cm != null ? consultation.height_cm + ' cm' : 'N/A' }}
-                    </p>
-                </div>
+                    </DataText>
+                </DataCell>
 
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">BMI</label>
-                    <p class="text-sm font-semibold capitalize">
+                <DataCell>
+                    <DataLabel>BMI</DataLabel>
+                    <DataText>
                         {{ bmi ? bmi + ' ; ' + bmiCategory : 'N/A' }}
-                    </p>
-                </div>
+                    </DataText>
+                </DataCell>
             </DataCard>
 
             <!-- OTHER READINGS -->
@@ -162,19 +162,19 @@ const bmiCategory = computed(() => {
                 title="Additional Readings"
                 :columns="2"
             >
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Temperature</label>
-                    <p class="text-sm font-semibold">
+                <DataCell>
+                    <DataLabel>Temperature</DataLabel>
+                    <DataText>
                         {{ consultation?.temperature_c != null ? consultation.temperature_c + '°C' : 'N/A' }}
-                    </p>
-                </div>
+                    </DataText>
+                </DataCell>
 
-                <div>
-                    <label class="text-xs font-medium text-muted-foreground">Oxygen Saturation</label>
-                    <p class="text-sm font-semibold">
+                <DataCell>
+                    <DataLabel>Oxygen Saturation</DataLabel>
+                    <DataText>
                         {{ consultation?.oxygen_saturation != null ? consultation.oxygen_saturation + '%' : 'N/A' }}
-                    </p>
-                </div>
+                    </DataText>
+                </DataCell>
             </DataCard>
 
             <DialogFooter>

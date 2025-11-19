@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import Button from '@/components/ui/button/Button.vue';
 import Calendar from '@/components/ui/calendar/Calendar.vue';
-import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogScrollContent, DialogTitle } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogScrollContent,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import FormLabel from '@/components/ui/form/FormLabel.vue';
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -10,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useFormatters } from '@/composables/useFormatters';
 import { cn } from '@/lib/utils';
 import { Appointment, Patient } from '@/types';
+import { ALL_SERVICES } from '@/types/constants';
 import { useForm as useInertiaForm } from '@inertiajs/vue3';
 import { DateFormatter, getLocalTimeZone, parseDate, today } from '@internationalized/date';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -18,6 +26,7 @@ import { toDate } from 'reka-ui/date';
 import { useForm as useVeeForm } from 'vee-validate';
 import { computed, watch } from 'vue';
 import * as z from 'zod';
+import { DataCard, DataText } from './ui/data';
 
 const props = defineProps<{
     open: boolean;
@@ -26,63 +35,11 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(['update:open']);
 
-const { toJsDate } = useFormatters();
+const { toJsDate, getFullName } = useFormatters();
 
 const closeDialog = () => {
     emit('update:open', false);
 };
-
-const services = [
-    {
-        label: 'Consultation',
-        value: 'consultation',
-    },
-    { label: 'Family Planning Counseling', value: 'family_planning_counseling' },
-    { label: 'Natural Methods (Rhythm), Pills, Depotrust', value: 'natural_methods' },
-    { label: 'Chelation Therapy', value: 'chelation_therapy' },
-    { label: 'Magnetic Resonance Analysis', value: 'magnetic_resonance_analysis' },
-    {
-        label: 'Multifunctional High Potential Therapeutic Services',
-        value: 'multifunctional_high_potential_therapeutic_services',
-    },
-    { label: 'Weight Loss Management', value: 'weight_loss_management' },
-    {
-        label: 'Psychosocial and Spiritual Counseling',
-        value: 'psychosocial_and_spiritual_counseling',
-    },
-    { label: 'Pregnancy Test', value: 'pregnancy_test' },
-    { label: 'Papsmear', value: 'papsmear' },
-    { label: 'Complete Blood Count', value: 'cbc' },
-    { label: 'Urinalysis', value: 'urinalysis' },
-    { label: 'Fecalysis', value: 'fecalysis' },
-    { label: 'Pre-Natal and Post-Natal Check Up', value: 'pre_natal_and_post_natal' },
-    { label: 'Normal Spontaneous Delivery', value: 'normal_spontaneous_delivery' },
-    { label: 'Immunization - BCG, HEP. B Vaccines, etc.', value: 'immunization' },
-    { label: 'Ear Piercing With Hypoallergenic Earrings', value: 'ear_pearcing' },
-    { label: 'Nebulization With and Without Medication', value: 'nebulization' },
-    { label: 'Foley Cathether Insertion', value: 'foley_catheter_insertion' },
-    { label: 'Surgical Wound Dressing', value: 'surgical_wound_dressing' },
-    { label: 'Cord Dressing', value: 'cord_dressing' },
-    { label: 'Suture Removal', value: 'suture_removal' },
-    {
-        label: 'Issuance of Birth Certificate; Newborn Screening',
-        value: 'issuance_of_bc_newborn_screening',
-    },
-    { label: 'General OPD Consultation', value: 'general_opd_consultation' },
-    {
-        label: 'Medical / OPD / Pre-Employment Consultations',
-        value: 'medical_opd_consultation',
-    },
-    { label: 'Minor Surgical Procedures', value: 'minor_surgical_procedures' },
-    {
-        label: 'Issuance of Medical Certificate',
-        value: 'issuance_of_medical_certificate',
-    },
-    {
-        label: 'Pedia / Adult Immunization / Vaccination Services',
-        value: 'pedia_adult_vaccination_services',
-    },
-];
 
 const inertiaForm = useInertiaForm({
     complaints: null as string | null | undefined,
@@ -157,13 +114,11 @@ const scheduled_date = computed({
 
             <form @submit.prevent="updateAppointment">
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div class="mb-4 grid grid-cols-1 gap-2">
-                        <label class="border-b pb-1 text-xs font-semibold uppercase">Patient Name</label>
-                        <p class="text-sm">
-                            {{ patient?.last_name }}, {{ patient?.first_name }}
-                            {{ patient?.middle_name ? `${patient?.middle_name[0]}.` : '' }}
-                        </p>
-                    </div>
+                    <DataCard title="Patient Name">
+                        <DataText>
+                            {{ getFullName(patient?.last_name!, patient?.first_name!, patient?.middle_name!) }}
+                        </DataText>
+                    </DataCard>
 
                     <FormField
                         v-slot="{ componentField }"
@@ -212,7 +167,7 @@ const scheduled_date = computed({
                             <SelectContent>
                                 <SelectGroup>
                                     <SelectItem
-                                        v-for="service in services"
+                                        v-for="service in ALL_SERVICES"
                                         :value="service.value"
                                         :key="service.value"
                                         @select="
@@ -242,10 +197,17 @@ const scheduled_date = computed({
                                         <FormControl>
                                             <Button
                                                 variant="outline"
-                                                :class="cn('w-full border-input text-start font-normal', !scheduled_date && 'text-muted-foreground')"
+                                                :class="
+                                                    cn(
+                                                        'w-full border-input text-start font-normal',
+                                                        !scheduled_date && 'text-muted-foreground',
+                                                    )
+                                                "
                                             >
                                                 <span>{{
-                                                    scheduled_date ? formatDate.format(toDate(scheduled_date)) : 'Select appointment date'
+                                                    scheduled_date
+                                                        ? formatDate.format(toDate(scheduled_date))
+                                                        : 'Select appointment date'
                                                 }}</span>
                                                 <CalendarIcon class="ms-auto h-4 w-4 opacity-50" />
                                             </Button>

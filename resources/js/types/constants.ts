@@ -119,3 +119,26 @@ export const PATIENT_GENDERS = [
         value: 'female',
     },
 ];
+
+export const PATIENT_CIVIL_STATUSES = [
+    {
+        label: 'Single',
+        value: 'single',
+    },
+    {
+        label: 'Married',
+        value: 'married',
+    },
+    {
+        label: 'Widowed',
+        value: 'widowed',
+    },
+    {
+        label: 'Divorced',
+        value: 'divorced',
+    },
+    {
+        label: 'Separated',
+        value: 'separated',
+    },
+];

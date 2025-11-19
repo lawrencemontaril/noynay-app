@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import ActivityTimeline from '@/components/ActivityTimeline.vue';
-import DataCard from '@/components/DataCard.vue';
-import DataCell from '@/components/DataCell.vue';
-import DataLabel from '@/components/DataLabel.vue';
-import DataText from '@/components/DataText.vue';
 import DeleteLaboratoryResultDialog from '@/components/DeleteLaboratoryResultDialog.vue';
 import EditLaboratoryResultDialog from '@/components/EditLaboratoryResultDialog.vue';
 import PatientProfileTabs from '@/components/PatientProfileTabs.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DataCard, DataCell, DataLabel, DataText } from '@/components/ui/data';
 import { useFormatters } from '@/composables/useFormatters';
 import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -121,7 +118,6 @@ const isDeleteDialogOpen = ref(false);
 
                 <!-- Body -->
                 <CardContent class="text-sm">
-                    <!-- Patient Info -->
                     <DataCard
                         title="Patient Information"
                         :columns="3"

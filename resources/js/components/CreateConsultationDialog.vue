@@ -21,8 +21,8 @@ import { LoaderCircle } from 'lucide-vue-next';
 import { useForm as useVeeForm } from 'vee-validate';
 import { computed, watch } from 'vue';
 import * as z from 'zod';
-import DataCard from './DataCard.vue';
 import InputError from './InputError.vue';
+import { DataCard, DataCell, DataLabel, DataText } from './ui/data';
 
 const props = withDefaults(
     defineProps<{
@@ -166,24 +166,24 @@ const bmiCategory = computed(() => {
                     title="Patient Information"
                     :columns="3"
                 >
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Name</label>
-                        <p class="text-sm font-semibold">
+                    <DataCell>
+                        <DataLabel>Name</DataLabel>
+                        <DataText>
                             {{ getFullName(patient?.last_name!, patient?.first_name!, patient?.middle_name!) }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Gender</label>
-                        <p class="text-sm capitalize">
+                        </DataText>
+                    </DataCell>
+                    <DataCell>
+                        <DataLabel>Gender</DataLabel>
+                        <DataText>
                             {{ patient?.gender }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Age</label>
-                        <p class="text-sm">
+                        </DataText>
+                    </DataCell>
+                    <DataCell>
+                        <DataLabel>Age</DataLabel>
+                        <DataText>
                             {{ patient?.age?.formatted_long }}
-                        </p>
-                    </div>
+                        </DataText>
+                    </DataCell>
                 </DataCard>
 
                 <FormField

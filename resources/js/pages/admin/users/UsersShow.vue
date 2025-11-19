@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import ActivityTimeline from '@/components/ActivityTimeline.vue';
 import Container from '@/components/Container.vue';
-import DataCard from '@/components/DataCard.vue';
 import EditUserDialog from '@/components/EditUserDialog.vue';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Button from '@/components/ui/button/Button.vue';
+import { DataCard, DataCell, DataLabel, DataText } from '@/components/ui/data';
 import { useFormatters } from '@/composables/useFormatters';
 import { getInitials } from '@/composables/useInitials';
 import { usePermissions } from '@/composables/usePermissions';
@@ -76,34 +76,33 @@ function openEditUserDialog() {
                     </Button>
                 </div>
 
-                <!-- Personal Information -->
                 <DataCard
                     title="Personal Details"
                     :columns="4"
                 >
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">First Name</label>
-                        <p class="text-sm font-medium">{{ user.first_name }}</p>
-                    </div>
+                    <DataCell>
+                        <DataLabel>First Name</DataLabel>
+                        <DataText>{{ user.first_name }}</DataText>
+                    </DataCell>
 
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Last Name</label>
-                        <p class="text-sm font-medium">{{ user.last_name }}</p>
-                    </div>
+                    <DataCell>
+                        <DataLabel>Last Name</DataLabel>
+                        <DataText>{{ user.last_name }}</DataText>
+                    </DataCell>
 
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Middle Name</label>
-                        <p class="text-sm font-medium">{{ user.middle_name ?? 'N/A' }}</p>
-                    </div>
+                    <DataCell>
+                        <DataLabel>Middle Name</DataLabel>
+                        <DataText>{{ user.middle_name ?? 'N/A' }}</DataText>
+                    </DataCell>
 
-                    <div>
-                        <label class="text-xs font-medium text-muted-foreground">Email Address</label>
-                        <p class="text-sm font-medium">{{ user.email }}</p>
-                    </div>
+                    <DataCell>
+                        <DataLabel>Email Address</DataLabel>
+                        <DataText>{{ user.email }}</DataText>
+                    </DataCell>
                 </DataCard>
 
                 <DataCard title="Account Status">
-                    <p class="text-sm">{{ user.is_active ? 'Active' : 'Inactive' }}</p>
+                    <DataText>{{ user.is_active ? 'Active' : 'Inactive' }}</DataText>
                 </DataCard>
             </div>
 

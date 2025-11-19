@@ -4,6 +4,7 @@ import DeleteConsultationDialog from '@/components/DeleteConsultationDialog.vue'
 import EditConsultationDialog from '@/components/EditConsultationDialog.vue';
 import PatientProfileTabs from '@/components/PatientProfileTabs.vue';
 import Button from '@/components/ui/button/Button.vue';
+import { DataCard, DataText } from '@/components/ui/data';
 import { useFormatters } from '@/composables/useFormatters';
 import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -135,20 +136,13 @@ const openDeleteDialog = (consultation: Consultation) => {
                         </div>
                     </div>
 
-                    <!-- Body -->
-                    <div class="px-4 py-3 text-sm text-muted-foreground">
-                        <p v-if="appointment.complaints">
-                            <span class="font-medium text-foreground">Complaints:</span>
-                            {{ consultation.chief_complaints }}
-                        </p>
+                    <DataCard title="Complaints">
+                        <DataText>{{ consultation.chief_complaints }}</DataText>
+                    </DataCard>
 
-                        <p class="mt-1 text-xs text-muted-foreground">
-                            Consultation date:
-                            <span class="font-medium text-foreground">{{
-                                consultation.created_at.formatted_date
-                            }}</span>
-                        </p>
-                    </div>
+                    <DataCard title="Consultation date">
+                        <DataText>{{ consultation.created_at.formatted_date }}</DataText>
+                    </DataCard>
                 </div>
 
                 <!-- Empty state -->
