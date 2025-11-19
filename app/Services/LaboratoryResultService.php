@@ -18,9 +18,7 @@ class LaboratoryResultService
         }
 
         return LaboratoryResult::create([
-            'appointment_id' => $data['appointment_id'],
             'description' => $data['description'],
-            'type' => $data['type'],
             'results_file_path' => $data['results_file_path'] ?? null,
         ]);
     }
