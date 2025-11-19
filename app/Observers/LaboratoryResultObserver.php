@@ -7,6 +7,7 @@ use App\Models\{LaboratoryResult, User};
 use App\Notifications\{LaboratoryResultCreated, PendingInvoice};
 use App\Services\AppointmentService;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 
 class LaboratoryResultObserver
 {
@@ -42,5 +43,15 @@ class LaboratoryResultObserver
             'description' => $laboratoryResult->type->fullDescription().' Fee',
             'quantity' => 1
         ]);
+    }
+
+    /**
+     * Handle the LaboratoryResult "deleted" event.
+     */
+    public function deleted(LaboratoryResult $laboratoryResult)
+    {
+        if ($laboratoryResult->results_file_path) {
+            Storage::disk('public')->delete($laboratoryResult->results_file_path);
+        }
     }
 }

@@ -25,11 +25,6 @@ class UpdateLaboratoryResultRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'appointment_id' => [
-                'required',
-                'integer',
-                Rule::exists('appointments', 'id'),
-            ],
             'description' => [
                 'required',
                 'string'
@@ -39,11 +34,6 @@ class UpdateLaboratoryResultRequest extends FormRequest
                 'file',
                 'mimes:pdf',
                 'max:12228'
-            ],
-            'type' => [
-                'required',
-                'string',
-                Rule::enum(LaboratoryResultType::class),
             ],
         ];
     }

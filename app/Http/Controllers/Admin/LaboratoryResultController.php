@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLaboratoryResultRequest;
 use App\Http\Requests\UpdateLaboratoryResultRequest;
 use App\Models\LaboratoryResult;
+use App\Services\LaboratoryResultService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class LaboratoryResultController extends Controller
@@ -42,21 +44,9 @@ class LaboratoryResultController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreLaboratoryResultRequest $request)
+    public function store(StoreLaboratoryResultRequest $request, LaboratoryResultService $laboratoryResultService)
     {
-        $data = $request->validated();
-
-        if ($request->hasFile('results_file')) {
-            $path = $request->file('results_file')->store('laboratory_results', 'public');
-            $data['results_file_path'] = $path;
-        }
-
-        LaboratoryResult::create([
-            'appointment_id' => $data['appointment_id'],
-            'description' => $data['description'],
-            'type' => $data['type'],
-            'results_file_path' => $data['results_file_path'] ?? null,
-        ]);
+        $laboratoryResultService->create($request->validated());
 
         return redirect()
             ->back()
@@ -66,26 +56,12 @@ class LaboratoryResultController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateLaboratoryResultRequest $request, LaboratoryResult $laboratoryResult)
-    {
-        $data = $request->validated();
-
-        if ($request->hasFile('results_file')) {
-            // Delete the old file if it exists
-            if ($laboratoryResult->results_file_path && \Storage::disk('public')->exists($laboratoryResult->results_file_path)) {
-                \Storage::disk('public')->delete($laboratoryResult->results_file_path);
-            }
-
-            $path = $request->file('results_file')->store('laboratory_results', 'public');
-            $data['results_file_path'] = $path;
-        }
-
-        $laboratoryResult->update([
-            'appointment_id' => $data['appointment_id'],
-            'description' => $data['description'],
-            'type' => $data['type'],
-            'results_file_path' => $data['results_file_path'] ?? null,
-        ]);
+    public function update(
+        UpdateLaboratoryResultRequest $request,
+        LaboratoryResult $laboratoryResult,
+        LaboratoryResultService $laboratoryResultService
+    ) {
+        $laboratoryResultService->update($laboratoryResult, $request->validated());
 
         return redirect()
             ->back()
@@ -98,10 +74,6 @@ class LaboratoryResultController extends Controller
     public function destroy(LaboratoryResult $laboratoryResult)
     {
         Gate::authorize('delete', $laboratoryResult);
-
-        if ($laboratoryResult->results_file_path && \Storage::disk('public')->exists($laboratoryResult->results_file_path)) {
-            \Storage::disk('public')->delete($laboratoryResult->results_file_path);
-        }
 
         $laboratoryResult->delete();
 
