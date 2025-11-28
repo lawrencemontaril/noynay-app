@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import Container from '@/components/Container.vue';
-import DataCard from '@/components/DataCard.vue';
-import DataCell from '@/components/DataCell.vue';
-import DataLabel from '@/components/DataLabel.vue';
-import DataText from '@/components/DataText.vue';
 import InputError from '@/components/InputError.vue';
 import Button from '@/components/ui/button/Button.vue';
 import Calendar from '@/components/ui/calendar/Calendar.vue';
 import { Card, CardContent } from '@/components/ui/card';
+import { DataCard, DataCell, DataLabel, DataText } from '@/components/ui/data';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {

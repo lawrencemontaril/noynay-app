@@ -116,7 +116,7 @@ class DashboardController extends Controller
         return [
             'approvedAppointments' => Appointment::with('patient')
                 ->whereDoesntHave('consultations')
-                ->where('status', 'approved')
+                ->operatable()
                 ->whereNotIn('type', ['pregnancy_test', 'papsmear', 'cbc', 'urinalysis', 'fecalysis'])
                 ->oldest()
                 ->limit(10)
@@ -143,7 +143,7 @@ class DashboardController extends Controller
     {
         return [
             'approvedAppointments' => Appointment::with(['patient', 'procedures', 'invoice.invoiceItems'])
-                ->where('status', 'approved')
+                ->operatable()
                 ->whereDoesntHave('invoice')
                 ->where(function ($q) {
                     return $q->whereHas('consultations')
@@ -176,8 +176,11 @@ class DashboardController extends Controller
     {
         return [
             'pendingLaboratoryResults' => LaboratoryResult::with('appointment.patient')
+                ->whereHas('appointment', function ($q) {
+                    $q->operatable();
+                })
                 ->whereNull('results_file_path')
-                ->where('status', 'pending')
+                ->where('laboratory_results.status', 'pending')
                 ->latest()
                 ->limit(10)
                 ->get()

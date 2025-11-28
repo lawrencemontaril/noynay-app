@@ -81,14 +81,20 @@ class Appointment extends Model
         return Attribute::get(function () {
             return in_array($this->status, [AppointmentStatus::PENDING, AppointmentStatus::APPROVED])
                 && $this->scheduled_at->greaterThanOrEqualTo(now()->addDay())
-                    && ! $this->has_been_serviced;
+                && ! $this->has_been_serviced;
         });
     }
 
     protected function isOperatable(): Attribute
     {
+        $now = now();
+        $tomorrow = now()->copy()->addDay();
+
         return Attribute::get(
-            fn () => in_array($this->status, [AppointmentStatus::APPROVED, AppointmentStatus::COMPLETED])
+            fn () => (
+                $this->scheduled_at->between($now, $tomorrow) &&
+                in_array($this->status, [AppointmentStatus::APPROVED, AppointmentStatus::COMPLETED])
+            )
         );
     }
 
@@ -138,5 +144,15 @@ class Appointment extends Model
     protected function searchPatient(Builder $query, ?string $keyword = '')
     {
         $query->whereHas('patient', fn ($q) => $q->search($keyword));
+    }
+
+    #[Scope]
+    protected function operatable(Builder $query)
+    {
+        $now = now();
+        $tomorrow = $now->copy()->addDay();
+
+        $query->whereBetween('scheduled_at', [$now, $tomorrow])
+            ->where('status', AppointmentStatus::APPROVED);
     }
 }
