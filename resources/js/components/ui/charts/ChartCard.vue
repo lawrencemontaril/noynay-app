@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import Skeleton from '@/components/ui/skeleton/Skeleton.vue';
 import { Deferred, WhenVisible } from '@inertiajs/vue3';
-import Skeleton from './ui/skeleton/Skeleton.vue';
 
 withDefaults(
     defineProps<{
