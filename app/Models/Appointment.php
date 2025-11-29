@@ -60,14 +60,6 @@ class Appointment extends Model
     | Accessors/Mutators
     |--------------------------------------------------------------------------
     */
-    protected function scheduledAt(): Attribute
-    {
-        return Attribute::get(
-            fn (string $value) => Carbon::parse($value)
-                ->timezone('Asia/Manila')
-        );
-    }
-
     protected function isReschedulable(): Attribute
     {
         return Attribute::get(function () {
