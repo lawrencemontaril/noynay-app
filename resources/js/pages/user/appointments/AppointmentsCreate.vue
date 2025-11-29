@@ -163,10 +163,18 @@ const formSchema = [
         complaints: z.string().nullable().optional(),
         type: z.string({ required_error: 'Service field is required.' }),
     }),
-    z.object({
-        scheduled_date: z.string({ required_error: 'Date field is required.' }),
-        scheduled_time: z.string({ required_error: 'Time field is required.' }),
-    }),
+    z
+        .object({
+            scheduled_date: z.string({ required_error: 'Date field is required.' }),
+            scheduled_time: z.string({ required_error: 'Time field is required.' }),
+        })
+        .refine(
+            (data) => {
+                const scheduled = toJsDate(data.scheduled_date, data.scheduled_time);
+                return scheduled > new Date();
+            },
+            { message: 'Selected date and time must be in the future.', path: ['scheduled_time'] },
+        ),
     z.object({}),
 ];
 
@@ -190,6 +198,8 @@ const inertiaForm = useInertiaForm({
 
 const createAppointment = handleSubmit(() => {
     validate();
+
+    console.log(toJsDate(values.scheduled_date, values.scheduled_time).toISOString());
 
     if (stepIndex.value === steps.length && meta.value.valid) {
         inertiaForm.type = values.type;
