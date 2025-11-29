@@ -79,12 +79,9 @@ class Appointment extends Model
 
     protected function isOperatable(): Attribute
     {
-        $now = now();
-        $tomorrow = now()->copy()->addDay();
-
         return Attribute::get(
             fn () => (
-                $this->scheduled_at->between($now, $tomorrow) &&
+                now()->between($this->scheduled_at, $this->scheduled_at->addDay()) &&
                 in_array($this->status, [AppointmentStatus::APPROVED, AppointmentStatus::COMPLETED])
             )
         );
@@ -141,10 +138,10 @@ class Appointment extends Model
     #[Scope]
     protected function operatable(Builder $query)
     {
-        $now = now();
-        $tomorrow = $now->copy()->addDay();
-
-        $query->whereBetween('scheduled_at', [$now, $tomorrow])
-            ->where('status', AppointmentStatus::APPROVED);
+        $query->where('status', AppointmentStatus::APPROVED)
+            ->where(function (Builder $query) {
+                $query->where('scheduled_at', '<=', now())              // started
+                    ->where('scheduled_at', '>=', now()->subDay());  // not expired yet
+            });
     }
 }
