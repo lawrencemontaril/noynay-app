@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import Container from '@/components/Container.vue';
-import DataCard from '@/components/DataCard.vue';
-import DataText from '@/components/DataText.vue';
 import DeleteAppointmentDialog from '@/components/DeleteAppointmentDialog.vue';
 import EditAppointmentDialog from '@/components/EditAppointmentDialog.vue';
 import Pagination from '@/components/Pagination.vue';
 import PatientProfileTabs from '@/components/PatientProfileTabs.vue';
 import Badge from '@/components/ui/badge/Badge.vue';
 import Button from '@/components/ui/button/Button.vue';
+import { DataCard, DataText } from '@/components/ui/data';
 import { useFormatters } from '@/composables/useFormatters';
 import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
