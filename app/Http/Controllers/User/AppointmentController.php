@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Enums\AppointmentStatus;
 use App\Filters\AppointmentFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RescheduleAppointmentRequest;
@@ -60,7 +61,32 @@ class AppointmentController extends Controller
                 ->with('error', 'You cannot create new appointment. You have an unsettled appointment.');
         }
 
-        return Inertia::render('user/appointments/AppointmentsCreate');
+
+        // Fetch all relevant appointments
+        $appointments = Appointment::whereIn('status', [
+            AppointmentStatus::APPROVED,
+            AppointmentStatus::COMPLETED,
+            AppointmentStatus::PENDING,
+        ])->get();
+
+        // Build the "fully booked" structure
+        $fullSlots = [];
+
+        foreach ($appointments->groupBy(fn ($a) => $a->scheduled_at->timezone('Asia/Manila')->toDateString()) as $date => $dayAppointments) {
+
+            $times = collect($dayAppointments)
+                ->groupBy(fn ($a) => $a->scheduled_at->timezone('Asia/Manila')->format('H:i:00'))
+                ->filter(fn ($t) => $t->count() >= $appointmentService->maxAppointmentsPerSlot)
+                ->keys();
+
+            if ($times->isNotEmpty()) {
+                $fullSlots[$date] = $times->values();
+            }
+        }
+
+        return Inertia::render('user/appointments/AppointmentsCreate', [
+            'fullSlots' => $fullSlots,
+        ]);
     }
 
     /**

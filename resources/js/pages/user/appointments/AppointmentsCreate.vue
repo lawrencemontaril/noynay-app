@@ -24,8 +24,12 @@ import { getLocalTimeZone, parseDate, today } from '@internationalized/date';
 import { toTypedSchema } from '@vee-validate/zod';
 import { Check, Circle, Dot } from 'lucide-vue-next';
 import { useForm as useVeeForm } from 'vee-validate';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import * as z from 'zod';
+
+const props = defineProps<{
+    fullSlots: Record<string, string[]>;
+}>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -160,13 +164,13 @@ const availableTimesPM = availableTimes.filter((t) => t.label.includes('PM'));
 
 const formSchema = [
     z.object({
-        complaints: z.string().nullable().optional(),
+        complaints: z.string({ required_error: 'Complaints field is required.' }).nonempty('Complaint cannot be empty'),
         type: z.string({ required_error: 'Service field is required.' }),
     }),
     z
         .object({
-            scheduled_date: z.string({ required_error: 'Date field is required.' }),
-            scheduled_time: z.string({ required_error: 'Time field is required.' }),
+            scheduled_date: z.string({ required_error: 'Date field is required.' }).nonempty('Date must be selected'),
+            scheduled_time: z.string({ required_error: 'Time field is required.' }).nonempty('Time must be selected'),
         })
         .refine(
             (data) => {
@@ -179,7 +183,7 @@ const formSchema = [
 ];
 
 type FormValues = {
-    complaints?: string | null;
+    complaints: string;
     type: string;
     scheduled_date: string;
     scheduled_time: string;
@@ -192,14 +196,12 @@ const { setErrors, setFieldValue, values, validate, meta, handleSubmit } = useVe
 
 const inertiaForm = useInertiaForm({
     type: '',
-    complaints: null as undefined | string | null,
+    complaints: '',
     scheduled_at: '',
 });
 
 const createAppointment = handleSubmit(() => {
     validate();
-
-    console.log(toJsDate(values.scheduled_date, values.scheduled_time).toISOString());
 
     if (stepIndex.value === steps.length && meta.value.valid) {
         inertiaForm.type = values.type;
@@ -217,6 +219,31 @@ const createAppointment = handleSubmit(() => {
 const scheduled_date = computed({
     get: () => (values.scheduled_date ? parseDate(values.scheduled_date) : undefined),
     set: (val) => val,
+});
+
+const isTimeDisabled = (time: string) => {
+    if (!values.scheduled_date) return false;
+
+    const disabledTimes = props.fullSlots[values.scheduled_date] || [];
+    return disabledTimes.includes(time);
+};
+
+watch(
+    () => values.scheduled_date,
+    (newDate) => {
+        if (!newDate) return;
+
+        const disabledTimes = props.fullSlots[newDate] || [];
+        const current = values.scheduled_time;
+
+        if (current && disabledTimes.includes(current)) {
+            setFieldValue('scheduled_time', '');
+        }
+    },
+);
+
+const canGoNext = computed(() => {
+    return values.scheduled_date && values.scheduled_time;
 });
 </script>
 
@@ -366,6 +393,13 @@ const scheduled_date = computed({
                                                             }
                                                         }
                                                     "
+                                                    :is-date-unavailable="
+                                                        (day) => {
+                                                            const dateStr = day.toString();
+                                                            const disabledTimes = props.fullSlots[dateStr] || [];
+                                                            return disabledTimes.length >= availableTimes.length;
+                                                        }
+                                                    "
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -386,6 +420,7 @@ const scheduled_date = computed({
                                                         "
                                                         :key="time.value"
                                                         class="w-fit"
+                                                        :disabled="isTimeDisabled(time.value)"
                                                     >
                                                         {{ time.label }}
                                                     </Button>
@@ -401,6 +436,7 @@ const scheduled_date = computed({
                                                         "
                                                         :key="time.value"
                                                         class="w-fit"
+                                                        :disabled="isTimeDisabled(time.value)"
                                                     >
                                                         {{ time.label }}
                                                     </Button>
@@ -475,11 +511,12 @@ const scheduled_date = computed({
                             <Button
                                 v-if="stepIndex !== 3"
                                 :type="meta.valid ? 'button' : 'submit'"
-                                :disabled="isNextDisabled"
+                                :disabled="stepIndex === 2 ? !canGoNext : isNextDisabled"
                                 @click="meta.valid && nextStep()"
                             >
                                 Next
                             </Button>
+
                             <Button
                                 v-if="stepIndex === 3"
                                 type="submit"

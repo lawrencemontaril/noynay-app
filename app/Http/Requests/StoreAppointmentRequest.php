@@ -25,7 +25,7 @@ class StoreAppointmentRequest extends FormRequest
     {
         return [
             'complaints' => [
-                'nullable',
+                'required',
                 'string'
             ],
             'scheduled_at' => [

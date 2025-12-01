@@ -17,7 +17,7 @@ class AppointmentService
 {
     protected const DEFAULT_MAX_APPOINTMENTS_PER_SLOT = 1;
 
-    protected int $maxAppointmentsPerSlot;
+    public readonly int $maxAppointmentsPerSlot;
 
     public function __construct()
     {
