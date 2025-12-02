@@ -116,7 +116,6 @@ class DashboardController extends Controller
         return [
             'approvedAppointments' => Appointment::with('patient')
                 ->whereDoesntHave('consultations')
-                ->operatable()
                 ->whereNotIn('type', ['pregnancy_test', 'papsmear', 'cbc', 'urinalysis', 'fecalysis'])
                 ->oldest()
                 ->limit(10)
@@ -176,9 +175,6 @@ class DashboardController extends Controller
     {
         return [
             'pendingLaboratoryResults' => LaboratoryResult::with('appointment.patient')
-                ->whereHas('appointment', function ($q) {
-                    $q->operatable();
-                })
                 ->whereNull('results_file_path')
                 ->where('laboratory_results.status', 'pending')
                 ->latest()

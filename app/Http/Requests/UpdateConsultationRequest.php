@@ -34,11 +34,11 @@ class UpdateConsultationRequest extends FormRequest
                 'string'
             ],
             'assessment' => [
-                'required',
+                'nullable',
                 'string',
             ],
             'plan' => [
-                'required',
+                'nullable',
                 'string'
             ],
             'systolic' => [

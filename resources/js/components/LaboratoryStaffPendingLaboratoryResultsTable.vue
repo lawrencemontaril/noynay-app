@@ -104,6 +104,7 @@ function refreshLaboratoryResults() {
                         <Button
                             v-if="
                                 hasPermissionTo('laboratory_results:update') &&
+                                pendingLaboratoryResult.appointment?.is_operatable &&
                                 !pendingLaboratoryResult.results_file_path
                             "
                             @click="openEditLaboratoryResultDialog(pendingLaboratoryResult)"

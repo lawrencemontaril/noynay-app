@@ -126,7 +126,7 @@ const noShowAppointment = handleSubmit(() => {
             </div>
 
             <DialogFooter>
-                <template v-if="hasAnyRole(['doctor', 'laboratory_staff']) && appointment?.status === 'approved'">
+                <template v-if="hasAnyRole(['doctor', 'laboratory_staff']) && appointment?.is_operatable">
                     <Button
                         @click="
                             () => {

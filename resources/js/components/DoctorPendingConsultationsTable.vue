@@ -107,7 +107,7 @@ function refreshAppointments() {
                         </Button>
 
                         <Button
-                            v-if="hasPermissionTo('consultations:create')"
+                            v-if="hasPermissionTo('consultations:create') && approvedAppointment.is_operatable"
                             @click="openCreateConsultationDialog(approvedAppointment)"
                             size="icon"
                         >

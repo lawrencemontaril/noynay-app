@@ -47,8 +47,8 @@ const inertiaForm = useInertiaForm({
     appointment_id: props.appointment?.id,
     type: '',
     chief_complaints: '',
-    assessment: '',
-    plan: '',
+    assessment: null as string | null,
+    plan: null as string | null,
     systolic: null as number | null,
     diastolic: null as number | null,
     heart_rate: null as number | null,
@@ -65,8 +65,8 @@ const formSchema = toTypedSchema(
             appointment_id: z.number({ required_error: 'Appointment is required.' }),
             type: z.string({ required_error: 'Type field is required.' }),
             chief_complaints: z.string({ required_error: 'Chief Complaints field is required.' }),
-            assessment: z.string({ required_error: 'Assessment field is required.' }),
-            plan: z.string({ required_error: 'Plan field is required.' }),
+            assessment: z.string().nullable(),
+            plan: z.string().nullable(),
             systolic: z.number().min(70, 'Systolic too low').max(250, 'Systolic too high').nullable(),
             diastolic: z.number().min(40, 'Diastolic too low').max(150, 'Diastolic too high').nullable(),
             heart_rate: z.number().min(30, 'Heart rate too low.').max(220, 'Heart rate too high.').nullable(),
@@ -243,7 +243,7 @@ const bmiCategory = computed(() => {
                     name="assessment"
                 >
                     <FormItem>
-                        <FormLabel required>Assessment</FormLabel>
+                        <FormLabel>Assessment</FormLabel>
 
                         <FormControl>
                             <Textarea v-bind="componentField" />
@@ -258,7 +258,7 @@ const bmiCategory = computed(() => {
                     name="plan"
                 >
                     <FormItem>
-                        <FormLabel required>Plan</FormLabel>
+                        <FormLabel>Plan</FormLabel>
 
                         <FormControl>
                             <Textarea v-bind="componentField" />
