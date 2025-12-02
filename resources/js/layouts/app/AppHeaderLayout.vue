@@ -62,7 +62,7 @@ const flash = ref<any>({
             </div>
         </Transition>
 
-        <AppContent>
+        <AppContent class="gap-0">
             <slot />
         </AppContent>
     </AppShell>
