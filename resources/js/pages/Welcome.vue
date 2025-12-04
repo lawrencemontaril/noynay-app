@@ -8,61 +8,144 @@ import { onMounted, onUnmounted, ref } from 'vue';
 const services = {
     consultation: {
         label: 'Consultation',
-        children: [{ label: 'Consultation', value: 'consultation' }],
+        children: [
+            { label: 'Consultation', value: 'consultation', description: 'General consultation with a physician' },
+        ],
     },
     family_planning_service: {
         label: 'Family Planning Services',
         children: [
-            { label: 'Family Planning Counseling', value: 'family_planning_counseling' },
-            { label: 'Natural Methods (Rhythm), Pills, Depotrust', value: 'natural_methods' },
+            {
+                label: 'Family Planning Counseling',
+                value: 'family_planning_counseling',
+                description: 'Guidance on contraceptives and family planning options',
+            },
+            {
+                label: 'Natural Methods (Rhythm), Pills, Depotrust',
+                value: 'natural_methods',
+                description: 'Includes rhythm method, oral contraceptives, and Depo-Provera injections',
+            },
         ],
     },
     integrative_and_wellness: {
         label: 'Integrative and Wellness Healthcare Services',
         children: [
-            { label: 'Chelation Therapy', value: 'chelation_therapy' },
-            { label: 'Magnetic Resonance Analysis', value: 'magnetic_resonance_analysis' },
+            {
+                label: 'Chelation Therapy',
+                value: 'chelation_therapy',
+                description: 'Removal of heavy metals from the body',
+            },
+            {
+                label: 'Magnetic Resonance Analysis',
+                value: 'magnetic_resonance_analysis',
+                description: 'Non-invasive body analysis using magnetic resonance',
+            },
             {
                 label: 'Multifunctional High Potential Therapeutic Services',
                 value: 'multifunctional_high_potential_therapeutic_services',
+                description: 'Advanced therapeutic modalities for wellness improvement',
             },
-            { label: 'Weight Loss Management', value: 'weight_loss_management' },
-            { label: 'Psychosocial and Spiritual Counseling', value: 'psychosocial_and_spiritual_counseling' },
+            {
+                label: 'Weight Loss Management',
+                value: 'weight_loss_management',
+                description: 'Programs for healthy weight management',
+            },
+            {
+                label: 'Psychosocial and Spiritual Counseling',
+                value: 'psychosocial_and_spiritual_counseling',
+                description: 'Mental, emotional, and spiritual support services',
+            },
         ],
     },
     laboratory_services: {
         label: 'Laboratory Services',
         children: [
-            { label: 'Pregnancy Test', value: 'pregnancy_test' },
-            { label: 'Papsmear', value: 'papsmear' },
-            { label: 'Complete Blood Count', value: 'cbc' },
-            { label: 'Urinalysis', value: 'urinalysis' },
-            { label: 'Fecalysis', value: 'fecalysis' },
+            { label: 'Pregnancy Test', value: 'pregnancy_test', description: 'Confirm pregnancy status' },
+            { label: 'Papsmear', value: 'papsmear', description: 'Screening test for cervical cancer' },
+            { label: 'Complete Blood Count', value: 'cbc', description: 'Analysis of blood components' },
+            { label: 'Urinalysis', value: 'urinalysis', description: 'Urine test for infection or other conditions' },
+            {
+                label: 'Fecalysis',
+                value: 'fecalysis',
+                description: 'Stool examination for parasites and digestion issues',
+            },
         ],
     },
     maternal_and_child_health_services: {
         label: 'Maternal and Child Health Services',
         children: [
-            { label: 'Pre-Natal and Post-Natal Check Up', value: 'pre_natal_and_post_natal' },
-            { label: 'Normal Spontaneous Delivery', value: 'normal_spontaneous_delivery' },
-            { label: 'Immunization - BCG, HEP. B Vaccines, etc.', value: 'immunization' },
-            { label: 'Ear Piercing With Hypoallergenic Earrings', value: 'ear_pearcing' },
-            { label: 'Nebulization With and Without Medication', value: 'nebulization' },
-            { label: 'Foley Catheter Insertion', value: 'foley_catheter_insertion' },
-            { label: 'Surgical Wound Dressing', value: 'surgical_wound_dressing' },
-            { label: 'Cord Dressing', value: 'cord_dressing' },
-            { label: 'Suture Removal', value: 'suture_removal' },
-            { label: 'Issuance of Birth Certificate; Newborn Screening', value: 'issuance_of_bc_newborn_screening' },
+            {
+                label: 'Pre-Natal and Post-Natal Check Up',
+                value: 'pre_natal_and_post_natal',
+                description: 'Routine check-ups for mother before and after delivery',
+            },
+            {
+                label: 'Normal Spontaneous Delivery',
+                value: 'normal_spontaneous_delivery',
+                description: 'Natural childbirth without complications',
+            },
+            {
+                label: 'Immunization - BCG, HEP. B Vaccines, etc.',
+                value: 'immunization',
+                description: 'Vaccinations for infants and children',
+            },
+            {
+                label: 'Ear Piercing With Hypoallergenic Earrings',
+                value: 'ear_pearcing',
+                description: 'Safe ear piercing service',
+            },
+            {
+                label: 'Nebulization With and Without Medication',
+                value: 'nebulization',
+                description: 'Respiratory therapy via nebulizer',
+            },
+            {
+                label: 'Foley Catheter Insertion',
+                value: 'foley_catheter_insertion',
+                description: 'Urinary catheter insertion',
+            },
+            {
+                label: 'Surgical Wound Dressing',
+                value: 'surgical_wound_dressing',
+                description: 'Care for post-surgical wounds',
+            },
+            { label: 'Cord Dressing', value: 'cord_dressing', description: 'Umbilical cord care for newborns' },
+            { label: 'Suture Removal', value: 'suture_removal', description: 'Removal of surgical stitches' },
+            {
+                label: 'Issuance of Birth Certificate; Newborn Screening',
+                value: 'issuance_of_bc_newborn_screening',
+                description: 'Documentation and health screening for newborns',
+            },
         ],
     },
     medical_surgical_services: {
         label: 'Medical/Surgical Services',
         children: [
-            { label: 'General OPD Consultation', value: 'general_opd_consultation' },
-            { label: 'Medical / OPD / Pre-Employment Consultations', value: 'medical_opd_consultation' },
-            { label: 'Minor Surgical Procedures', value: 'minor_surgical_procedures' },
-            { label: 'Issuance of Medical Certificate', value: 'issuance_of_medical_certificate' },
-            { label: 'Pedia / Adult Immunization / Vaccination Services', value: 'pedia_adult_vaccination_services' },
+            {
+                label: 'General OPD Consultation',
+                value: 'general_opd_consultation',
+                description: 'Outpatient department consultation',
+            },
+            {
+                label: 'Medical / OPD / Pre-Employment Consultations',
+                value: 'medical_opd_consultation',
+                description: 'General health check for employment or routine purposes',
+            },
+            {
+                label: 'Minor Surgical Procedures',
+                value: 'minor_surgical_procedures',
+                description: 'Small surgical interventions',
+            },
+            {
+                label: 'Issuance of Medical Certificate',
+                value: 'issuance_of_medical_certificate',
+                description: 'Official medical certification of health',
+            },
+            {
+                label: 'Pedia / Adult Immunization / Vaccination Services',
+                value: 'pedia_adult_vaccination_services',
+                description: 'Vaccination for children and adults',
+            },
         ],
     },
 };
@@ -134,9 +217,9 @@ onUnmounted(() => {
                 class="object-cover md:h-96 md:w-full"
             />
 
-            <div class="bg-primary/15 py-8 text-center">
+            <div class="bg-accent py-8 text-center text-lg text-accent-foreground">
                 <h1 class="mb-4 text-4xl font-bold">We serve to make you better.</h1>
-                <p class="mb-6 text-lg text-zinc-700">
+                <p class="mb-6 text-lg text-accent-foreground">
                     Book appointments, manage billing, and access healthcare services anytime, anywhere.
                 </p>
 
@@ -155,7 +238,7 @@ onUnmounted(() => {
         </section>
 
         <!-- Services Section -->
-        <section class="mt-12 flex px-4">
+        <section class="flex border-x px-4 py-12">
             <!-- Navigation Sidebar -->
             <nav class="sticky top-20 hidden h-[80vh] w-64 overflow-auto pr-4 md:block">
                 <h2 class="mb-4 text-xl font-bold">Our services</h2>
@@ -185,7 +268,7 @@ onUnmounted(() => {
                     :data-key="key"
                     class="scroll-m-16"
                 >
-                    <h3 class="sticky top-0 z-10 border-b border-zinc-200 bg-white px-2 py-3 text-2xl font-bold">
+                    <h3 class="sticky top-0 z-10 border-b px-2 py-3 text-2xl font-bold">
                         {{ service.label }}
                     </h3>
 
@@ -193,7 +276,7 @@ onUnmounted(() => {
                         <div
                             v-for="child in service.children"
                             :key="child.value"
-                            class="overflow-hidden rounded-lg bg-white shadow-md"
+                            class="overflow-hidden rounded-lg border shadow-xs"
                         >
                             <img
                                 :src="`/images/services/${child.value}.jpg`"
@@ -202,8 +285,8 @@ onUnmounted(() => {
                             />
                             <div class="p-4">
                                 <h4 class="mb-2 text-lg font-semibold">{{ child.label }}</h4>
-                                <p class="text-sm text-zinc-600">
-                                    Comprehensive care and expert attention to support your health and wellness.
+                                <p class="text-sm text-zinc-600 dark:text-zinc-400">
+                                    {{ child.description }}
                                 </p>
                             </div>
                         </div>
@@ -213,9 +296,9 @@ onUnmounted(() => {
         </section>
 
         <!-- Call to Action -->
-        <section class="mt-16 bg-zinc-50 py-16 text-center">
+        <section class="bg-accent py-16 text-center text-accent-foreground">
             <h2 class="mb-4 text-2xl font-bold">Why Choose Us?</h2>
-            <p class="mx-auto mb-6 max-w-2xl text-zinc-700">
+            <p class="mx-auto mb-6 max-w-2xl">
                 Our clinic combines advanced medical technology with personalized care. Manage appointments, track
                 billing, and access specialized services all in one place—designed for your convenience.
             </p>
