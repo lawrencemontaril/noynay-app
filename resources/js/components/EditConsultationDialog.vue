@@ -13,6 +13,7 @@ import Input from '@/components/ui/input/Input.vue';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { useFormatters } from '@/composables/useFormatters';
 import { Appointment, Consultation, Patient } from '@/types';
+import { PATIENT_GENDERS } from '@/types/constants';
 import { useForm as useInertiaForm } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
 import { LoaderCircle } from 'lucide-vue-next';
@@ -38,6 +39,8 @@ function closeDialog() {
 const inertiaForm = useInertiaForm({
     appointment_id: 0,
     chief_complaints: '',
+    assessment: null as string | null,
+    plan: null as string | null,
     systolic: 0,
     diastolic: 0,
     heart_rate: 0,
@@ -46,8 +49,6 @@ const inertiaForm = useInertiaForm({
     height_cm: 0 as number | null | undefined,
     temperature_c: 0,
     oxygen_saturation: 0 as number | null | undefined,
-    assessment: '' as string | null | undefined,
-    plan: '' as string | null | undefined,
 });
 
 const formSchema = toTypedSchema(
@@ -55,8 +56,8 @@ const formSchema = toTypedSchema(
         .object({
             appointment_id: z.number({ required_error: 'Appointment is required.' }),
             chief_complaints: z.string({ required_error: 'Chief Complaints field is required.' }),
-            assessment: z.string({ required_error: 'Assessment field is required.' }),
-            plan: z.string({ required_error: 'Plan field is required.' }),
+            assessment: z.string().nullable(),
+            plan: z.string().nullable(),
             systolic: z.number().min(70, 'Systolic too low').max(250, 'Systolic too high').nullable(),
             diastolic: z.number().min(40, 'Diastolic too low').max(150, 'Diastolic too high').nullable(),
             heart_rate: z.number().min(30, 'Heart rate too low.').max(220, 'Heart rate too high.').nullable(),
@@ -168,7 +169,7 @@ const bmiCategory = computed(() => {
                     <DataCell>
                         <DataLabel>Gender</DataLabel>
                         <DataText>
-                            {{ patient?.gender }}
+                            {{ PATIENT_GENDERS.find((gender) => gender.value === patient?.gender)?.label }}
                         </DataText>
                     </DataCell>
                     <DataCell>
@@ -184,7 +185,7 @@ const bmiCategory = computed(() => {
                     name="chief_complaints"
                 >
                     <FormItem>
-                        <FormLabel>Chief Complaints</FormLabel>
+                        <FormLabel required>Chief Complaints</FormLabel>
 
                         <FormControl>
                             <Textarea
@@ -202,7 +203,7 @@ const bmiCategory = computed(() => {
                     name="assessment"
                 >
                     <FormItem>
-                        <FormLabel required>Assessment</FormLabel>
+                        <FormLabel>Assessment</FormLabel>
 
                         <FormControl>
                             <Textarea v-bind="componentField" />
@@ -217,7 +218,7 @@ const bmiCategory = computed(() => {
                     name="plan"
                 >
                     <FormItem>
-                        <FormLabel required>Plan</FormLabel>
+                        <FormLabel>Plan</FormLabel>
 
                         <FormControl>
                             <Textarea v-bind="componentField" />
