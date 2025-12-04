@@ -175,30 +175,37 @@ let observer: IntersectionObserver;
 
 onMounted(() => {
     const sections = Object.entries(categoryRefs.value)
-        .map(([key, el]) => ({ key: key as ServiceKey, el }))
-        .filter((s) => s.el !== null) as { key: ServiceKey; el: HTMLElement }[];
+        .map(([key, el]) => {
+            if (!el) return null;
+            return { key: key as ServiceKey, el };
+        })
+        .filter((s): s is { key: ServiceKey; el: HTMLElement } => s !== null);
 
     observer = new IntersectionObserver(
         () => {
-            let closestSection: { key: ServiceKey; distance: number } | null = null;
+            let closestKey: ServiceKey | null = null;
+            let closestDistance = Number.POSITIVE_INFINITY;
 
-            sections.forEach(({ key, el }) => {
+            for (const { key, el } of sections) {
                 const rect = el.getBoundingClientRect();
-                const distance = Math.abs(rect.top); // distance from top of viewport
+                const distance = Math.abs(rect.top);
 
-                if (!closestSection || distance < closestSection.distance) {
-                    closestSection = { key, distance };
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestKey = key;
                 }
-            });
-
-            if (closestSection) {
-                activeSection.value = closestSection.key;
             }
+
+            activeSection.value = closestKey;
         },
-        { threshold: [0, 0.25, 0.5, 0.75, 1] },
+        {
+            threshold: [0, 0.25, 0.5, 0.75, 1],
+        },
     );
 
-    sections.forEach(({ el }) => observer.observe(el));
+    for (const { el } of sections) {
+        observer.observe(el);
+    }
 });
 
 onUnmounted(() => {
@@ -268,7 +275,7 @@ onUnmounted(() => {
                     :data-key="key"
                     class="scroll-m-16"
                 >
-                    <h3 class="sticky top-0 z-10 border-b px-2 py-3 text-2xl font-bold">
+                    <h3 class="sticky top-16 z-10 border-b bg-background px-2 py-3 text-2xl font-bold">
                         {{ service.label }}
                     </h3>
 
