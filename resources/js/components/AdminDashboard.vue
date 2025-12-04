@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ChartCard, ChartGrid } from '@/components/ui/charts';
 import { Appointment } from '@/types';
 import AdminPendingAppointmentsTable from './AdminPendingAppointmentsTable.vue';
 
