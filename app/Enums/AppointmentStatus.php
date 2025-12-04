@@ -9,6 +9,7 @@ enum AppointmentStatus: string
     case REJECTED = 'rejected';
     case CANCELLED = 'cancelled';
     case NO_SHOW = 'no_show';
+    case EXPIRED = 'expired';
     case COMPLETED = 'completed';
 
     public function label(): string
@@ -19,6 +20,7 @@ enum AppointmentStatus: string
             self::REJECTED => 'Rejected',
             self::CANCELLED => 'Cancelled',
             self::NO_SHOW => 'No Show',
+            self::EXPIRED => 'Expired',
             self::COMPLETED => 'Completed',
         };
     }

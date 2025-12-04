@@ -12,6 +12,7 @@ export const APPOINTMENT_STATUSES: {
     { label: 'Rejected', value: 'rejected', badge: 'destructive' },
     { label: 'Cancelled', value: 'cancelled', badge: 'destructive' },
     { label: 'No Show', value: 'no_show', badge: 'destructive' },
+    { label: 'Expired', value: 'expired', badge: 'outline' },
 ];
 
 export const INVOICE_STATUSES: {

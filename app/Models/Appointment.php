@@ -140,8 +140,15 @@ class Appointment extends Model
     {
         $query->where('status', AppointmentStatus::APPROVED)
             ->where(function (Builder $query) {
-                $query->where('scheduled_at', '<=', now())              // started
-                    ->where('scheduled_at', '>=', now()->subDay());  // not expired yet
+                $query->where('scheduled_at', '<=', now())
+                    ->where('scheduled_at', '>=', now()->subDay());
             });
+    }
+
+    #[Scope]
+    protected function expired(Builder $query)
+    {
+        $query->whereIn('status', [AppointmentStatus::PENDING, AppointmentStatus::APPROVED])
+            ->where('scheduled_at', '<', now()->subDay());
     }
 }

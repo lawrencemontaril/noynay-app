@@ -44,6 +44,7 @@ class AppointmentStatusChart
                 '#FB923C',
                 '#EF4444',
                 '#D11D1D',
+                '#E0E0E0',
                 '#3B82F6',
             ])
             ->toVue();
