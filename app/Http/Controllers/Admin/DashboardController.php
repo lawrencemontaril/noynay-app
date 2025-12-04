@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\AppointmentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\Invoice;
@@ -117,6 +118,7 @@ class DashboardController extends Controller
             'approvedAppointments' => Appointment::with('patient')
                 ->whereDoesntHave('consultations')
                 ->whereNotIn('type', ['pregnancy_test', 'papsmear', 'cbc', 'urinalysis', 'fecalysis'])
+                ->whereIn('status', [AppointmentStatus::APPROVED])
                 ->oldest()
                 ->limit(10)
                 ->get()
@@ -175,8 +177,11 @@ class DashboardController extends Controller
     {
         return [
             'pendingLaboratoryResults' => LaboratoryResult::with('appointment.patient')
-                ->whereNull('results_file_path')
+                ->whereHas('appointment', function ($q) {
+                    return $q->whereIn('appointments.status', [AppointmentStatus::APPROVED, AppointmentStatus::COMPLETED]);
+                })
                 ->where('laboratory_results.status', 'pending')
+                ->whereNull('results_file_path')
                 ->latest()
                 ->limit(10)
                 ->get()
