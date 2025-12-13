@@ -81,7 +81,7 @@ class Appointment extends Model
     {
         return Attribute::get(
             fn () => (
-                now()->between($this->scheduled_at, $this->scheduled_at->addDay()) &&
+                today()->isSameDay($this->scheduled_at) &&
                 in_array($this->status, [AppointmentStatus::APPROVED, AppointmentStatus::COMPLETED])
             )
         );
@@ -139,11 +139,9 @@ class Appointment extends Model
     protected function operatable(Builder $query)
     {
         $query->where('status', AppointmentStatus::APPROVED)
-            ->where(function (Builder $query) {
-                $query->where('scheduled_at', '<=', now())
-                    ->where('scheduled_at', '>=', now()->subDay());
-            });
+            ->whereDate('scheduled_at', today());
     }
+
 
     #[Scope]
     protected function expired(Builder $query)

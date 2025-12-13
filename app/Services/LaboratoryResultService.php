@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\LaboratoryResult;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 
 class LaboratoryResultService
@@ -17,10 +18,7 @@ class LaboratoryResultService
             $data['results_file_path'] = $path;
         }
 
-        return LaboratoryResult::create([
-            'description' => $data['description'],
-            'results_file_path' => $data['results_file_path'] ?? null,
-        ]);
+        return LaboratoryResult::create(Arr::except($data, ['results_file']));
     }
 
     /**

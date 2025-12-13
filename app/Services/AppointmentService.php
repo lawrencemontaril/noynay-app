@@ -185,6 +185,7 @@ class AppointmentService
                 AppointmentStatus::COMPLETED,
                 AppointmentStatus::CANCELLED,
                 AppointmentStatus::NO_SHOW,
+                AppointmentStatus::EXPIRED
             ])
             ->exists();
     }

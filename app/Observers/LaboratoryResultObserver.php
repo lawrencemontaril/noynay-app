@@ -14,7 +14,7 @@ class LaboratoryResultObserver
     /**
      * Handle the LaboratoryResult "saving" event.
      */
-    public function saving(LaboratoryResult $laboratoryResult): void
+    public function saved(LaboratoryResult $laboratoryResult): void
     {
         $user = $laboratoryResult->appointment->patient->user;
 
