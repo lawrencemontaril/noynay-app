@@ -179,7 +179,7 @@ class DashboardController extends Controller
         return [
             'pendingLaboratoryResults' => LaboratoryResult::with('appointment.patient')
                 ->whereHas('appointment', function ($q) {
-                    return $q->operatable();
+                    return $q->whereIn('appointments.status', [AppointmentStatus::APPROVED, AppointmentStatus::COMPLETED]);
                 })
                 ->where('laboratory_results.status', LaboratoryResultStatus::PENDING)
                 ->whereNull('results_file_path')
