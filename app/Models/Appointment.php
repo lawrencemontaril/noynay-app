@@ -81,7 +81,7 @@ class Appointment extends Model
     {
         return Attribute::get(
             fn () => (
-                today()->isSameDay($this->scheduled_at) &&
+                today(tz: 'Asia/Manila')->isSameDay($this->scheduled_at->timezone('Asia/Manila')) &&
                 in_array($this->status, [AppointmentStatus::APPROVED, AppointmentStatus::COMPLETED])
             )
         );
@@ -139,7 +139,7 @@ class Appointment extends Model
     protected function operatable(Builder $query)
     {
         $query->where('status', AppointmentStatus::APPROVED)
-            ->whereDate('scheduled_at', today());
+            ->whereDate('scheduled_at', today(tz: 'Asia/Manila'));
     }
 
 
