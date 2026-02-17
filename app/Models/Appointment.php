@@ -139,7 +139,7 @@ class Appointment extends Model
     protected function operatable(Builder $query)
     {
         $query->where('status', AppointmentStatus::APPROVED)
-            ->whereDate('scheduled_at', today(tz: 'Asia/Manila'));
+            ->whereDate('scheduled_at', today());
     }
 
 
